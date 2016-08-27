@@ -7,18 +7,29 @@ SIDE_2_INDEX = 1
 
 BEST_OF = 3
 
-MATCH_STATUS_NOT_STARTED = 0
-MATCH_STATUS_IN_PROGRESS = 1
-MATCH_STATUS_COMPLETE = 2
+MATCH_STATUS_NOT_FULL = 0
+MATCH_STATUS_NOT_STARTED = 1
+MATCH_STATUS_IN_PROGRESS = 2
+MATCH_STATUS_COMPLETE = 3
 
  
 class Match():
-  def __init__(self, side_1, side_2):
-    self.__sides_tuple = (side_1, side_2)
+  def __init__(self):
+    self.__sides_tuple = (None, None)
     self.__wins_tuple = (0, 0)
     self.__losses_tupe = (0, 0)
     self.__reset_triggers_tuple = (0,0)
     #self.__match_id = 
+
+  def add_side(self, side):
+    if self.__sides_tuple[0] == None:
+      self.__sides_tuple = (side, None)
+      print "Top side added."
+    elif self.__sides_tuple[1] == None:
+      self.__sides_tuple = (self.__sides_tuple[SIDE_1_INDEX], side)
+      print "Bottom side added."
+    else:
+      print "This game is full!"
 
   def add_win(self, handle):
     side_1_wins = self.__wins_tuple[SIDE_1_INDEX]
@@ -36,6 +47,8 @@ class Match():
 
     if side_2.get_handle() == handle:
       self.__wins_tuple = (side_1_wins, side_2_wins + 1) 
+    
+    print handle + " gains a point."
 
   def add_loss(self, handle):
     side_1_losses = self.__losses_tuple[SIDE_1_INDEX]
@@ -69,11 +82,21 @@ class Match():
 
   def print_top(self):
     side = self.__sides_tuple[SIDE_1_INDEX]
+    if side == None:
+      print "This is a bye game."
+      return
+
     points = self.__wins_tuple[SIDE_1_INDEX]
     print side.get_name() + ": " + str(points)
 
   def print_bottom(self):
     side = self.__sides_tuple[SIDE_2_INDEX]
+    if side == None:
+      if self.__sides_tuple[SIDE_1_INDEX] == None:
+        print "This is a bye game."
+      else:
+        print "This side is a bye."
+      return
     points = self.__wins_tuple[SIDE_2_INDEX]
     print side.get_name() + ": " + str(points)
 
@@ -86,9 +109,19 @@ def main():
   top_player = Player("abc", "Pepe", "Rodo") 
   bottom_player = Player("ZXY", "Papi", "Chulo") 
 
-  match = Match(top_player, bottom_player)
-  #match.print_top()
-  #match.print_bottom()
+  match = Match()
+  match.print_bottom()
+  print ""
+
+  match.add_side(top_player)
+  match.print_top()
+  match.print_bottom()
+  print ""
+
+  match.add_side(bottom_player)
+  match.print_top()
+  match.print_bottom()
+  print ""
 
   match.add_win(top_player.get_handle())
 

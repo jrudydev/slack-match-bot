@@ -18,3 +18,9 @@ Find the Slack API key in the bot configuration section under Integration Settin
 ```
 > SLACK_BOT_TOKEN should be exported before running the print_bot_id.py script.
 > then, export the returned string as BOT_ID before moving on.
+
+## Run Local Bot Server
+```
+(matchbot)$ python matchbot.py
+> MatchBot connected and runing!
+```

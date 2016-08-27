@@ -36,6 +36,7 @@ def populate_tourny():
     tourny.add_player(Player(member_info["name"], profile["first_name"], profile["last_name"]))
   
   tourny.show_players()
+  tourny.get_game_indexes()
 
 def handle_command(command, channel):
   """

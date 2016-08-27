@@ -1,5 +1,5 @@
 # Slack Match Bot
-Slack MatchBot generates single and double elimination tournament brackets from all the users in the channel.
+Slack MatchBot makes a list of users in a channel and generates a single elimination tournament bracket.
 
 ## Setup Virtual Environment
 ```

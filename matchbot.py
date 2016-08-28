@@ -12,9 +12,11 @@ BOT_ID = os.environ.get("BOT_ID")
 # constants
 AT_BOT = "<@" + BOT_ID  + ">"
 ROOM_NAME = "pingpongtourny"
-EXAMPLE_COMMAND = "do"
-START_TOURNY = "start tourny"
-REPORT_WIN = "report win"
+
+HELP_COMMAND = "help"
+START_TOURNY = "start"
+PRINT_TOURNY = "print"
+REPORT_WIN = "win"
 
 tourny = Tourny()
 slack_client = SlackClient(os.environ.get('SLACK_BOT_TOKEN')) 
@@ -53,13 +55,16 @@ def handle_command(user, command, channel):
     are valid commands. If so, then acts on teh commands. If not,
     returns back what it needs for clarification.
   """
-  response = "Not sure what you mean. Use the *" + EXAMPLE_COMMAND + \
+  response = "Not sure what you mean. Use the *" + HELP_COMMAND + \
     "* command with numbers, deliminated by spaces."
-  if command.startswith(EXAMPLE_COMMAND):	
+  if command.startswith(HELP_COMMAND):	
     response = "Sure... write more code then I can do that!"
   if command.startswith(START_TOURNY):
     populate_tourny()    
     response = "Generating tournament bracket!"
+  if command.startswith(PRINT_TOURNY):
+    print "Printing trounament bracket..."
+    response = "Printing trounament bracket...\n" + tourny.get_printed_tourny()
   if command.startswith(REPORT_WIN):
     tourny.report_win(user)
     response = "Reporting win."

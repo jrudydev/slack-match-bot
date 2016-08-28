@@ -8,7 +8,8 @@ class Tourny:
   def __init__(self):
     self.__players = {}
     self.__games = []
-    self.__unassigned_players = []
+    self.__unassigned_players_top = []
+    self.__unassigned_players_bottom = []
 
   def __get_bye_games(self):
     number_of_players = len(self.__players)
@@ -28,14 +29,24 @@ class Tourny:
     top_size = bottom_size + number_of_games % 2
     return top_size, half_size - top_size, bottom_size, half_size - bottom_size
 
-  def __pop_random_unassigned_player(self):
-    number_of_players = len(self.__unassigned_players)
+  def __pop_random_unassigned_player_top(self):
+    number_of_players = len(self.__unassigned_players_top)
     if number_of_players == 0:
       return None
 
     rand_int = random.choice(range(number_of_players))
-    random_player = self.__unassigned_players[rand_int]
-    del self.__unassigned_players[rand_int]
+    random_player = self.__unassigned_players_top[rand_int]
+    del self.__unassigned_players_top[rand_int]
+    return random_player
+
+  def __pop_random_unassigned_player_bottom(self):
+    number_of_players = len(self.__unassigned_players_bottom)
+    if number_of_players == 0:
+      return None
+
+    rand_int = random.choice(range(number_of_players))
+    random_player = self.__unassigned_players_bottom[rand_int]
+    del self.__unassigned_players_bottom[rand_int]
     return random_player
   
   def add_player(self, player):
@@ -46,16 +57,22 @@ class Tourny:
     if size < 2:
       print "There are not enough players."
       return
-
+ 
+    half_size = size / 2
+    i = 0
     for key in self.__players:
-      self.__unassigned_players.append(self.__players[key])
+      if i < len(self.__players) - half_size:
+        self.__unassigned_players_top.append(self.__players[key])
+      else:
+        self.__unassigned_players_bottom.append(self.__players[key])
+      i += 1
 
     top_games, bye_games_top, bottom_games,  bye_games_bottom = self.__get_bye_games()
     for x in range(top_games):
-      first_player = self.__pop_random_unassigned_player()
+      first_player = self.__pop_random_unassigned_player_top()
       if first_player != None:
         first_player.set_match_id(x)
-      second_player = self.__pop_random_unassigned_player()
+      second_player = self.__pop_random_unassigned_player_top()
       if second_player != None:
         second_player.set_match_id(x)
 
@@ -69,10 +86,10 @@ class Tourny:
       self.__games.append(match)
 
     for x in range(bottom_games):
-      first_player = self.__pop_random_unassigned_player()
+      first_player = self.__pop_random_unassigned_player_bottom()
       if first_player != None:
         first_player.set_match_id(x + top_games + bye_games_top)
-      second_player = self.__pop_random_unassigned_player()
+      second_player = self.__pop_random_unassigned_player_bottom()
       if second_player != None:
         second_player.set_match_id(x + bottom_games + bye_games_bottom)
 
@@ -96,11 +113,18 @@ class Tourny:
     print player.get_name() + " repoted a win."
     match.add_win(user)
 
-  def print_tourny(self):
+  def get_printed_tourny(self):
+    string = ""
+    i = 1
     for match in self.__games:
-      print "Match:"
-      match.print_score()
-      print ""
+      string = "%s\nMatch: %d\n" % (string, i)
+      string = "%s%s\n" % (string, match.get_score())
+      i += 1
+    
+    return string
+
+  def print_tourny(self):
+    print self.get_printed_tourny()
 
   def show_players(self):
     for key in self.__players:

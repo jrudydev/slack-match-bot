@@ -32,21 +32,21 @@ class Match():
       print "This game is full!"
 
   def add_win(self, user):
-    side_1_wins = self.__wins_tuple[SIDE_1_INDEX]
-    side_2_wins = self.__wins_tuple[SIDE_2_INDEX]
+    frist_side_wins = self.__wins_tuple[SIDE_1_INDEX]
+    second_side_wins = self.__wins_tuple[SIDE_2_INDEX]
 
-    if side_1_wins + side_2_wins > BEST_OF:
+    if frist_side_wins + second_side_wins > BEST_OF:
       print("This game is complete.")
       return
     
-    side_1 = self.__sides_tuple[SIDE_1_INDEX]
-    side_2 = self.__sides_tuple[SIDE_2_INDEX]
+    first_side = self.__sides_tuple[SIDE_1_INDEX]
+    second_side = self.__sides_tuple[SIDE_2_INDEX]
 
-    if side_1.get_user() == user:
-      self.__wins_tuple = (side_1_wins + 1, side_2_wins) 
+    if first_side != None and first_side.get_user() == user:
+      self.__wins_tuple = (frist_side_wins + 1, second_side_wins) 
 
-    if side_2.get_user() == user:
-      self.__wins_tuple = (side_1_wins, side_2_wins + 1) 
+    if second_side != None and second_side.get_user() == user:
+      self.__wins_tuple = (frist_side_wins, second_side_wins + 1) 
     
     print user + " gains a point."
 
@@ -80,16 +80,16 @@ class Match():
 
   def request_reset(handle): return
 
-  def print_top(self):
+  def get_top(self):
     side = self.__sides_tuple[SIDE_1_INDEX]
     if side == None:
       print "This is a bye game."
       return
 
     points = self.__wins_tuple[SIDE_1_INDEX]
-    print side.get_name() + ": " + str(points)
+    return side.get_name() + ": " + str(points)
 
-  def print_bottom(self):
+  def get_bottom(self):
     side = self.__sides_tuple[SIDE_2_INDEX]
     if side == None:
       if self.__sides_tuple[SIDE_1_INDEX] == None:
@@ -98,11 +98,13 @@ class Match():
         print "This side is a bye."
       return
     points = self.__wins_tuple[SIDE_2_INDEX]
-    print side.get_name() + ": " + str(points)
+    return side.get_name() + ": " + str(points)
 
+  def get_score(self):
+    return "%s\n%s" % (self.get_top(), self.get_bottom())
+  
   def print_score(self):
-    self.print_top()
-    self.print_bottom()
+    print self.get_score()
 
 
 def main(): 
@@ -110,18 +112,18 @@ def main():
   bottom_player = Player("U234355", "ZXY", "Papi", "Chulo") 
 
   match = Match()
-  match.print_bottom()
+  print match.get_bottom()
   match.print_score()
   print ""
 
   match.add_side(top_player)
-  match.print_top()
-  match.print_bottom()
+  print match.get_top()
+  print match.get_bottom()
   print ""
 
   match.add_side(bottom_player)
-  match.print_top()
-  match.print_bottom()
+  print match.get_top()
+  print match.get_bottom()
   print ""
 
   match.add_win(top_player.get_handle())

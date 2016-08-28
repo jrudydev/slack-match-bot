@@ -13,7 +13,7 @@ Find the Slack API key in the bot configuration section under Integration Settin
 ```
 (matchbot)$ export SLACK_BOT_TOKEN='slack api token goes here'
 (matchbot)$ python print_bot_id.py
-> BA3GH56Y #returned by slack api call
+> The matchbot BOT_ID is: BA3GH56Y #returned by slack api call
 (matchbot)$ export BOT_ID='bot id returned by script'
 ```
 > SLACK_BOT_TOKEN should be exported before running the print_bot_id.py script.
@@ -24,3 +24,17 @@ Find the Slack API key in the bot configuration section under Integration Settin
 (matchbot)$ python matchbot.py
 > MatchBot connected and runing!
 ```
+
+## Slack Setup
+- Create a chennel called pingpoingtourny
+- Invite matchbot and more friends
+
+## Slack Commands
+> @matchbot <COMMAND> 
+|COMMAND|DESCRIPTION                 |
+|-------|----------------------------|
+|help   |Print a readme file         |
+|start  |Generate tournament         |
+|print  |Print tournmanet Bracket    |
+|win    |Report a win                |
+

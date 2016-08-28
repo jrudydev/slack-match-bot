@@ -45,11 +45,21 @@ MatchBot makes it easy to setup whether on you are on the web or native aplicati
 ### help
 Options: [COMMAND] = start | print | win
 
+Example:
+```
+@matchbot help win
+```
+
 Description: Use this command to pull up more information about how to use MatchBot.
 
 ---
 ### start
 Options: None
+
+Example:
+```
+@matchbot start
+```
 
 Description: Use this command to generate a tournament from all the players in the room.
 
@@ -57,11 +67,21 @@ Description: Use this command to generate a tournament from all the players in t
 ### print
 Options: [ROUND] = INT, [MATCH] = INT
 
+Example:
+```
+@matchbot print 1 4
+```
+
 Description: Use this command to print a match, round, or entire tree.
 
 ---
 ### win
 Options: None
+
+Example:
+```
+@matchbot win
+```
 
 Description: Use this command to report a win.
 

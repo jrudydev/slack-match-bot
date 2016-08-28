@@ -38,7 +38,7 @@ MatchBot makes it easy to setup whether on you are on the web or native aplicati
 |-------|----------------------------|------------------------------|
 |help   |Print a readme file         |[COMMAND] Ex: help start      |
 |start  |Generate tournament         |None                          |
-|print  |Print tournmanet Bracket    |[ROUND] <MATCH> Ex: print 1 4 |  
+|print  |Print tournmanet Bracket    |[ROUND] [MATCH] Ex: print 1 4 |  
 |win    |Report a win                |None                          |
 
 ---

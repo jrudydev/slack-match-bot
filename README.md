@@ -31,6 +31,7 @@ Find the Slack API key in the bot configuration section under Integration Settin
 
 ## Slack Commands
 > @matchbot <COMMAND> 
+
 |COMMAND|DESCRIPTION                 |
 |-------|----------------------------|
 |help   |Print a readme file         |

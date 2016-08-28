@@ -33,10 +33,19 @@ def populate_tourny():
     member_info_raw = slack_client.api_call("users.info", user=member_id)
     member_info = member_info_raw["user"]
     profile = member_info["profile"]
-    tourny.add_player(Player(member_info["name"], profile["first_name"], profile["last_name"]))
+    
+    first_name = ""
+    if "first_name" in profile:
+      first_name = profile["first_name"]
+    lase_name = ""
+    if "last_name" in profile:
+      last_name = profile["last_name"]
+    
+    tourny.add_player(Player(member_info["name"], first_name, last_name))
   
-  tourny.show_players()
-  tourny.get_game_indexes()
+  tourny.add_player(Player("yyy", "han", "solo"))
+  tourny.start_tourny()
+  tourny.print_tourny()
 
 def handle_command(command, channel):
   """

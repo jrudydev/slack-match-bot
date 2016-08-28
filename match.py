@@ -80,6 +80,15 @@ class Match():
 
   def request_reset(handle): return
 
+  def print_test(self):
+    side = self.__sides_tuple[SIDE_1_INDEX]
+    if side == None:
+      print "This is a bye game."
+      return
+    print side
+    points = self.__wins_tuple[SIDE_1_INDEX]
+    #print side.get_name() + ": " + str(points)
+
   def print_top(self):
     side = self.__sides_tuple[SIDE_1_INDEX]
     if side == None:
@@ -111,6 +120,7 @@ def main():
 
   match = Match()
   match.print_bottom()
+  match.print_score()
   print ""
 
   match.add_side(top_player)

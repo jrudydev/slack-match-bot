@@ -26,7 +26,16 @@ class Player():
     return self.__get_match_id 
 
   def get_name(self):
-    return self.__name_tuple[FNAME_INDEX] + ' ' +  self.__name_tuple[LNAME_INDEX]
+    first_name = self.__name_tuple[FNAME_INDEX]
+    last_name = self.__name_tuple[LNAME_INDEX]
+
+    if first_name == "" and last_name == "":
+      return self.__handle
+
+    if first_name == "":
+      return last_name
+    else:
+      return first_name + ' ' +  last_name
 
   def get_record(self):
     wins = self.__record_tuple[WIN_INDEX]
@@ -67,6 +76,7 @@ def main():
   first_player = Player("abcxyz", "Pepe", "Rodo")
   first_player.print_name_and_record()
   first_player.print_win_percent()
+  print(first_player.get_name())
 
 if __name__ == '__main__':
   main()

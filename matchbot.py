@@ -14,6 +14,7 @@ AT_BOT = "<@" + BOT_ID  + ">"
 ROOM_NAME = "pingpongtourny"
 EXAMPLE_COMMAND = "do"
 START_TOURNY = "start tourny"
+REPORT_WIN = "report win"
 
 tourny = Tourny()
 slack_client = SlackClient(os.environ.get('SLACK_BOT_TOKEN')) 
@@ -45,9 +46,8 @@ def populate_tourny():
   
   tourny.add_player(Player("yyy", "han", "solo"))
   tourny.start_tourny()
-  tourny.print_tourny()
 
-def handle_command(command, channel):
+def handle_command(user, command, channel):
   """
     Recieves commands directed to the bot and determins if they
     are valid commands. If so, then acts on teh commands. If not,
@@ -60,6 +60,11 @@ def handle_command(command, channel):
   if command.startswith(START_TOURNY):
     populate_tourny()    
     response = "Generating tournament bracket!"
+  if command.startswith(REPORT_WIN):
+    tourny.report_win(user)
+    response = "Reporting win."
+
+  tourny.print_tourny()
 
   slack_client.api_call("chat.postMessage", channel=channel, text=response, as_user=True)
 
@@ -73,20 +78,20 @@ def parse_slack_output(slack_rtm_output):
   output_list = slack_rtm_output
   if output_list and len(output_list) > 0:
     for output in output_list:
-      if output and 'text' in output and AT_BOT in output['text']:
-        # return text after the @ mention, whitespace rempoved
-        return output['text'].split(AT_BOT)[1].strip(':').lower(), output['channel']
+      if output and 'text' in output and AT_BOT in output['text'] and 'user' in output:
+        # return text after the @ mention, whitespace removed
+        return output['user'], output['text'].split(AT_BOT)[1].strip(' ').lower(), output['channel']
 
-  return None, None
+  return None, None, None
 
 def main():
   READ_WEBSOCKET_DELAY = 1 # 1 second delay between reading from firehose
   if slack_client.rtm_connect():
     print("MatchBot connected and runing!")
     while True:
-      command, channel = parse_slack_output(slack_client.rtm_read())
+      user, command, channel = parse_slack_output(slack_client.rtm_read())
       if command and channel:
-        handle_command(command, channel)
+        handle_command(user, command, channel)
       time.sleep(READ_WEBSOCKET_DELAY)
   else:
     print("Connection failed. Invalide Slack token or bot ID")

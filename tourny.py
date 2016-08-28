@@ -68,6 +68,11 @@ class Tourny:
       match = Match()
       self.__games.append(match)
 
+  def report_win(self, user):
+    #player = self.__players[user]
+    #player.print_name()
+    pass
+
   def print_tourny(self):
     for match in self.__games:
       print "Match:"

@@ -42,9 +42,9 @@ def populate_tourny():
     if "last_name" in profile:
       last_name = profile["last_name"]
     
-    tourny.add_player(Player(member_info["name"], first_name, last_name))
+    tourny.add_player(Player(member_info["id"], member_info["name"], first_name, last_name))
   
-  tourny.add_player(Player("yyy", "han", "solo"))
+  tourny.add_player(Player("U2134134", "yyy", "han", "solo"))
   tourny.start_tourny()
 
 def handle_command(user, command, channel):

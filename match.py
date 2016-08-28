@@ -24,14 +24,14 @@ class Match():
   def add_side(self, side):
     if self.__sides_tuple[0] == None:
       self.__sides_tuple = (side, None)
-      print "Top side added."
+      print "Player added added."
     elif self.__sides_tuple[1] == None:
       self.__sides_tuple = (self.__sides_tuple[SIDE_1_INDEX], side)
-      print "Bottom side added."
+      print "Player added added."
     else:
       print "This game is full!"
 
-  def add_win(self, handle):
+  def add_win(self, user):
     side_1_wins = self.__wins_tuple[SIDE_1_INDEX]
     side_2_wins = self.__wins_tuple[SIDE_2_INDEX]
 
@@ -42,15 +42,15 @@ class Match():
     side_1 = self.__sides_tuple[SIDE_1_INDEX]
     side_2 = self.__sides_tuple[SIDE_2_INDEX]
 
-    if side_1.get_handle() == handle:
+    if side_1.get_user() == user:
       self.__wins_tuple = (side_1_wins + 1, side_2_wins) 
 
-    if side_2.get_handle() == handle:
+    if side_2.get_user() == user:
       self.__wins_tuple = (side_1_wins, side_2_wins + 1) 
     
-    print handle + " gains a point."
+    print user + " gains a point."
 
-  def add_loss(self, handle):
+  def add_loss(self, user):
     side_1_losses = self.__losses_tuple[SIDE_1_INDEX]
     side_2_losses = self.__losses_tuple[SIDE_2_INDEX]
 
@@ -61,10 +61,10 @@ class Match():
     side_1 = self.__sides_tuple[SIDE_1_INDEX]
     side_2 = self.__sides_tuple[SIDE_2_INDEX]
 
-    if side_1.get_handle() == handle:
+    if side_1.get_handle() == user:
       self.__losses_tuple = (side_1_losses + 1, side_2_losses) 
 
-    if side_2.get_handle() == handle:
+    if side_2.get_handle() == user:
       self.__losses_tuple = (side_1_losses, side_2_losses + 1) 
 
   def match_status(self):
@@ -79,15 +79,6 @@ class Match():
       return MATCH_STATUS_IN_PROGRESS
 
   def request_reset(handle): return
-
-  def print_test(self):
-    side = self.__sides_tuple[SIDE_1_INDEX]
-    if side == None:
-      print "This is a bye game."
-      return
-    print side
-    points = self.__wins_tuple[SIDE_1_INDEX]
-    #print side.get_name() + ": " + str(points)
 
   def print_top(self):
     side = self.__sides_tuple[SIDE_1_INDEX]
@@ -115,8 +106,8 @@ class Match():
 
 
 def main(): 
-  top_player = Player("abc", "Pepe", "Rodo") 
-  bottom_player = Player("ZXY", "Papi", "Chulo") 
+  top_player = Player("U234135", "abc", "Pepe", "Rodo") 
+  bottom_player = Player("U234355", "ZXY", "Papi", "Chulo") 
 
   match = Match()
   match.print_bottom()

@@ -16,6 +16,9 @@ class Tourny:
     if number_of_players % 2 == 1:
       number_of_games += 1
 
+    if number_of_games == 1:
+      return 1, 0, 0, 0
+
     size = 2
     while size < number_of_games:
       size *= 2
@@ -36,7 +39,7 @@ class Tourny:
     return random_player
   
   def add_player(self, player):
-    self.__players[player.get_handle()] = player
+    self.__players[player.get_user()] = player
        
   def start_tourny(self):
     size = len(self.__players)
@@ -49,9 +52,16 @@ class Tourny:
 
     top_games, bye_games_top, bottom_games,  bye_games_bottom = self.__get_bye_games()
     for x in range(top_games):
+      first_player = self.__pop_random_unassigned_player()
+      if first_player != None:
+        first_player.set_match_id(x)
+      second_player = self.__pop_random_unassigned_player()
+      if second_player != None:
+        second_player.set_match_id(x)
+
       match = Match()
-      match.add_side(self.__pop_random_unassigned_player())
-      match.add_side(self.__pop_random_unassigned_player())
+      match.add_side(first_player)
+      match.add_side(second_player)
       self.__games.append(match)
    
     for x in range(bye_games_top):
@@ -59,9 +69,16 @@ class Tourny:
       self.__games.append(match)
 
     for x in range(bottom_games):
+      first_player = self.__pop_random_unassigned_player()
+      if first_player != None:
+        first_player.set_match_id(x + top_games + bye_games_top)
+      second_player = self.__pop_random_unassigned_player()
+      if second_player != None:
+        second_player.set_match_id(x + bottom_games + bye_games_bottom)
+
       match = Match()
-      match.add_side(self.__pop_random_unassigned_player())
-      match.add_side(self.__pop_random_unassigned_player())
+      match.add_side(first_player)
+      match.add_side(second_player)
       self.__games.append(match)
 
     for x in range(bye_games_bottom):
@@ -69,14 +86,21 @@ class Tourny:
       self.__games.append(match)
 
   def report_win(self, user):
-    #player = self.__players[user]
-    #player.print_name()
-    pass
+    if user not in self.__players:
+      print "Player not found."
+      return
+
+    player = self.__players[user]
+    game_id = player.get_match_id()
+    match = self.__games[game_id]
+    print player.get_name() + " repoted a win."
+    match.add_win(user)
 
   def print_tourny(self):
     for match in self.__games:
       print "Match:"
       match.print_score()
+      print ""
 
   def show_players(self):
     for key in self.__players:
@@ -87,9 +111,18 @@ class Tourny:
 
 def main():
   tourny = Tourny()
-  tourny.add_player(Player("abc", "fabc", "labc"))
-  tourny.add_player(Player("def", "fdef", "ldef"))
+  tourny.add_player(Player("U123", "abc", "fabc", "labc"))
+  tourny.add_player(Player("U456", "def", "fdef", "ldef"))
+
   tourny.start_tourny()
+  print ""
+  
+  tourny.print_tourny()
+  print ""
+
+  tourny.report_win("U123")
+  print ""
+
   tourny.print_tourny()
 
 if __name__ == '__main__':

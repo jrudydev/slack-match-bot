@@ -10,7 +10,8 @@ LOSS_INDEX = 1
 
 class Player():
 
-  def __init__(self, handle, fname, lname):
+  def __init__(self, user,  handle, fname, lname):
+    self.__user = user
     self.__handle = handle
     self.__name_tuple = (fname, lname)
     self.__record_tuple = (0, 0)
@@ -19,11 +20,14 @@ class Player():
   def set_match_id(self, id):
     self.__match_id = id
 
+  def get_user(self):
+    return self.__user
+
   def get_handle(self):
     return self.__handle
 
   def get_match_id(self):
-    return self.__get_match_id 
+    return self.__match_id 
 
   def get_name(self):
     first_name = self.__name_tuple[FNAME_INDEX]
@@ -73,7 +77,7 @@ class Player():
  
 
 def main():
-  first_player = Player("abcxyz", "Pepe", "Rodo")
+  first_player = Player("U2343255", "abcxyz", "Pepe", "Rodo")
   first_player.print_name_and_record()
   first_player.print_win_percent()
   print(first_player.get_name())

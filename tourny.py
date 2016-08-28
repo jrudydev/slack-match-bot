@@ -103,6 +103,10 @@ class Tourny:
       self.__games.append(match)
 
   def report_win(self, user):
+    if len(self.__games) == 0:
+      print "The tournament has not started."
+      return
+
     if user not in self.__players:
       print "Player not found."
       return
@@ -113,7 +117,26 @@ class Tourny:
     print player.get_name() + " repoted a win."
     match.add_win(user)
 
+  def report_loss(self, user):
+    if len(self.__games) == 0:
+      print "The tournament has not started."
+      return
+      
+    if user not in self.__players:
+      print "Player not found."
+      return
+
+    player = self.__players[user]
+    game_id = player.get_match_id()
+    match = self.__games[game_id]
+    print player.get_name() + " repoted a loss."
+    match.add_loss(user)
+
   def get_printed_tourny(self):
+    if len(self.__games) == 0:
+      print "The tournament has not started."
+      return
+
     string = ""
     i = 1
     for match in self.__games:

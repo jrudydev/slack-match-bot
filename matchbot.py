@@ -2,10 +2,8 @@
 
 import os
 import json
-
 from slackclient import SlackClient
 import time
-
 from tourny import Tourny
 from player import Player
 
@@ -13,7 +11,6 @@ BOT_ID = os.environ.get("BOT_ID")
 
 # constants
 AT_BOT = "<@" + BOT_ID  + ">"
-ROOM_NAME = "pingpongtourny"
 
 HELP_COMMAND = "help"
 START_TOURNY = "start"
@@ -24,32 +21,43 @@ tourny = Tourny()
 slack_client = SlackClient(os.environ.get('SLACK_BOT_TOKEN')) 
 
 def populate_tourny():
-  json_raw = slack_client.api_call("channels.list")
-  for channel in json_raw['channels']:
-    if str(channel['name']) == "pingpongtourny":
-      channel_id = str(channel['id'])
-  
+  channel_id = None
+  api_call = slack_client.api_call("channels.list")
+  if api_call.get('ok'):
+    # retrieve all channels so we can find our bot
+    channels = api_call.get('channels')
+    for channel in channels:
+      print channel
+      if 'is_member' in channel and channel.get('is_member') == True:
+        channel_id = channel.get('is_memeber')
+        print "Bot channel found."
+
   if not channel_id:
+    print "Bot not a member of any channels."
     return
 
-  channel_info_raw = slack_client.api_call("channels.info", channel=channel_id)
-  channel_info = channel_info_raw["channel"]
-  for member_id in channel_info["members"]:
-    member_info_raw = slack_client.api_call("users.info", user=member_id)
-    member_info = member_info_raw["user"]
-    profile = member_info["profile"]
-    
-    first_name = ""
-    if "first_name" in profile:
-      first_name = profile["first_name"]
-    lase_name = ""
-    if "last_name" in profile:
-      last_name = profile["last_name"]
-    
-    tourny.add_player(Player(member_info["id"], member_info["name"], first_name, last_name))
-  
-  tourny.add_player(Player("U2134134", "yyy", "han", "solo"))
-  tourny.start_tourny()
+  api_call = slack_client.api_call("channels.info", channel=channel_id)
+  if api_call.get('ok'):
+    # retrieve channel info so we can find all the members
+    members = api_call.get('channel').get('members')
+    for member_id in members:
+       api_call = slack_client.api_call("users.info", user=member_id)
+       if api_call.get('ok'):
+          # retrieve user info so we can get profile
+          member_info = api_call.get('user')
+          profile = api_call.get('profile')
+
+          first_name = ""
+          if "first_name" in profile:
+            first_name = profile.get("first_name")
+          lase_name = ""
+          if "last_name" in profile:
+            last_name = profile.get("last_name")
+
+          tourny.add_player(Player(member_info["id"], member_info["name"], first_name, last_name))
+
+    tourny.add_player(Player("U2134134", "yyy", "han", "solo"))
+    tourny.start_tourny()
 
 def handle_command(user, command, channel):
   """

@@ -24,13 +24,15 @@ Find the Slack API key in the bot configuration section under Integration Settin
 (matchbot)$ python matchbot.py
 > MatchBot connected and runing!
 ```
+# Slack Client
+MatchBot makes it easy to setup whether on you are on the web or native aplication.
 
-## Slack Setup
-- Create a chennel called pingpoingtourny
+## Setup
+- Create a channel called pingpongtourny
 - Invite matchbot and more friends
 
-## Slack Commands
-> @matchbot <COMMAND> 
+## Commands
+> @matchbot [COMMAND] 
 
 |COMMAND|DESCRIPTION                 |
 |-------|----------------------------|

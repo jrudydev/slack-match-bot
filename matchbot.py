@@ -1,9 +1,11 @@
 #!/usr/bin/python
 
 import os
-import time
 import json
+
 from slackclient import SlackClient
+import time
+
 from tourny import Tourny
 from player import Player
 

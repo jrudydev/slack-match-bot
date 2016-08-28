@@ -36,26 +36,30 @@ MatchBot makes it easy to setup whether on you are on the web or native aplicati
 
 |COMMAND|DESCRIPTION                 |OPTIONS                       |
 |-------|----------------------------|------------------------------|
-|help   |Print a readme file         |<COMMAND> Ex: help start      |
+|help   |Print a readme file         |[COMMAND] Ex: help start      |
 |start  |Generate tournament         |None                          |
-|print  |Print tournmanet Bracket    |<ROUND> <MATCH> Ex: print 1 4 |  
+|print  |Print tournmanet Bracket    |[ROUND] <MATCH> Ex: print 1 4 |  
 |win    |Report a win                |None                          |
+
 ---
 ### help
-Options: <COMMAND> = start | print | win
+Options: [COMMAND] = start | print | win
 
 Description: Use this command to pull up more information about how to use MatchBot.
 
+---
 ### start
 Options: None
 
 Description: Use this command to generate a tournament from all the players in the room.
 
+---
 ### print
-Options: <ROUND> = INT, <MATCH> = INT
+Options: [ROUND] = INT, [MATCH] = INT
 
 Description: Use this command to print a match, round, or entire tree.
 
+---
 ### win
 Options: None
 

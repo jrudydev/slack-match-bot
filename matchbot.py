@@ -14,6 +14,7 @@ AT_BOT = "<@" + BOT_ID  + ">"
 ROOM_NAME = "pingpongtourny"
 EXAMPLE_COMMAND = "do"
 START_TOURNY = "start tourny"
+PRINT_TOURNY = "print tourny"
 REPORT_WIN = "report win"
 
 tourny = Tourny()
@@ -60,6 +61,9 @@ def handle_command(user, command, channel):
   if command.startswith(START_TOURNY):
     populate_tourny()    
     response = "Generating tournament bracket!"
+  if command.startswith(PRINT_TOURNY):
+    print "Printing trounament bracket..."
+    response = "Printing trounament bracket...\n" + tourny.get_printed_tourny()
   if command.startswith(REPORT_WIN):
     tourny.report_win(user)
     response = "Reporting win."

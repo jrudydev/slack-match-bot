@@ -2,6 +2,7 @@
 
 from player import Player
 from match import Match
+from match import MATCH_STATUS_COMPLETE
 import random
 
 class Tourny:
@@ -57,7 +58,8 @@ class Tourny:
     if size < 2:
       print "There are not enough players."
       return
- 
+
+    self.__games = []
     half_size = size / 2
     i = 0
     for key in self.__players:
@@ -102,20 +104,32 @@ class Tourny:
       match = Match()
       self.__games.append(match)
 
+    self.print_tourny()
+
   def report_win(self, user):
+    output = ""
     if len(self.__games) == 0:
-      print "The tournament has not started."
-      return
+      output = "The tournament has not started."
+      print output
+      return output
 
     if user not in self.__players:
-      print "Player not found."
-      return
-
+      output = "Player not found."
+      print output
+      return output
+    
     player = self.__players[user]
     game_id = player.get_match_id()
     match = self.__games[game_id]
-    print player.get_name() + " repoted a win."
     match.add_win(user)
+
+    if match.match_status() == MATCH_STATUS_COMPLETE:
+      output = player.get_name() + " wins the match."
+    else:
+      output = player.get_name() + " repoted a win."
+
+    print output
+    return output
 
   def report_loss(self, user):
     if len(self.__games) == 0:
@@ -133,11 +147,12 @@ class Tourny:
     match.add_loss(user)
 
   def get_printed_tourny(self):
-    if len(self.__games) == 0:
-      print "The tournament has not started."
-      return
-
     string = ""
+    if len(self.__games) == 0:
+      output = "The tournament has not started."
+      print output
+      return output
+
     i = 1
     for match in self.__games:
       string = "%s\nMatch: %d\n" % (string, i)

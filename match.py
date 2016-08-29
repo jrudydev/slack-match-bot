@@ -32,61 +32,62 @@ class Match():
       print "This game is full!"
 
   def add_win(self, user):
-    frist_side_wins = self.__wins_tuple[SIDE_1_INDEX]
-    second_side_wins = self.__wins_tuple[SIDE_2_INDEX]
-
-    if frist_side_wins + second_side_wins > BEST_OF:
+    if self.match_status() == MATCH_STATUS_COMPLETE:
       print("This game is complete.")
       return
 
-    if self.__match_status() == MATCH_STATUS_NOT_FULL:
+    if self.match_status() == MATCH_STATUS_NOT_FULL:
       print("Cannot win a bye game.")
       return
     
     first_side = self.__sides_tuple[SIDE_1_INDEX]
     second_side = self.__sides_tuple[SIDE_2_INDEX]
+    first_side_wins = self.__wins_tuple[SIDE_1_INDEX]
+    second_side_wins = self.__wins_tuple[SIDE_2_INDEX]
 
     name = ""
     if first_side.get_user() == user:
-      self.__wins_tuple = (frist_side_wins + 1, second_side_wins)
+      self.__wins_tuple = (first_side_wins + 1, second_side_wins)
       name = first_side.get_name()
 
     if second_side.get_user() == user:
-      self.__wins_tuple = (frist_side_wins, second_side_wins + 1) 
+      self.__wins_tuple = (first_side_wins, second_side_wins + 1) 
       name = second_side.get_name()
     
     print name + " gains a point."
 
   def add_loss(self, user):
-    side_1_losses = self.__losses_tuple[SIDE_1_INDEX]
-    side_2_losses = self.__losses_tuple[SIDE_2_INDEX]
-
-    if side_1_losses + side_2_losses > BEST_OF:
+    if self.match_status() == MATCH_STATUS_COMPLETE:
       print("This game is complete.")
       return
-    
-    if self.__match_status() == MATCH_STATUS_NOT_FULL:
-      print("Cannot loss a bye game.")
-      return
 
-    side_1 = self.__sides_tuple[SIDE_1_INDEX]
-    side_2 = self.__sides_tuple[SIDE_2_INDEX]
+    if self.match_status() == MATCH_STATUS_NOT_FULL:
+      print("Cannot win a bye game.")
+      return
+    
+    first_side = self.__sides_tuple[SIDE_1_INDEX]
+    second_side = self.__sides_tuple[SIDE_2_INDEX]
+    first_side_losses = self.__losses_tuple[SIDE_1_INDEX]
+    second_side_losses = self.__losses_tuple[SIDE_2_INDEX]
 
     if side_1.get_handle() == user:
-      self.__losses_tuple = (side_1_losses + 1, side_2_losses) 
+      self.__losses_tuple = (first_side_losses + 1, second_side_losses) 
 
     if side_2.get_handle() == user:
-      self.__losses_tuple = (side_1_losses, side_2_losses + 1) 
+      self.__losses_tuple = (first_side_losses, second_side_losses + 1) 
 
-  def __match_status(self):
+  def match_status(self):
+    first_side = self.__sides_tuple[SIDE_1_INDEX]
+    second_side = self.__sides_tuple[SIDE_2_INDEX]
     side_1_points = self.__wins_tuple[SIDE_1_INDEX]
-    side_2_points = self.__wins_tuple[SODE_2_INDEX]
- 
-    if frist_side == None or second_side == None:
+    side_2_points = self.__wins_tuple[SIDE_2_INDEX]
+
+    games_to_win = BEST_OF - 1
+    if first_side == None or second_side == None:
       return MATCH_STATUS_NOT_FULL
     if side_1_points == 0 and side_2_points == 0:
       return MATCH_STATUS_NOT_STARTED
-    if side_1_points + side_2_points > BEST_OF:
+    if side_1_points >= games_to_win or side_2_points >= games_to_win:
       return MATCH_STATUS_COMPLETE
     else:
       return MATCH_STATUS_IN_PROGRESS

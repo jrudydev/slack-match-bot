@@ -27,9 +27,8 @@ def populate_tourny():
     # retrieve all channels so we can find our bot
     channels = api_call.get('channels')
     for channel in channels:
-      print channel
       if 'is_member' in channel and channel.get('is_member') == True:
-        channel_id = channel.get('is_memeber')
+        channel_id = channel.get('id')
         print "Bot channel found."
 
   if not channel_id:
@@ -45,8 +44,8 @@ def populate_tourny():
        if api_call.get('ok'):
           # retrieve user info so we can get profile
           member_info = api_call.get('user')
-          profile = api_call.get('profile')
-
+          profile = member_info.get('profile')
+        
           first_name = ""
           if "first_name" in profile:
             first_name = profile.get("first_name")
@@ -58,6 +57,7 @@ def populate_tourny():
 
     tourny.add_player(Player("U2134134", "yyy", "han", "solo"))
     tourny.start_tourny()
+    tourny.print_tourny()
 
 def handle_command(user, command, channel):
   """
@@ -71,15 +71,12 @@ def handle_command(user, command, channel):
     response = "Sure... write more code then I can do that!"
   if command.startswith(START_TOURNY):
     populate_tourny()    
-    response = "Generating tournament bracket!"
+    response = "Generating tournament bracket...\n" + tourny.get_printed_tourny()
   if command.startswith(PRINT_TOURNY):
-    print "Printing trounament bracket..."
     response = "Printing trounament bracket...\n" + tourny.get_printed_tourny()
   if command.startswith(REPORT_WIN):
-    tourny.report_win(user)
-    response = "Reporting win."
+    response = "Reporting win...\n" + tourny.report_win(user)
 
-  tourny.print_tourny()
 
   slack_client.api_call("chat.postMessage", channel=channel, text=response, as_user=True)
 

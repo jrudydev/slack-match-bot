@@ -45,7 +45,6 @@ def populate_tourny():
           # retrieve user info so we can get profile
           member_info = api_call.get('user')
           profile = member_info.get('profile')
-        
           first_name = ""
           if "first_name" in profile:
             first_name = profile.get("first_name")
@@ -73,7 +72,7 @@ def handle_command(user, command, channel):
     populate_tourny()    
     response = "Generating tournament bracket...\n" + tourny.get_printed_tourny()
   if command.startswith(PRINT_TOURNY):
-    response = "Printing trounament bracket...\n" + tourny.get_printed_tourny()
+    response = "Printing tournament bracket...\n" + tourny.get_printed_tourny()
   if command.startswith(REPORT_WIN):
     response = "Reporting win...\n" + tourny.report_win(user)
 

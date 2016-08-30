@@ -56,26 +56,6 @@ class Match():
     
     print name + " gains a point."
 
-  def add_loss(self, user):
-    if self.match_status() == MATCH_STATUS_COMPLETE:
-      print("This game is complete.")
-      return
-
-    if self.match_status() == MATCH_STATUS_NOT_FULL:
-      print("Cannot win a bye game.")
-      return
-    
-    first_side = self.__sides_tuple[SIDE_1_INDEX]
-    second_side = self.__sides_tuple[SIDE_2_INDEX]
-    first_side_losses = self.__losses_tuple[SIDE_1_INDEX]
-    second_side_losses = self.__losses_tuple[SIDE_2_INDEX]
-
-    if side_1.get_handle() == user:
-      self.__losses_tuple = (first_side_losses + 1, second_side_losses) 
-
-    if side_2.get_handle() == user:
-      self.__losses_tuple = (first_side_losses, second_side_losses + 1) 
-
   def match_status(self):
     first_side = self.__sides_tuple[SIDE_1_INDEX]
     second_side = self.__sides_tuple[SIDE_2_INDEX]
@@ -91,6 +71,9 @@ class Match():
       return MATCH_STATUS_COMPLETE
     else:
       return MATCH_STATUS_IN_PROGRESS
+
+  def is_complete(self):
+    return self.match_status() == MATCH_STATUS_COMPLETE
 
   def request_reset(handle): return
 

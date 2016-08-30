@@ -91,44 +91,33 @@ class Tourny:
     self.print_tourny()
 
   def report_win(self, user):
-    output = ""
     if len(self.__games) == 0:
-      output = "The tournament has not started."
-      print output
-      return output
+      return "The tournament has not started."
 
     if user not in self.__players:
-      output = "Player not found."
-      print output
-      return output
+      return "Player not found."
     
     player = self.__players[user]
     game_id = player.get_match_id()
     match = self.__games[game_id]
     match.add_win(user)
 
+    response = ""
     if match.match_status() == MATCH_STATUS_COMPLETE:
-      output = player.get_name() + " wins the match."
+      response = player.get_name() + " wins the match."
     else:
-      output = player.get_name() + " repoted a win."
+      response = player.get_name() + " repoted a win"
 
-    print output
-    return output
+    if len(self.__games) == 1 and self.is_complete():
+      response += " and is the champion!"
+    else:
+      response += "."
 
-  def report_loss(self, user):
-    if len(self.__games) == 0:
-      print "The tournament has not started."
-      return
-      
-    if user not in self.__players:
-      print "Player not found."
-      return
+    return response
 
-    player = self.__players[user]
-    game_id = player.get_match_id()
-    match = self.__games[game_id]
-    print player.get_name() + " repoted a loss."
-    match.add_loss(user)
+  def next_rount(sef):
+    if self.is_complete():
+      print "Advance to the next round"
 
   def get_printed_tourny(self):
     string = ""
@@ -156,6 +145,13 @@ class Tourny:
 
   def get_size(self):
     return len(self.__players)
+
+  def is_complete(self):
+    for match in self.__games:
+      if match.is_complete() == False:
+        return False
+    
+    return True
 
 
 def main():

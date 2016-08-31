@@ -17,9 +17,7 @@ class Match():
   def __init__(self):
     self.__sides_tuple = (None, None)
     self.__wins_tuple = (0, 0)
-    self.__losses_tupe = (0, 0)
     self.__reset_triggers_tuple = (0,0)
-    #self.__match_id = 
 
   def add_side(self, side):
     if self.__sides_tuple[0] == None:
@@ -55,6 +53,12 @@ class Match():
       name = second_side.get_name()
     
     print name + " gains a point."
+
+  def set_match_ids(self, match_id):
+    top_side = self.__sides_tuple[SIDE_1_INDEX]
+    bottom_side = self.__sides_tuple[SIDE_2_INDEX]
+    top_side.set_match_id(match_id)
+    bottom_side.set_match_id(match_id)
 
   def match_status(self):
     first_side = self.__sides_tuple[SIDE_1_INDEX]

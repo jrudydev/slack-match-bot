@@ -6,8 +6,8 @@ import random
 
 class TournyNode(object):
   def __init__(self, key):
-    self.match = None
     self.key = key
+    self.match = None
     self.left = None
     self.right = None
 
@@ -21,6 +21,9 @@ class TournyNode(object):
 class TournyTree(object):
   def __init__(self):
     self.node = None
+    self.__players = {}
+    self.__games = []
+    self.__round = 1
 
   def __get_height(self, players):
     height = 1
@@ -31,8 +34,8 @@ class TournyTree(object):
 
     return height
 
-  def insert_matches(self, players, count):
-    n = TournyNode(players)
+  def insert_matches(self, key, count, players):
+    n = TournyNode(key)
     if not self.node:
       self.node = n
       self.node.left = TournyTree()
@@ -40,39 +43,23 @@ class TournyTree(object):
       self.node.match = Match()
       
       if count > 1:
-        half = players / 2
-        self.node.right.insert_matches(half, count - 1)
+        half = key / 2
+        self.node.right.insert_matches(half, count - 1, players)
 
-        if players % 2 == 1: half += 1
-        self.node.left.insert_matches(half, count - 1)
+        if key % 2 == 1: half += 1
+        self.node.left.insert_matches(half, count - 1, players)
+      else:
+        for x in range(self.node.key):
+          # pop a random player
+          number_of_players = len(players)
+          if number_of_players == 0:
+            return None
 
-  def insert_players(self, players):
-    result = []
+          rand_int = random.choice(range(number_of_players))
+          random_player = players[rand_int]
+          del players[rand_int]
 
-    if not self.node:
-      return result
-
-    result.extend(self.node.left.insert_players(players))
-    if self.node.left.node == None or self.node.right.node == None:
-      match_id = len(players) - 1
-      for x in range(self.node.key):
-        # pop a random player
-        number_of_players = len(players)
-        if number_of_players == 0:
-          return None
-
-        rand_int = random.choice(range(number_of_players))
-        random_player = players[rand_int]
-        del players[rand_int]
-
-        random_player.set_match_id(match_id)
-        self.node.match.add_side(random_player)
-      
-
-      result.append(self.node.match)
-    result.extend(self.node.right.insert_players(players))
-
-    return result
+          self.node.match.add_side(random_player)
 
   def inorder_traverse(self):
     result = []
@@ -87,20 +74,45 @@ class TournyTree(object):
 
     return result
 
+  def __set_round(self, round):
+
+    #!!! Need to traverse only to round height
+
+    self.__games = tree.inorder_traverse()
+    for x in range(len(self.__games)):
+      self.__games[x].set_match_ids(x)
+
   def generate(self, players):
     number_of_players = len(players)
-    tree.insert_matches(number_of_players, self.__get_height(number_of_players))
-    tree.insert_players(players)
+    
+    self.node = None
+    tree.insert_matches(
+      number_of_players, 
+      self.__get_height(number_of_players),
+      players)
+
+    self.__set_round(self.__round)
   
 
 if __name__ == '__main__':
   tree = TournyTree()
+  first_player = Player("U555", "jru", "ru", "go")
 
   players = [
+    first_player,
     Player("U123", "abc", "fabc", "labc"), 
     Player("U456", "def", "fdef", "ldef"), 
     Player("U789", "efg", "fefg", "lefg")]
   tree.generate(players)
+
+  games = tree.inorder_traverse()
+  for match in games:
+    print match.get_score()
+
+  print str(first_player.get_match_id())
+  print ""
+
+  games[first_player.get_match_id()].add_win("U555")
 
   games = tree.inorder_traverse()
   for match in games:

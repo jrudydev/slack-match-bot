@@ -12,50 +12,83 @@ BOT_ID = os.environ.get("BOT_ID")
 # constants
 AT_BOT = "<@" + BOT_ID  + ">"
 
-HELP_COMMAND = "help"
+# admin commands
 START_TOURNY = "start"
+REPORT_QUIT = "boot"
+NEXT_ROUND = "next"
+
+# user commmands
+HELP_COMMAND = "help"
 PRINT_TOURNY = "show"
 REPORT_WIN = "win"
 
 tourny = Tourny()
-slack_client = SlackClient(os.environ.get('SLACK_BOT_TOKEN')) 
+slack_client = SlackClient(os.environ.get('SLACK_BOT_TOKEN'))
 
-def populate_tourny():
-  channel_id = None
+def __get_bot_channel_id():
+  bot_channel_id = None
   api_call = slack_client.api_call("channels.list")
   if api_call.get('ok'):
     # retrieve all channels so we can find our bot
     channels = api_call.get('channels')
     for channel in channels:
       if 'is_member' in channel and channel.get('is_member') == True:
-        channel_id = channel.get('id')
+        bot_channel_id = channel.get('id')
         print "Bot channel found."
 
+  return bot_channel_id
+
+def __get_user_porfile(user_id):
+  user = {}
+  api_call = slack_client.api_call("users.info", user=user_id)
+  if api_call.get('ok'):
+    user = api_call.get('user')
+
+  return user
+
+def __get_channel_users(bot_channel_id):
+  users = []
+  api_call = slack_client.api_call("channels.info", channel=bot_channel_id)
+  if api_call.get('ok'):
+    # retrieve channel info so we can find all the members
+    users = api_call.get('channel').get('members')
+
+  return users
+
+def populate_tourny():
+  channel_id = __get_bot_channel_id()
   if not channel_id:
     print "Bot not a member of any channels."
     return
 
-  api_call = slack_client.api_call("channels.info", channel=channel_id)
-  if api_call.get('ok'):
-    # retrieve channel info so we can find all the members
-    members = api_call.get('channel').get('members')
-    for member_id in members:
-       api_call = slack_client.api_call("users.info", user=member_id)
-       if api_call.get('ok'):
-          # retrieve user info so we can get profile
-          member_info = api_call.get('user')
-          profile = member_info.get('profile')
-          first_name = ""
-          if "first_name" in profile:
-            first_name = profile.get("first_name")
-          lase_name = ""
-          if "last_name" in profile:
-            last_name = profile.get("last_name")
+  members = __get_channel_users(channel_id)
+  for member_id in members:
+    # retrieve user info so we can get profile
+    member_info = __get_user_porfile(member_id)
+    if 'profile' in member_info:
+      profile = member_info.get('profile')
+      first_name = ""
+      if "first_name" in profile:
+        first_name = profile.get("first_name")
+      last_name = ""
+      if "last_name" in profile:
+        last_name = profile.get("last_name")
 
-          tourny.add(Player(member_info["id"], member_info["name"], first_name, last_name))
+      tourny.add(Player(member_info["id"], member_info["name"], first_name, last_name))
 
-    tourny.add(Player("U2134134", "yyy", "han", "solo"))
-    tourny.start()
+  tourny.start()
+
+def handle_admin_command(admin_command):
+  response = ""
+  if admin_command.startswith(START_TOURNY):
+    populate_tourny()    
+    response = "Generating tournament bracket...\n" + tourny.get_printed()
+  if admin_command.startswith(REPORT_QUIT):
+    response = "Trying to call the match"
+  if admin_command.startswith(NEXT_ROUND):
+    response = "Trying to call advance to next round."
+
+  return response
 
 def handle_command(user, command, channel):
   """
@@ -65,20 +98,27 @@ def handle_command(user, command, channel):
   """
   response = "Not sure what you mean. Use the *" + HELP_COMMAND + \
     "* command with numbers, deliminated by spaces."
+
+  user_profile = __get_user_porfile(user)
+  is_admin = user_profile.get("is_admin")
+  if command.startswith(START_TOURNY) or \
+      command.startswith(REPORT_QUIT) or \
+      command.startswith(NEXT_ROUND):
+    if is_admin:
+      command_response = handle_admin_command(command)
+      if command_response != "":
+        response = command_response
+    else:
+      response = "Must be an admin to use this command."
+  
   if command.startswith(HELP_COMMAND):	
     response = "Sure... write more code then I can do that!"
-  if command.startswith(START_TOURNY):
-    populate_tourny()    
-    response = "Generating tournament bracket...\n" + tourny.get_printed()
   if command.startswith(PRINT_TOURNY):
     response = "Printing tournament bracket...\n" + tourny.get_printed()
-    pass
   if command.startswith(REPORT_WIN):
     response = "Reporting win...\n" + tourny.win(user)
 
-
   slack_client.api_call("chat.postMessage", channel=channel, text=response, as_user=True)
-
 
 def parse_slack_output(slack_rtm_output):
   """
@@ -94,6 +134,7 @@ def parse_slack_output(slack_rtm_output):
         return output['user'], output['text'].split(AT_BOT)[1].strip(' ').lower(), output['channel']
 
   return None, None, None
+
 
 def main():
   READ_WEBSOCKET_DELAY = 1 # 1 second delay between reading from firehose

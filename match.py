@@ -78,22 +78,24 @@ class Match():
   def request_reset(handle): return
 
   def get_top(self):
+    output = ""
     side = self.__sides_tuple[SIDE_1_INDEX]
     if side == None:
-      print "This is a bye game."
-      return
+      output = "This is a bye game."
+      return output
 
     points = self.__wins_tuple[SIDE_1_INDEX]
     return side.get_name() + ": " + str(points)
 
   def get_bottom(self):
+    output = ""
     side = self.__sides_tuple[SIDE_2_INDEX]
     if side == None:
       if self.__sides_tuple[SIDE_1_INDEX] == None:
-        print "This is a bye game."
+        output = "This is a bye game."
       else:
-        print "This side is a bye."
-      return
+        output = "This side is a bye."
+      return output
     points = self.__wins_tuple[SIDE_2_INDEX]
     return side.get_name() + ": " + str(points)
 
@@ -123,7 +125,7 @@ def main():
   print match.get_bottom()
   print ""
 
-  match.add_win(top_player.get_handle())
+  match.add_win(top_player.get_user())
 
   match.print_score()
 

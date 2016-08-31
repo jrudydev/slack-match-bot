@@ -8,29 +8,19 @@ import random
 class Tourny:
   def __init__(self):
     self.__players = {}
-    self.__games = []
-    self.__unassigned_players_top = []
-    self.__unassigned_players_bottom = []
-    self.__bracket_size = None
+    self.__unassigned_players = []
+    self.__tree = None
+    self.__games = None
+    self.__round = -1    
 
-  def __pop_random_unassigned_player_top(self):
-    number_of_players = len(self.__unassigned_players_top)
+  def __pop_random_unassigned_player(self):
+    number_of_players = len(self.__unassigned_players)
     if number_of_players == 0:
       return None
 
     rand_int = random.choice(range(number_of_players))
-    random_player = self.__unassigned_players_top[rand_int]
-    del self.__unassigned_players_top[rand_int]
-    return random_player
-
-  def __pop_random_unassigned_player_bottom(self):
-    number_of_players = len(self.__unassigned_players_bottom)
-    if number_of_players == 0:
-      return None
-
-    rand_int = random.choice(range(number_of_players))
-    random_player = self.__unassigned_players_bottom[rand_int]
-    del self.__unassigned_players_bottom[rand_int]
+    random_player = self.__unassigned_players[rand_int]
+    del self.__unassigned_players[rand_int]
     return random_player
   
   def add_player(self, player):
@@ -42,26 +32,12 @@ class Tourny:
       print "There are not enough players."
       return
     
-    number_of_games = number_of_players / 2
-    if number_of_players % 2 == 1:
-      number_of_games += 1
-
-    self.__bracket_size = 1
-    while self.__bracket_size < number_of_games:
-      self.__bracket_size *= 2
-
-    half_of_the_bracket = self.__bracket_size / 2
-
-    self.__games = []
-  
-    i = 0
     for key in self.__players:
-      if i < len(self.__players) - number_of_players / 2:
-        self.__unassigned_players_top.append(self.__players[key])
-      else:
-        self.__unassigned_players_bottom.append(self.__players[key])
-      i += 1
-
+      self.__unassigned_players.append(self.__players[key])
+    
+    tree = TournyTree(len(self.__unassigned_players))
+    '''
+    self.__games = []
     for x in range(half_of_the_bracket):
       first_player = self.__pop_random_unassigned_player_top()
       if first_player != None:
@@ -89,7 +65,7 @@ class Tourny:
       self.__games.append(match)
 
     self.print_tourny()
-
+    '''
   def report_win(self, user):
     if len(self.__games) == 0:
       return "The tournament has not started."

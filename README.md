@@ -28,7 +28,6 @@ Find the Slack API key in the bot configuration section under Integration Settin
 MatchBot makes it easy to setup whether on you are on the web or native aplication.
 
 ## Setup
-- Create a channel called pingpongtourny
 - Invite matchbot and more friends
 
 ## Commands

@@ -43,7 +43,7 @@ MatchBot makes it easy to setup whether on you are on the web or native aplicati
 
 ---
 ### help
-Options: [COMMAND] = start | print | win
+Options: [COMMAND] = start | show | win
 
 Example:
 ```
@@ -69,7 +69,7 @@ Options: [ROUND] = INT, [MATCH] = INT
 
 Example:
 ```
-@matchbot print 1 4
+@matchbot show 1 4
 ```
 
 Description: Use this command to print a match, round, or entire tree.

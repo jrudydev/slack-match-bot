@@ -59,9 +59,6 @@ class Tourny:
     if self.is_complete():
       print "Advance to the next round"
 
-
-
-
   def get_printed(self):
     games = self.__bracket.get_round(1)
 

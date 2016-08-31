@@ -37,7 +37,7 @@ MatchBot makes it easy to setup whether you are on the web or native aplication.
 |-------|----------------------------|------------------------------|
 |help   |Print a readme file         |[COMMAND] Ex: help start      |
 |start  |Generate tournament         |None                          |
-|print  |Print tournmanet Bracket    |[ROUND] [MATCH] Ex: print 1 4 |  
+|show   |Print tournmanet Bracket    |[ROUND] [MATCH] Ex: show 1 4 |  
 |win    |Report a win                |None                          |
 
 ---
@@ -63,7 +63,7 @@ Example:
 Description: Use this command to generate a tournament from all the players in the room.
 
 ---
-### print
+### show
 Options: [ROUND] = INT, [MATCH] = INT
 
 Example:

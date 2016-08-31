@@ -57,8 +57,10 @@ class Match():
   def set_match_ids(self, match_id):
     top_side = self.__sides_tuple[SIDE_1_INDEX]
     bottom_side = self.__sides_tuple[SIDE_2_INDEX]
-    top_side.set_match_id(match_id)
-    bottom_side.set_match_id(match_id)
+    if top_side != None:
+      top_side.set_match_id(match_id)
+    if bottom_side != None:
+      bottom_side.set_match_id(match_id)
 
   def match_status(self):
     first_side = self.__sides_tuple[SIDE_1_INDEX]

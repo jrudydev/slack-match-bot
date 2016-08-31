@@ -61,6 +61,31 @@ class TournyTree(object):
 
           self.node.match.add_side(random_player)
 
+  def get_games(self):
+    return self.__games
+
+  def get_round(self, round_number):
+    result = []
+
+    if not self.node:
+      return result
+
+    result.extend(self.node.left.inorder_traverse())
+
+    node_left = self.node
+    for x in range(round_number):
+      node_left = node_left.left.node
+    node_right = self.node
+    for x in range(round_number):
+      node_right = node_right.right.node
+
+    if node_left == None or node_right == None:
+      result.append(self.node.match) 
+
+    result.extend(self.node.right.inorder_traverse())
+
+    return result
+
   def inorder_traverse(self):
     result = []
 
@@ -78,7 +103,7 @@ class TournyTree(object):
 
     #!!! Need to traverse only to round height
 
-    self.__games = tree.inorder_traverse()
+    self.__games = self.inorder_traverse()
     for x in range(len(self.__games)):
       self.__games[x].set_match_ids(x)
 
@@ -86,7 +111,7 @@ class TournyTree(object):
     number_of_players = len(players)
     
     self.node = None
-    tree.insert_matches(
+    self.insert_matches(
       number_of_players, 
       self.__get_height(number_of_players),
       players)

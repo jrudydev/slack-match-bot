@@ -14,7 +14,7 @@ AT_BOT = "<@" + BOT_ID  + ">"
 
 HELP_COMMAND = "help"
 START_TOURNY = "start"
-PRINT_TOURNY = "print"
+PRINT_TOURNY = "show"
 REPORT_WIN = "win"
 
 tourny = Tourny()
@@ -52,11 +52,10 @@ def populate_tourny():
           if "last_name" in profile:
             last_name = profile.get("last_name")
 
-          tourny.add_player(Player(member_info["id"], member_info["name"], first_name, last_name))
+          tourny.add(Player(member_info["id"], member_info["name"], first_name, last_name))
 
-    tourny.add_player(Player("U2134134", "yyy", "han", "solo"))
-    tourny.start_tourny()
-    tourny.print_tourny()
+    tourny.add(Player("U2134134", "yyy", "han", "solo"))
+    tourny.start()
 
 def handle_command(user, command, channel):
   """
@@ -70,11 +69,12 @@ def handle_command(user, command, channel):
     response = "Sure... write more code then I can do that!"
   if command.startswith(START_TOURNY):
     populate_tourny()    
-    response = "Generating tournament bracket...\n" + tourny.get_printed_tourny()
+    response = "Generating tournament bracket...\n" + tourny.get_printed()
   if command.startswith(PRINT_TOURNY):
-    response = "Printing tournament bracket...\n" + tourny.get_printed_tourny()
+    response = "Printing tournament bracket...\n" + tourny.get_printed()
+    pass
   if command.startswith(REPORT_WIN):
-    response = "Reporting win...\n" + tourny.report_win(user)
+    response = "Reporting win...\n" + tourny.win(user)
 
 
   slack_client.api_call("chat.postMessage", channel=channel, text=response, as_user=True)

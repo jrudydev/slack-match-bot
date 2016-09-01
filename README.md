@@ -37,16 +37,16 @@ MatchBot makes it easy to setup whether you are on the web or native aplication.
 |-------|----------------------------|------------------------------|:----------:|
 |help   |Print a readme file         |[COMMAND] Ex: help start      |            |
 |start  |Generate tournament         |None                          |x           |
-|boot   |Disqualify player           |[HANDLE] Ex: userhandle       |x           |
-|next   |Move to next round          |None                          |x			 |
-|show   |Print tournmanet Bracket    |[ROUND] [MATCH] Ex: show 1 4  |            |
+|boot   |Disqualify player           |[HANDLE] Ex: slackbot         |x           |
+|next   |Move to next round          |None                          |x			     |
+|show   |Print tournmanet Bracket    |[OPTION] Ex: all              |            |
 |win    |Report a win                |None                          |            |
 
 ---
 ### help
 Options: [COMMAND] = start | show | win
 
-Example:
+Example: @matchbot help boot
 ```
 @matchbot help start
 ```
@@ -57,7 +57,7 @@ Description: Pull up more information about how to use MatchBot.
 ### start (Admin Only)
 Options: None
 
-Example:
+Example: @matchbot start
 ```
 @matchbot start
 ```
@@ -67,7 +67,7 @@ Description: Generate a tournament from all the players in the room.
 ---
 ### boot (Admin Only)
 
-Example:
+Example: @matchbot boot slackbot
 ```
 @matchbot boot userhandle
 ```
@@ -77,7 +77,7 @@ Description: Disqualify a player with matching handle.
 ---
 ### next (Admin Only)
 
-Example:
+Example:@matchbot next
 ```
 @matchbot next
 ```
@@ -88,7 +88,7 @@ Description: Use to advance to the next round.
 ### show
 Options: [ROUND] = INT, [MATCH] = INT
 
-Example:
+Example: @matchbot show
 ```
 @matchbot show 1 4
 ```
@@ -99,7 +99,7 @@ Description: Print a match, round, or entire tree.
 ### win
 Options: None
 
-Example:
+Example:@matchbot win
 ```
 @matchbot win
 ```

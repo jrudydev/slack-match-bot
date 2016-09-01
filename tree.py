@@ -1,10 +1,23 @@
 #!/usr/bin/python
 
+# Created by: JRG
+# Date: Aug 31, 2016
+#
+# Description: The tree object replicates a trounmanet bracket. The height
+# is set depeding on the number of players. The size will double to 
+# accommodate any number of players with an even distribution.
+
 from match import Match
 from player import Player
 import random
 
 class TournyNode(object):
+  '''
+  Each node contains a key that will be used to equally distribute
+  the users across the leaves of the tree. It also holds another object,
+  in this case a match.
+  '''
+
   def __init__(self, key):
     self.key = key
     self.match = None
@@ -19,6 +32,11 @@ class TournyNode(object):
 
 
 class TournyTree(object):
+  '''
+  The tree is initializes with a list of players and generates all the
+  games of the tournament with the root node containing the championship game.
+  '''
+
   def __init__(self):
     self.node = None
     self.__players = {}
@@ -27,6 +45,9 @@ class TournyTree(object):
     self.__height = -1
 
   def __set_height(self, players):
+    '''
+    Caculate the height of the tree based on the number of players
+    '''
     height = 1
     bracket_size = 2
     while bracket_size < players:
@@ -36,6 +57,10 @@ class TournyTree(object):
     self.__height = height
 
   def insert_matches(self, key, count, players):
+    '''
+    Generates the tree of empty matches starting at the root node and
+    adding players at the leaves.
+    '''
     n = TournyNode(key)
     if not self.node:
       self.node = n
@@ -44,18 +69,17 @@ class TournyTree(object):
       self.node.match = Match()
       
       if count > 1:
+        # non leaf nodes have an empty match object inserted to them
         half = key / 2
         self.node.right.insert_matches(half, count - 1, players)
 
         if key % 2 == 1: half += 1
         self.node.left.insert_matches(half, count - 1, players)
       else:
+        # leaf node reached so add one or two players to the game
         for x in range(self.node.key):
           # pop a random player
           number_of_players = len(players)
-          if number_of_players == 0:
-            return None
-
           rand_int = random.choice(range(number_of_players))
           random_player = players[rand_int]
           del players[rand_int]
@@ -65,20 +89,26 @@ class TournyTree(object):
   def get_games(self):
     return self.__games
 
-  def __traverse_nodes(self, round_number):
+  def __traverse_nodes(self, depth):
+    '''
+    Traverse tree in order and return a row at the depth provided.
+    '''
     result = []
 
     if not self.node:
       return result
 
-    result.extend(self.node.left.__traverse_nodes(round_number - 1))
-    if round_number == 1:
+    result.extend(self.node.left.__traverse_nodes(depth - 1))
+    if depth == 1:
       result.append(self.node)
-    result.extend(self.node.right.__traverse_nodes(round_number - 1))
+    result.extend(self.node.right.__traverse_nodes(depth - 1))
 
     return result
 
   def __load_round_nodes(self):
+    '''
+    Return a list of nodes that correspond to the current round.
+    '''
     nodes = []
     if self.__height != -1:
       adjusted_round = self.__round - 1
@@ -90,6 +120,9 @@ class TournyTree(object):
     return nodes
 
   def __load_round_matches(self):
+    '''
+    Return a list of matches that correspond to the current round.
+    '''
     matches = []
     if self.__height != -1:
       adjusted_round = self.__round - 1
@@ -104,29 +137,38 @@ class TournyTree(object):
     return matches
 
   def __create_round(self):
+    '''
+    Assign the match ids to the players before every round.
+    '''
     self.__games = self.__load_round_matches()
     for x in range(len(self.__games)):
       self.__games[x].set_match_ids(x)
 
   def __promote_winners(self):
+    '''
+    Draw the winners from the previous round to populate the current one.
+    '''
     for node in self.__load_round_nodes():
       node.match.add_side(node.left.node.match.get_winner())
       node.match.add_side(node.right.node.match.get_winner())
 
   def generate(self, players):
+    '''
+    Initalize and reset the tree with the players provided.
+    '''
     number_of_players = len(players)
     
     self.__round = 1
     self.node = None
     self.__set_height(number_of_players)
-    self.insert_matches(
-      number_of_players, 
-      self.__height,
-      players)
+    self.insert_matches(number_of_players, self.__height, players)
 
     self.__create_round()
   
   def advance(self):
+    '''
+    Try to adavance to the next round and promote the winners.
+    '''
     response = ""
     if len(self.__games) != 1:
       self.__round += 1
@@ -154,7 +196,7 @@ if __name__ == '__main__':
   for match in games:
     print match.get_score()
 
-  games[first_player.get_match_id()].add_win("U555")
+  games[first_player.match_id].add_win("U555")
 
   games = tree.get_games()
   for match in games:

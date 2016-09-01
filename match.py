@@ -1,5 +1,12 @@
 #!/usr/bin/python
 
+# Created by: JRG
+# Date: Aug 31, 2016
+#
+# Description: The match object holds a two side tuple and their current
+# match score tuple respectively. It track the best of three matches and
+# presents the winner.
+
 from player import Player
 
 SIDE_1_INDEX = 0
@@ -14,43 +21,66 @@ MATCH_STATUS_COMPLETE = 3
 
  
 class Match():
+  '''
+  This class allows you to add two objects and stores them in a tuple. The score
+  is also stored in a tuple respectively.
+  '''
+
   def __init__(self):
     self.__sides_tuple = (None, None)
     self.__wins_tuple = (0, 0)
 
   def add_side(self, side):
+    '''
+    Try to add a side to the top and the to the bottom slot  if there is room.
+    '''
+    response = ""
     if self.__sides_tuple[0] == None:
       self.__sides_tuple = (side, None)
-      print "Player added added."
+      response = "Player added added to top."
     elif self.__sides_tuple[1] == None:
       self.__sides_tuple = (self.__sides_tuple[SIDE_1_INDEX], side)
-      print "Player added added."
+      response = "Player added added to bottom."
     else:
-      print "This game is full!"
+      response = "This game is full!"
+
+    print response
 
   def add_win(self, user):
+    '''
+    Register a win for the player with the slack user id provided.
+    '''
     if self.match_status() == MATCH_STATUS_COMPLETE:
-      print("This game is complete.")
+      print "This game is complete."
       return
 
     if self.match_status() == MATCH_STATUS_NOT_FULL:
-      print("Cannot win a bye game.")
+      print "Cannot win a bye game."
       return
 
     top, bottom, top_points, bottom_points = self.__get_tuple()
 
-    name = ""
+    response = ""
     if top.get_user() == user:
       self.__wins_tuple = (top_points + 1, bottom_points)
-      name = top.get_name()
+      response = top.get_name()
 
     if bottom.get_user() == user:
       self.__wins_tuple = (top_points, bottom_points + 1) 
-      name = bottom.get_name()
+      response = bottom.get_name()
 
-    print name + " gains a point."
+    if response == "":
+      response = "Player not found."
+    else:
+      response += " gains a point."
+    
+    print response
 
   def quit_player(self, user):
+    '''
+    This method will disqualify a player with the slack user id provide and
+    consiquently give the win to the oppenent.
+    '''
     if self.match_status() == MATCH_STATUS_NOT_FULL:
       print("Cannot win a bye game.")
       return
@@ -58,76 +88,94 @@ class Match():
     first_side = self.__sides_tuple[SIDE_1_INDEX]
     second_side = self.__sides_tuple[SIDE_2_INDEX]
 
-    name = ""
+    response = ""
     if first_side.get_user() == user:
       self.__wins_tuple = (0, BEST_OF - 1)
-      name = first_side.get_name()
+      response = first_side.get_name()
 
     if second_side.get_user() == user:
       self.__wins_tuple = (BEST_OF - 1, 0) 
-      name = second_side.get_name()
+      response = second_side.get_name()
 
-    print name + " has been disqualified."
+    if response == "":
+      response = "Player not found."
+    else:
+      response += " has been disqualified."
+    
+    print response 
 
   def set_match_ids(self, match_id):
-    top_side = self.__sides_tuple[SIDE_1_INDEX]
-    bottom_side = self.__sides_tuple[SIDE_2_INDEX]
-    if top_side != None:
-      top_side.set_match_id(match_id)
-    if bottom_side != None:
-      bottom_side.set_match_id(match_id)
+    '''
+    Sets the match ids for the players in the game to later grab them from a list.
+    '''
+    top = self.__sides_tuple[SIDE_1_INDEX]
+    bottom = self.__sides_tuple[SIDE_2_INDEX]
+    if top != None:
+      top.match_id = match_id
+    if bottom != None:
+      bottom.match_id = match_id
 
   def match_status(self):
     top, bottom, top_points, bottom_points = self.__get_tuple()
 
+    response = None
     games_to_win = BEST_OF - 1
     if top == None or bottom == None:
-      return MATCH_STATUS_NOT_FULL
-    if top_points == 0 and bottom_points == 0:
-      return MATCH_STATUS_NOT_STARTED
-    if top_points >= games_to_win or bottom_points >= games_to_win:
-      return MATCH_STATUS_COMPLETE
+      response = MATCH_STATUS_NOT_FULL
+    elif top_points == 0 and bottom_points == 0:
+      response = MATCH_STATUS_NOT_STARTED
+    elif top_points >= games_to_win or bottom_points >= games_to_win:
+      response = MATCH_STATUS_COMPLETE
     else:
-      return MATCH_STATUS_IN_PROGRESS
+      response = MATCH_STATUS_IN_PROGRESS
+
+    return response
 
   def is_complete(self):
-    return self.match_status() == MATCH_STATUS_COMPLETE or \
-      self.match_status() == MATCH_STATUS_NOT_FULL
+    status = self.match_status()
+    return status == MATCH_STATUS_COMPLETE or status == MATCH_STATUS_NOT_FULL
 
   def __get_tuple(self):
     return self.__sides_tuple[SIDE_1_INDEX], self.__sides_tuple[SIDE_2_INDEX], \
       self.__wins_tuple[SIDE_1_INDEX], self.__wins_tuple[SIDE_2_INDEX]
 
   def get_winner(self):
+    '''
+    Return the side with has won the majority of the games and handle bye match
+    '''
     response = None
     if not self.is_complete():
       print "This game has not been completed."
     else:
       top, bottom, top_points, bottom_points = self.__get_tuple()
 
-      if top == None:
-        response = "This game is empty."
-      else:
-        if bottom == None:
-          response = top
-        if top_points == 2:
-          response = top
-        if bottom_points == 2:
-          response = bottom
+      if bottom == None:
+        response = top
+      if top_points == 2:
+        response = top
+      if bottom_points == 2:
+        response = bottom 
 
     return response 
 
   def get_top(self):
+    '''
+    Display the top side along with the score.
+    '''
     output = ""
     side = self.__sides_tuple[SIDE_1_INDEX]
     if side == None:
       output = "This is a bye game."
-      return output
+    else:
+      points = self.__wins_tuple[SIDE_1_INDEX]
+      output = side.get_name() + ": " + str(points)
 
-    points = self.__wins_tuple[SIDE_1_INDEX]
-    return side.get_name() + ": " + str(points)
+    return output
 
   def get_bottom(self):
+    '''
+    Display the bottom side along with the score.
+    '''
     output = ""
     side = self.__sides_tuple[SIDE_2_INDEX]
     if side == None:
@@ -135,15 +183,14 @@ class Match():
         output = "This is a bye game."
       else:
         output = "This side is a bye."
-      return output
-    points = self.__wins_tuple[SIDE_2_INDEX]
-    return side.get_name() + ": " + str(points)
+    else:
+      points = self.__wins_tuple[SIDE_2_INDEX]
+      output = side.get_name() + ": " + str(points)
+
+    return output
 
   def get_score(self):
     return "%s\n%s" % (self.get_top(), self.get_bottom())
-  
-  def print_score(self):
-    print self.get_score()
 
 
 def main(): 
@@ -167,7 +214,7 @@ def main():
 
   match.add_win(top_player.get_user())
 
-  match.print_score()
+  print match.get_score()
 
 
 if __name__ == '__main__':

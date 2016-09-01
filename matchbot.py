@@ -1,5 +1,12 @@
 #!/usr/bin/python
 
+# Created by: JRG
+# Date: Aug 31, 2016
+#
+# Description: MatchBot attemps to intelligently respond to a slack user's
+# demands to automate a single elimination bracket. The bot allows participants
+# to register their own wins and gives the admin full control of bracket progression.
+
 import os
 import json
 from slackclient import SlackClient
@@ -8,8 +15,6 @@ from tourny import Tourny
 from player import Player
 
 BOT_ID = os.environ.get("BOT_ID") 
-
-# constants
 AT_BOT = "<@" + BOT_ID  + ">"
 
 # admin commands
@@ -17,7 +22,7 @@ START_TOURNY = "start"
 REPORT_QUIT = "boot"
 NEXT_ROUND = "next"
 
-# user commmands
+# user commands
 HELP_COMMAND = "help"
 PRINT_TOURNY = "show"
 REPORT_WIN = "win"
@@ -25,20 +30,10 @@ REPORT_WIN = "win"
 tourny = Tourny()
 slack_client = SlackClient(os.environ.get('SLACK_BOT_TOKEN'))
 
-def __get_bot_channel_id():
-  bot_channel_id = None
-  api_call = slack_client.api_call("channels.list")
-  if api_call.get('ok'):
-    # retrieve all channels so we can find our bot
-    channels = api_call.get('channels')
-    for channel in channels:
-      if 'is_member' in channel and channel.get('is_member') == True:
-        bot_channel_id = channel.get('id')
-        print "Bot channel found."
-
-  return bot_channel_id
-
-def __get_user_porfile(user_id):
+def get_user_porfile(user_id):
+  '''
+  Return the user information with the slack id provided.
+  '''
   user = {}
   api_call = slack_client.api_call("users.info", user=user_id)
   if api_call.get('ok'):
@@ -46,7 +41,10 @@ def __get_user_porfile(user_id):
 
   return user
 
-def __get_channel_users(bot_channel_id):
+def get_channel_users(bot_channel_id):
+  '''
+  Return the channel information with the slack id provided.
+  '''
   users = []
   api_call = slack_client.api_call("channels.info", channel=bot_channel_id)
   if api_call.get('ok'):
@@ -55,16 +53,16 @@ def __get_channel_users(bot_channel_id):
 
   return users
 
-def populate_tourny():
-  channel_id = __get_bot_channel_id()
-  if not channel_id:
-    print "Bot not a member of any channels."
-    return
-
-  members = __get_channel_users(channel_id)
+def populate_tourny(bot_channel):
+  '''
+  Use the slack api to first get a list of channels for the team, find the
+  one containing matchbot, then get a list of channel memebers, and finally
+  create a player object and add it to the tournament.
+  '''
+  members = get_channel_users(bot_channel)
   for member_id in members:
     # retrieve user info so we can get profile
-    member_info = __get_user_porfile(member_id)
+    member_info = get_user_porfile(member_id)
     if 'profile' in member_info:
       profile = member_info.get('profile')
       first_name = ""
@@ -78,27 +76,34 @@ def populate_tourny():
 
   tourny.start()
 
-def handle_admin_command(admin_command):
-  admin_response = ""
+def handle_admin_command(admin_command, bot_channel):
+  '''
+  These commands can only be used by administrators of the channel.
+  '''
+  response = ""
   if admin_command.startswith(START_TOURNY):
-    populate_tourny()    
-    admin_response = "Generating tournament bracket...\n" + tourny.get_printed()
+    populate_tourny(bot_channel)    
+    response = "Generating tournament bracket...\n"
+    response += tourny.get_printed()
 
   if admin_command.startswith(REPORT_QUIT):
     parts = admin_command.split()
     if len(parts) >= 2:
+      # potential handle was provided for disqualification
       handle = parts[1]
-      response = tourny.boot(handle)
-      admin_response = "Disqualifying " + handle + "...\n" 
-      admin_response += response + "\n" + tourny.get_printed()
+      boot_response = tourny.boot(handle)
+      response = "Disqualifying " + handle + "...\n" 
+      response += boot_response + "\n"
+      response += tourny.get_printed()
     else: 
-      admin_response = "Provide and handle to disqualify."
+      response = "Provide and handle to disqualify."
 
   if admin_command.startswith(NEXT_ROUND):
-    admin_response = "Trying to call advance to next round.\n"
-    admin_response += tourny.next()
+    response = "Trying to call advance to next round.\n"
+    response += tourny.next() + "\n"
+    response += tourny.get_printed()
 
-  return admin_response
+  return response
 
 def handle_command(user, command, channel):
   """
@@ -109,13 +114,13 @@ def handle_command(user, command, channel):
   response = "Not sure what you mean. Use the *" + HELP_COMMAND + \
     "* command with numbers, deliminated by spaces."
 
-  user_profile = __get_user_porfile(user)
+  user_profile = get_user_porfile(user)
   is_admin = user_profile.get("is_admin")
   if command.startswith(START_TOURNY) or \
       command.startswith(REPORT_QUIT) or \
       command.startswith(NEXT_ROUND):
     if is_admin:
-      admin_response = handle_admin_command(command)
+      admin_response = handle_admin_command(command, channel)
       if admin_response != "":
         response = admin_response
     else:
@@ -123,10 +128,15 @@ def handle_command(user, command, channel):
   
   if command.startswith(HELP_COMMAND):	
     response = "Sure... write more code then I can do that!"
+
   if command.startswith(PRINT_TOURNY):
-    response = "Printing tournament bracket...\n" + tourny.get_printed()
+    response = "Printing tournament bracket...\n"
+    resposne += tourny.get_printed()
+    
   if command.startswith(REPORT_WIN):
-    response = "Reporting win...\n" + tourny.win(user)
+    response = "Reporting a win...\n"
+    response += tourny.win(user) + "\n"
+    response += tourny.get_printed()
 
   slack_client.api_call("chat.postMessage", channel=channel, text=response, as_user=True)
 

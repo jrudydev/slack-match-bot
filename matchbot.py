@@ -79,16 +79,26 @@ def populate_tourny():
   tourny.start()
 
 def handle_admin_command(admin_command):
-  response = ""
+  admin_response = ""
   if admin_command.startswith(START_TOURNY):
     populate_tourny()    
-    response = "Generating tournament bracket...\n" + tourny.get_printed()
-  if admin_command.startswith(REPORT_QUIT):
-    response = "Trying to call the match"
-  if admin_command.startswith(NEXT_ROUND):
-    response = "Trying to call advance to next round."
+    admin_response = "Generating tournament bracket...\n" + tourny.get_printed()
 
-  return response
+  if admin_command.startswith(REPORT_QUIT):
+    parts = admin_command.split()
+    if len(parts) >= 2:
+      handle = parts[1]
+      response = tourny.boot(handle)
+      admin_response = "Disqualifying " + handle + "...\n" 
+      admin_response += response + "\n" + tourny.get_printed()
+    else: 
+      admin_response = "Provide and handle to disqualify."
+
+  if admin_command.startswith(NEXT_ROUND):
+    admin_response = "Trying to call advance to next round.\n"
+    admin_response += tourny.next()
+
+  return admin_response
 
 def handle_command(user, command, channel):
   """
@@ -105,9 +115,9 @@ def handle_command(user, command, channel):
       command.startswith(REPORT_QUIT) or \
       command.startswith(NEXT_ROUND):
     if is_admin:
-      command_response = handle_admin_command(command)
-      if command_response != "":
-        response = command_response
+      admin_response = handle_admin_command(command)
+      if admin_response != "":
+        response = admin_response
     else:
       response = "Must be an admin to use this command."
   

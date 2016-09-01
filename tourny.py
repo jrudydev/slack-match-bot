@@ -13,21 +13,49 @@ class Tourny:
   
   def add(self, player):
     self.__players[player.get_user()] = player
-
-  def help(self, key):
-    # call the readmedocs app
-    pass
        
   def start(self):
     number_of_players = len(self.__players)
     if number_of_players < 2:
-      print "There are not enough players."
-      return
+      return "There are not enough players."
     
     players = []
     for key in self.__players:
       players.append(self.__players[key])
     self.__bracket.generate(players)
+
+    return "Bracket generated."
+
+  def boot(self, handle):
+    response = ""
+    for key in self.__players:
+      player = self.__players[key]
+      if handle == player.get_handle():
+        games = self.__bracket.get_games()
+
+        user = player.get_user()
+        player = self.__players[user]
+        match = games[player.get_match_id()]
+        match.quit_player(user)
+
+        response = player.get_name() + " has been disqualified."
+
+    if response == "":
+      response = "Player not found."
+    return response
+
+  def next(self):
+    response = ""
+    if self.is_complete():
+      response = self.__bracket.advance()
+    else:
+      response = "The matches are not all complete."
+
+    return response
+
+  def help(self, key):
+    # call the readmedocs app
+    pass
 
   def win(self, user):
     games = self.__bracket.get_games()
@@ -55,12 +83,8 @@ class Tourny:
 
     return response
 
-  def next(sef):
-    if self.is_complete():
-      print "Advance to the next round"
-
   def get_printed(self):
-    games = self.__bracket.get_round(1)
+    games = self.__bracket.get_games()
 
     string = ""
     if len(games) == 0:
@@ -78,12 +102,13 @@ class Tourny:
     print self.get_printed()
 
   def is_complete(self):
+    response = True
     games = self.__bracket.get_games()
     for match in games:
       if match.is_complete() == False:
-        return False
+        response = False
     
-    return True
+    return response
 
 
 def main():

@@ -28,18 +28,19 @@ Find the Slack API key in the bot configuration section under Integration Settin
 MatchBot makes it easy to setup whether on you are on the web or native aplication.
 
 ## Setup
-- Create a channel called pingpongtourny
 - Invite matchbot and more friends
 
 ## Commands
 > @matchbot [COMMAND] 
 
-|COMMAND|DESCRIPTION                 |OPTIONS                       |
-|-------|----------------------------|------------------------------|
-|help   |Print a readme file         |[COMMAND] Ex: help start      |
-|start  |Generate tournament         |None                          |
-|show   |Print tournmanet Bracket    |[ROUND] [MATCH] Ex: show 1 4 |  
-|win    |Report a win                |None                          |
+|COMMAND|DESCRIPTION                 |OPTIONS                       | ADMIN ONLY |
+|-------|----------------------------|------------------------------|:----------:|
+|help   |Print a readme file         |[COMMAND] Ex: help start      |            |
+|start  |Generate tournament         |None                          |x           |
+|boot   |Disqualify player           |[HANDLE] Ex: userhandle       |x           |
+|next   |Move to next round          |None                          |x			 |
+|show   |Print tournmanet Bracket    |[ROUND] [MATCH] Ex: show 1 4  |            |
+|win    |Report a win                |None                          |            |
 
 ---
 ### help
@@ -47,13 +48,13 @@ Options: [COMMAND] = start | show | win
 
 Example:
 ```
-@matchbot help win
+@matchbot help start
 ```
 
-Description: Use this command to pull up more information about how to use MatchBot.
+Description: Pull up more information about how to use MatchBot.
 
 ---
-### start
+### start (Admin Only)
 Options: None
 
 Example:
@@ -61,7 +62,27 @@ Example:
 @matchbot start
 ```
 
-Description: Use this command to generate a tournament from all the players in the room.
+Description: Generate a tournament from all the players in the room.
+
+---
+### boot (Admin Only)
+
+Example:
+```
+@matchbot boot userhandle
+```
+
+Description: Disqualify a player with matching handle.
+
+---
+### next (Admin Only)
+
+Example:
+```
+@matchbot next
+```
+
+Description: Use to advance to the next round.
 
 ---
 ### show
@@ -72,7 +93,7 @@ Example:
 @matchbot show 1 4
 ```
 
-Description: Use this command to print a match, round, or entire tree.
+Description: Print a match, round, or entire tree.
 
 ---
 ### win
@@ -83,5 +104,4 @@ Example:
 @matchbot win
 ```
 
-Description: Use this command to report a win.
-
+Description: Report a win for the sender.

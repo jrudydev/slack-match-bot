@@ -23,16 +23,17 @@ class TournyTree(object):
     self.node = None
     self.__players = {}
     self.__games = []
-    self.__round = 1
+    self.__round = -1
+    self.__height = -1
 
-  def __get_height(self, players):
+  def __set_height(self, players):
     height = 1
     bracket_size = 2
     while bracket_size < players:
       bracket_size *= 2
       height += 1
 
-    return height
+    self.__height = height
 
   def insert_matches(self, key, count, players):
     n = TournyNode(key)
@@ -64,60 +65,79 @@ class TournyTree(object):
   def get_games(self):
     return self.__games
 
-  def get_round(self, round_number):
+  def __traverse_nodes(self, round_number):
     result = []
 
     if not self.node:
       return result
 
-    result.extend(self.node.left.inorder_traverse())
-
-    node_left = self.node
-    for x in range(round_number):
-      node_left = node_left.left.node
-    node_right = self.node
-    for x in range(round_number):
-      node_right = node_right.right.node
-
-    if node_left == None or node_right == None:
-      result.append(self.node.match) 
-
-    result.extend(self.node.right.inorder_traverse())
+    result.extend(self.node.left.__traverse_nodes(round_number - 1))
+    if round_number == 1:
+      result.append(self.node)
+    result.extend(self.node.right.__traverse_nodes(round_number - 1))
 
     return result
 
-  def inorder_traverse(self):
-    result = []
+  def __load_round_nodes(self):
+    nodes = []
+    if self.__height != -1:
+      adjusted_round = self.__round - 1
+      depth = self.__height - adjusted_round
+      nodes = self.__traverse_nodes(depth)
+    else:
+      print "The tree has not been initialized."
+    
+    return nodes
 
-    if not self.node:
-      return result
+  def __load_round_matches(self):
+    matches = []
+    if self.__height != -1:
+      adjusted_round = self.__round - 1
+      depth = self.__height - adjusted_round
+      nodes = self.__traverse_nodes(depth)
 
-    result.extend(self.node.left.inorder_traverse())
-    if self.node.left.node == None or self.node.right.node == None:
-      result.append(self.node.match) 
-    result.extend(self.node.right.inorder_traverse())
+      for x in range(len(nodes)):
+        matches.append(nodes[x].match)
+    else:
+      print "The tree has not been initialized."
 
-    return result
+    return matches
 
-  def __set_round(self, round):
-
-    #!!! Need to traverse only to round height
-
-    self.__games = self.inorder_traverse()
+  def __create_round(self):
+    self.__games = self.__load_round_matches()
     for x in range(len(self.__games)):
       self.__games[x].set_match_ids(x)
+
+  def __promote_winners(self):
+    for node in self.__load_round_nodes():
+      node.match.add_side(node.left.node.match.get_winner())
+      node.match.add_side(node.right.node.match.get_winner())
 
   def generate(self, players):
     number_of_players = len(players)
     
+    self.__round = 1
     self.node = None
+    self.__set_height(number_of_players)
     self.insert_matches(
       number_of_players, 
-      self.__get_height(number_of_players),
+      self.__height,
       players)
 
-    self.__set_round(self.__round)
+    self.__create_round()
   
+  def advance(self):
+    response = ""
+    if len(self.__games) != 1:
+      self.__round += 1
+      self.__promote_winners()
+      self.__create_round()
+
+      response = "Tournament bracket advanced to next round."
+    else:
+      response = "Tournament is over, cannot advance."
+
+    return response
 
 if __name__ == '__main__':
   tree = TournyTree()
@@ -130,15 +150,12 @@ if __name__ == '__main__':
     Player("U789", "efg", "fefg", "lefg")]
   tree.generate(players)
 
-  games = tree.inorder_traverse()
+  games = tree.get_games()
   for match in games:
     print match.get_score()
 
-  print str(first_player.get_match_id())
-  print ""
-
   games[first_player.get_match_id()].add_win("U555")
 
-  games = tree.inorder_traverse()
+  games = tree.get_games()
   for match in games:
     print match.get_score()

@@ -17,7 +17,6 @@ class Match():
   def __init__(self):
     self.__sides_tuple = (None, None)
     self.__wins_tuple = (0, 0)
-    self.__reset_triggers_tuple = (0,0)
 
   def add_side(self, side):
     if self.__sides_tuple[0] == None:
@@ -37,22 +36,38 @@ class Match():
     if self.match_status() == MATCH_STATUS_NOT_FULL:
       print("Cannot win a bye game.")
       return
+
+    top, bottom, top_points, bottom_points = self.__get_tuple()
+
+    name = ""
+    if top.get_user() == user:
+      self.__wins_tuple = (top_points + 1, bottom_points)
+      name = top.get_name()
+
+    if bottom.get_user() == user:
+      self.__wins_tuple = (top_points, bottom_points + 1) 
+      name = bottom.get_name()
+
+    print name + " gains a point."
+
+  def quit_player(self, user):
+    if self.match_status() == MATCH_STATUS_NOT_FULL:
+      print("Cannot win a bye game.")
+      return
     
     first_side = self.__sides_tuple[SIDE_1_INDEX]
     second_side = self.__sides_tuple[SIDE_2_INDEX]
-    first_side_wins = self.__wins_tuple[SIDE_1_INDEX]
-    second_side_wins = self.__wins_tuple[SIDE_2_INDEX]
 
     name = ""
     if first_side.get_user() == user:
-      self.__wins_tuple = (first_side_wins + 1, second_side_wins)
+      self.__wins_tuple = (0, BEST_OF - 1)
       name = first_side.get_name()
 
     if second_side.get_user() == user:
-      self.__wins_tuple = (first_side_wins, second_side_wins + 1) 
+      self.__wins_tuple = (BEST_OF - 1, 0) 
       name = second_side.get_name()
-    
-    print name + " gains a point."
+
+    print name + " has been disqualified."
 
   def set_match_ids(self, match_id):
     top_side = self.__sides_tuple[SIDE_1_INDEX]
@@ -63,25 +78,44 @@ class Match():
       bottom_side.set_match_id(match_id)
 
   def match_status(self):
-    first_side = self.__sides_tuple[SIDE_1_INDEX]
-    second_side = self.__sides_tuple[SIDE_2_INDEX]
-    side_1_points = self.__wins_tuple[SIDE_1_INDEX]
-    side_2_points = self.__wins_tuple[SIDE_2_INDEX]
+    top, bottom, top_points, bottom_points = self.__get_tuple()
 
     games_to_win = BEST_OF - 1
-    if first_side == None or second_side == None:
+    if top == None or bottom == None:
       return MATCH_STATUS_NOT_FULL
-    if side_1_points == 0 and side_2_points == 0:
+    if top_points == 0 and bottom_points == 0:
       return MATCH_STATUS_NOT_STARTED
-    if side_1_points >= games_to_win or side_2_points >= games_to_win:
+    if top_points >= games_to_win or bottom_points >= games_to_win:
       return MATCH_STATUS_COMPLETE
     else:
       return MATCH_STATUS_IN_PROGRESS
 
   def is_complete(self):
-    return self.match_status() == MATCH_STATUS_COMPLETE
+    return self.match_status() == MATCH_STATUS_COMPLETE or \
+      self.match_status() == MATCH_STATUS_NOT_FULL
 
-  def request_reset(handle): return
+  def __get_tuple(self):
+    return self.__sides_tuple[SIDE_1_INDEX], self.__sides_tuple[SIDE_2_INDEX], \
+      self.__wins_tuple[SIDE_1_INDEX], self.__wins_tuple[SIDE_2_INDEX]
+
+  def get_winner(self):
+    response = None
+    if not self.is_complete():
+      print "This game has not been completed."
+    else:
+      top, bottom, top_points, bottom_points = self.__get_tuple()
+
+      if top == None:
+        response = "This game is empty."
+      else:
+        if bottom == None:
+          response = top
+        if top_points == 2:
+          response = top
+        if bottom_points == 2:
+          response = bottom
+
+    return response 
 
   def get_top(self):
     output = ""

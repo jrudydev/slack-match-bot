@@ -1,7 +1,7 @@
 # Slack Match Bot
 Slack MatchBot makes a list of users in a channel and generates a single elimination tournament bracket.
 
-## Setup Virtual Environment
+## Setup Local Virtual Environment
 ```
 $ cd slack-match-bot
 $ virtualenv matchbot
@@ -28,17 +28,23 @@ Find the Slack API key in the bot configuration section under Integration Settin
 MatchBot makes it easy to setup whether you are on the web or native aplication.
 
 ## Setup
-- Invite matchbot and more friends
+1. Create a Slack team (skip this step if you already have a team in mind)
+2. Login and add a custom integration to configure a bot named matchbot
+3. Invite matchbot to the team
+4. Create a channel for the tournament
+5. Invite matchbot and more friends to the channel
+6. Complete steps listed above under 'Setup Local Virtual Environment'
+
 
 ## Commands
 > @matchbot [COMMAND] 
 
 |COMMAND|DESCRIPTION                 |OPTIONS                       | ADMIN ONLY |
-|-------|----------------------------|------------------------------|:----------:|
-|help   |Print a readme file         |[COMMAND] Ex: help start      |            |
+|:-----:|----------------------------|:----------------------------:|:----------:|
+|help   |Print a readme file         |[COMMAND] Ex: start           |            |
 |start  |Generate tournament         |None                          |x           |
 |boot   |Disqualify player           |[HANDLE] Ex: slackbot         |x           |
-|next   |Move to next round          |None                          |x			     |
+|next   |Move to next round          |None                          |x			 |
 |show   |Print tournmanet Bracket    |[OPTION] Ex: all              |            |
 |win    |Report a win                |None                          |            |
 
@@ -66,7 +72,7 @@ Description: Generate a tournament from all the players in the room.
 
 ---
 ### boot (Admin Only)
-Options: [HANDLE] = <any handle from a player in the tournament>
+Options: [HANDLE] = (any handle for a player in the current round)
 
 Example:
 ```

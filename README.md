@@ -44,9 +44,9 @@ MatchBot makes it easy to setup whether you are on the web or native aplication.
 
 ---
 ### help
-Options: [COMMAND] = start | show | win
+Options: [COMMAND] = start | show | win | boot | next
 
-Example: @matchbot help boot
+Example:
 ```
 @matchbot help start
 ```
@@ -66,16 +66,18 @@ Description: Generate a tournament from all the players in the room.
 
 ---
 ### boot (Admin Only)
+Options: [HANDLE] = <any handle from a player in the tournament>
 
 Example:
 ```
 @matchbot boot slackbot
 ```
 
-Description: Disqualify a player with matching handle.
+Description: Disqualify a player with matching slack handle.
 
 ---
 ### next (Admin Only)
+Options: None
 
 Example:
 ```

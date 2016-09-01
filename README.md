@@ -57,7 +57,7 @@ Description: Pull up more information about how to use MatchBot.
 ### start (Admin Only)
 Options: None
 
-Example: @matchbot start
+Example:
 ```
 @matchbot start
 ```
@@ -67,9 +67,9 @@ Description: Generate a tournament from all the players in the room.
 ---
 ### boot (Admin Only)
 
-Example: @matchbot boot slackbot
+Example:
 ```
-@matchbot boot userhandle
+@matchbot boot slackbot
 ```
 
 Description: Disqualify a player with matching handle.
@@ -77,7 +77,7 @@ Description: Disqualify a player with matching handle.
 ---
 ### next (Admin Only)
 
-Example:@matchbot next
+Example:
 ```
 @matchbot next
 ```
@@ -88,9 +88,9 @@ Description: Use to advance to the next round.
 ### show
 Options: [OPTION] = me | all | handle
 
-Example: @matchbot show
+Example:
 ```
-@matchbot show 1 4
+@matchbot show
 ```
 
 Description: Print a match, round, or entire tree.
@@ -99,7 +99,7 @@ Description: Print a match, round, or entire tree.
 ### win
 Options: None
 
-Example:@matchbot win
+Example:
 ```
 @matchbot win
 ```

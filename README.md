@@ -86,7 +86,7 @@ Description: Use to advance to the next round.
 
 ---
 ### show
-Options: [ROUND] = INT, [MATCH] = INT
+Options: [OPTION] = me | all | handle
 
 Example: @matchbot show
 ```

@@ -50,17 +50,14 @@ class Match():
     '''
     Register a win for the player with the slack user id provided.
     '''
+    response = ""
     if self.match_status() == MATCH_STATUS_COMPLETE:
-      print "This game is complete."
-      return
+      return "This game is complete."
 
     if self.match_status() == MATCH_STATUS_NOT_FULL:
-      print "Cannot win a bye game."
-      return
+      return "Cannot win a bye game."
 
     top, bottom, top_points, bottom_points = self.__get_tuple()
-
-    response = ""
     if top.get_user() == user:
       self.__wins_tuple = (top_points + 1, bottom_points)
       response = top.get_name()
@@ -70,7 +67,7 @@ class Match():
       response = bottom.get_name()
 
     if response == "":
-      response = "Player not found."
+      response = "Player not found in match."
     else:
       response += " gains a point."
     
@@ -98,7 +95,7 @@ class Match():
       response = second_side.get_name()
 
     if response == "":
-      response = "Player not found."
+      response = "Player not found in match."
     else:
       response += " has been disqualified."
     
@@ -134,6 +131,9 @@ class Match():
   def is_complete(self):
     status = self.match_status()
     return status == MATCH_STATUS_COMPLETE or status == MATCH_STATUS_NOT_FULL
+
+  def get_sides(self):
+    return self.__sides_tuple[SIDE_1_INDEX], self.__sides_tuple[SIDE_2_INDEX] 
 
   def __get_tuple(self):
     return self.__sides_tuple[SIDE_1_INDEX], self.__sides_tuple[SIDE_2_INDEX], \

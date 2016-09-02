@@ -54,8 +54,17 @@ class Tourny:
 
         response = player.get_name() + " has been disqualified."
 
+        if len(self.__bracket.get_games()) == 1:
+          name = ""
+          top, bottom = match.get_sides()
+          if top.get_handle == handle:
+            name = bottom.get_name()
+          elif bottom.get_handle == handle:
+            name = bottom.get_name()
+          response += "\n" + name + " is the tournament champion."
+
     if response == "":
-      response = "Player not found."
+      response = "Player not found in tournament."
     return response
 
   def next(self):
@@ -81,10 +90,10 @@ class Tourny:
     '''
     games = self.__bracket.get_games()
     if len(games) == 0:
-      return "The tournament has not started."
+      return "The game was not found."
 
     if user not in self.__players:
-      return "Player not found."
+      return "Player not found in tournament."
     
     player = self.__players[user]
     match = games[player.match_id]
@@ -94,12 +103,10 @@ class Tourny:
     if match.match_status() == MATCH_STATUS_COMPLETE:
       response = player.get_name() + " wins the match."
     else:
-      response = player.get_name() + " repoted a win"
+      response = player.get_name() + " repoted a win."
 
     if len(games) == 1 and self.is_complete():
-      response += " and is the champion!"
-    else:
-      response += "."
+      response = "\n" + response + " is the tournament champion!"
 
     return response
 
@@ -112,10 +119,16 @@ class Tourny:
     string = ""
     if len(games) == 0:
       return "The tournament has not started."
+    
+    champion = False
+    if len(games) == 1 and self.is_complete():
+      champion = True 
 
     i = 1
     for match in games:
-      string = "%s\nMatch: %d\n" % (string, i)
+      if champion:
+        string = match.get_winner().get_name() + " is the tournament champion"
+      string += "%s\nMatch: %d\n" % (string, i)
       string = "%s%s\n" % (string, match.get_score())
       i += 1
     
@@ -127,10 +140,13 @@ class Tourny:
     '''
     response = True
     games = self.__bracket.get_games()
-    for match in games:
-      if match.is_complete() == False:
-        print match.get_score()
-        response = False
+    if len(games) == 0:
+      response = False
+    else:
+      for match in games:
+        if match.is_complete() == False:
+          print match.get_score()
+          response = False
     
     return response
 

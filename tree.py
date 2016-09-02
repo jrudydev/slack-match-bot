@@ -177,7 +177,7 @@ class TournyTree(object):
 
       response = "Tournament bracket advanced to next round."
     else:
-      response = "Tournament is over, cannot advance."
+      response = "Tournament is over."
 
     return response
 

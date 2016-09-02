@@ -59,22 +59,28 @@ def populate_tourny(bot_channel):
   one containing matchbot, then get a list of channel memebers, and finally
   create a player object and add it to the tournament.
   '''
+  response = "" 
   members = get_channel_users(bot_channel)
-  for member_id in members:
-    # retrieve user info so we can get profile
-    member_info = get_user_porfile(member_id)
-    if 'profile' in member_info:
-      profile = member_info.get('profile')
-      first_name = ""
-      if "first_name" in profile:
-        first_name = profile.get("first_name")
-      last_name = ""
-      if "last_name" in profile:
-        last_name = profile.get("last_name")
+  if len(members) == 0:
+    response =  "The channel does not have any members."
+  else:
+    for member_id in members:
+      # retrieve user info so we can get profile
+      member_info = get_user_porfile(member_id)
+      if 'profile' in member_info:
+        profile = member_info.get('profile')
+        first_name = ""
+        if "first_name" in profile:
+          first_name = profile.get("first_name")
+        last_name = ""
+        if "last_name" in profile:
+          last_name = profile.get("last_name")
 
-      tourny.add(Player(member_info["id"], member_info["name"], first_name, last_name))
+        tourny.add(Player(member_info["id"], member_info["name"], first_name, last_name))
 
-  tourny.start()
+    response = tourny.start()
+
+  return response
 
 def handle_admin_command(admin_command, bot_channel):
   '''
@@ -82,8 +88,9 @@ def handle_admin_command(admin_command, bot_channel):
   '''
   response = ""
   if admin_command.startswith(START_TOURNY):
-    populate_tourny(bot_channel)    
+    populate_response = populate_tourny(bot_channel)    
     response = "Generating tournament bracket...\n"
+    response += populate_response + "\n"
     response += tourny.get_printed()
 
   if admin_command.startswith(REPORT_QUIT):
@@ -99,7 +106,7 @@ def handle_admin_command(admin_command, bot_channel):
       response = "Provide and handle to disqualify."
 
   if admin_command.startswith(NEXT_ROUND):
-    response = "Trying to call advance to next round.\n"
+    response = "Advancing to the next round...\n"
     response += tourny.next() + "\n"
     response += tourny.get_printed()
 
@@ -131,7 +138,7 @@ def handle_command(user, command, channel):
 
   if command.startswith(PRINT_TOURNY):
     response = "Printing tournament bracket...\n"
-    resposne += tourny.get_printed()
+    response += tourny.get_printed()
     
   if command.startswith(REPORT_WIN):
     response = "Reporting a win...\n"

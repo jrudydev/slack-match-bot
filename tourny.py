@@ -54,15 +54,6 @@ class Tourny:
 
         response = player.get_name() + " has been disqualified."
 
-        if len(self.__bracket.get_games()) == 1:
-          name = ""
-          top, bottom = match.get_sides()
-          if top.get_handle == handle:
-            name = bottom.get_name()
-          elif bottom.get_handle == handle:
-            name = bottom.get_name()
-          response += "\n" + name + " is the tournament champion."
-
     if response == "":
       response = "Player not found in tournament."
     return response
@@ -105,9 +96,6 @@ class Tourny:
     else:
       response = player.get_name() + " repoted a win."
 
-    if len(games) == 1 and self.is_complete():
-      response = "\n" + response + " is the tournament champion!"
-
     return response
 
   def get_printed(self):
@@ -125,14 +113,15 @@ class Tourny:
       champion = True 
 
     i = 1
+    champ = ""
     for match in games:
       if champion:
-        string = match.get_winner().get_name() + " is the tournament champion"
-      string += "%s\nMatch: %d\n" % (string, i)
+        champ = match.get_winner().get_name() + " is the tournament champion!!!\n"
+      string = "%s\nMatch: %d\n" % (string, i)
       string = "%s%s\n" % (string, match.get_score())
       i += 1
     
-    return string
+    return champ + string
 
   def is_complete(self):
     '''

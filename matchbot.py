@@ -16,6 +16,7 @@ from player import Player
 
 BOT_ID = os.environ.get("BOT_ID") 
 AT_BOT = "<@" + BOT_ID  + ">"
+SLACK_BOTS_ALLOWED = False
 
 # admin commands
 START_TOURNY = "start"
@@ -53,6 +54,21 @@ def get_channel_users(bot_channel_id):
 
   return users
 
+def add_player_to_tourny(member_info):
+  '''
+  Add the user to the tournament
+  '''
+  if 'profile' in member_info:
+    profile = member_info.get('profile')
+  first_name = ""
+  if "first_name" in profile:
+    first_name = profile.get("first_name")
+  last_name = ""
+  if "last_name" in profile:
+    last_name = profile.get("last_name")
+
+  tourny.add(Player(member_info["id"], member_info["name"], first_name, last_name))
+
 def populate_tourny(bot_channel):
   '''
   Use the slack api to first get a list of channels for the team, find the
@@ -66,17 +82,11 @@ def populate_tourny(bot_channel):
   else:
     for member_id in members:
       # retrieve user info so we can get profile
-      member_info = get_user_porfile(member_id)
-      if 'profile' in member_info:
-        profile = member_info.get('profile')
-        first_name = ""
-        if "first_name" in profile:
-          first_name = profile.get("first_name")
-        last_name = ""
-        if "last_name" in profile:
-          last_name = profile.get("last_name")
-
-        tourny.add(Player(member_info["id"], member_info["name"], first_name, last_name))
+      member = get_user_porfile(member_id)
+      is_bot = member.get('is_bot')
+      if not is_bot or SLACK_BOTS_ALLOWED:
+        # only add real users if flag is set
+        add_player_to_tourny(member)
 
     response = tourny.start()
 

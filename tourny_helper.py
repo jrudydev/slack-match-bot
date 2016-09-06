@@ -5,9 +5,6 @@
 #
 # Description: 
 
-# import os
-# import json
-# import time
 from tourny import Tourny
 from player import Player
 
@@ -59,8 +56,9 @@ class TournyHelper():
     tourny = self.get_current_tourny()
     return tourny.add(Player(member_info["id"], member_info["name"], first_name, last_name))
 
-  def report_win():
-    pass
+  def report_win(self, user_handle):
+    tourny = self.get_current_tourny()
+    return tourny.win(user_handle)
 
   def get_tourny(self):
     tourny = self.get_current_tourny()

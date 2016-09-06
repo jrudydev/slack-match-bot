@@ -12,7 +12,7 @@ from player import Player
 SIDE_1_INDEX = 0
 SIDE_2_INDEX = 1 
 
-BEST_OF = 3
+BEST_OF = 1
 
 MATCH_STATUS_NOT_FULL = 0
 MATCH_STATUS_NOT_STARTED = 1
@@ -151,9 +151,9 @@ class Match():
 
       if bottom == None:
         response = top
-      if top_points == 2:
+      if top_points == BEST_OF:
         response = top
-      if bottom_points == 2:
+      if bottom_points == BEST_OF:
         response = bottom 
 
     return response 

@@ -110,7 +110,7 @@ def admin_command(run_command, bot_channel):
 
   return response
 
-def user_command(run_command):
+def user_command(user_handle, run_command):
   '''
   These commands can only be used by administrators of the channel.
   '''
@@ -123,7 +123,7 @@ def user_command(run_command):
     
   if run_command.startswith(REPORT_WIN):
     response = "Reporting a win...\n"
-    response += tourny.win(user) + "\n"
+    response += tournys.report_win(user_handle) + "\n"
     response += tournys.get_tourny()
 
   return response
@@ -147,7 +147,7 @@ def handle_command(user, command, channel):
   elif is_admin_command_bool:
     response = admin_command(command, channel)
   else:
-    response = user_command(command)
+    response = user_command(user, command)
 
   slack_client.api_call("chat.postMessage", channel=channel, text=response, as_user=True)
 

@@ -11,8 +11,7 @@ import os
 import json
 from slackclient import SlackClient
 import time
-from tourny import Tourny
-from player import Player
+from tourny_helper import TournyHelper
 
 BOT_ID = os.environ.get("BOT_ID") 
 AT_BOT = "<@" + BOT_ID  + ">"
@@ -28,7 +27,7 @@ HELP_COMMAND = "help"
 PRINT_TOURNY = "show"
 REPORT_WIN = "win"
 
-tourny = Tourny()
+tournys = TournyHelper()
 slack_client = SlackClient(os.environ.get('SLACK_BOT_TOKEN'))
 
 def get_user_porfile(user_id):
@@ -54,22 +53,7 @@ def get_channel_users(bot_channel_id):
 
   return users
 
-def add_player_to_tourny(member_info):
-  '''
-  Add the user to the tournament
-  '''
-  if 'profile' in member_info:
-    profile = member_info.get('profile')
-  first_name = ""
-  if "first_name" in profile:
-    first_name = profile.get("first_name")
-  last_name = ""
-  if "last_name" in profile:
-    last_name = profile.get("last_name")
-
-  tourny.add(Player(member_info["id"], member_info["name"], first_name, last_name))
-
-def populate_tourny(bot_channel):
+def populate(bot_channel):
   '''
   Use the slack api to first get a list of channels for the team, find the
   one containing matchbot, then get a list of channel memebers, and finally
@@ -86,39 +70,61 @@ def populate_tourny(bot_channel):
       is_bot = member.get('is_bot')
       if not is_bot or SLACK_BOTS_ALLOWED:
         # only add real users if flag is set
-        add_player_to_tourny(member)
+        tournys.add_player(member)
 
-    response = tourny.start()
+    response = tournys.start_tourny()
 
   return response
 
-def handle_admin_command(admin_command, bot_channel):
+def is_admin_command(tourny_command):
+  return tourny_command.startswith(START_TOURNY) or \
+      tourny_command.startswith(REPORT_QUIT) or \
+      tourny_command.startswith(NEXT_ROUND)
+
+def admin_command(run_command, bot_channel):
   '''
   These commands can only be used by administrators of the channel.
   '''
-  response = ""
-  if admin_command.startswith(START_TOURNY):
-    populate_response = populate_tourny(bot_channel)    
+  if run_command.startswith(START_TOURNY):
+    populate_response = populate(bot_channel)    
     response = "Generating tournament bracket...\n"
     response += populate_response + "\n"
-    response += tourny.get_printed()
+    response += tournys.get_tourny()
 
-  if admin_command.startswith(REPORT_QUIT):
-    parts = admin_command.split()
+  if run_command.startswith(REPORT_QUIT):
+    parts = run_command.split()
     if len(parts) >= 2:
       # potential handle was provided for disqualification
       handle = parts[1]
-      boot_response = tourny.boot(handle)
+      boot_response = tournys.boot_player(handle)
       response = "Disqualifying " + handle + "...\n" 
       response += boot_response + "\n"
-      response += tourny.get_printed()
+      response += tournys.get_tourny()
     else: 
       response = "Provide and handle to disqualify."
 
-  if admin_command.startswith(NEXT_ROUND):
+  if run_command.startswith(NEXT_ROUND):
     response = "Advancing to the next round...\n"
-    response += tourny.next() + "\n"
-    response += tourny.get_printed()
+    response += tournys.next() + "\n"
+    response += tournys.get_tourny()
+
+  return response
+
+def user_command(run_command):
+  '''
+  These commands can only be used by administrators of the channel.
+  '''
+  if run_command.startswith(HELP_COMMAND):  
+    response = "Sure... write more code then I can do that!"
+
+  if run_command.startswith(PRINT_TOURNY):
+    response = "Printing tournament bracket...\n"
+    response += tournys.get_tourny()
+    
+  if run_command.startswith(REPORT_WIN):
+    response = "Reporting a win...\n"
+    response += tourny.win(user) + "\n"
+    response += tournys.get_tourny()
 
   return response
 
@@ -131,29 +137,17 @@ def handle_command(user, command, channel):
   response = "Not sure what you mean. Use the *" + HELP_COMMAND + \
     "* command with numbers, deliminated by spaces."
 
+  tournys.set_current_tourny(channel)
+
   user_profile = get_user_porfile(user)
   is_admin = user_profile.get("is_admin")
-  if command.startswith(START_TOURNY) or \
-      command.startswith(REPORT_QUIT) or \
-      command.startswith(NEXT_ROUND):
-    if is_admin:
-      admin_response = handle_admin_command(command, channel)
-      if admin_response != "":
-        response = admin_response
-    else:
-      response = "Must be an admin to use this command."
-  
-  if command.startswith(HELP_COMMAND):	
-    response = "Sure... write more code then I can do that!"
-
-  if command.startswith(PRINT_TOURNY):
-    response = "Printing tournament bracket...\n"
-    response += tourny.get_printed()
-    
-  if command.startswith(REPORT_WIN):
-    response = "Reporting a win...\n"
-    response += tourny.win(user) + "\n"
-    response += tourny.get_printed()
+  is_admin_command_bool = is_admin_command(command)
+  if is_admin_command_bool and not is_admin:
+    response = "Must be an admin to use this command."
+  elif is_admin_command_bool:
+    response = admin_command(command, channel)
+  else:
+    response = user_command(command)
 
   slack_client.api_call("chat.postMessage", channel=channel, text=response, as_user=True)
 

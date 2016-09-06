@@ -41,11 +41,12 @@ MatchBot makes it easy to setup whether you are on the web or native aplication.
 
 |COMMAND|DESCRIPTION                 |OPTIONS                       | ADMIN ONLY |
 |:-----:|----------------------------|:----------------------------:|:----------:|
-|help   |Print a readme file         |[COMMAND] Ex: start           |            |
-|start  |Generate tournament         |None                          |x           |
-|boot   |Disqualify player           |[HANDLE] Ex: slackbot         |x           |
+|help   |Print a readme file         |[COMMAND]  Ex: start          |            |
+|start  |Generate tournament         |[TYPE]  Ex: doubles           |x           |
+|boot   |Disqualify player           |[HANDLE]  Ex: slackbot        |x           |
+|reset  |Reset match                 |[HANDLE]  Ex: slackbot        |x           |
 |next   |Move to next round          |None                          |x			 |
-|show   |Print tournmanet Bracket    |[OPTION] Ex: all              |            |
+|show   |Print tournmanet Bracket    |[OPTION]  Ex: all             |            |
 |win    |Report a win                |None                          |            |
 
 ---
@@ -80,6 +81,17 @@ Example:
 ```
 
 Description: Disqualify a player with matching slack handle.
+
+---
+### reset (Admin Only)
+Options: [HANDLE] = (any handle for a player in the current round)
+
+Example:
+```
+@matchbot reset slackbot
+```
+
+Description: Reset the match of player with matching slack handle.
 
 ---
 ### next (Admin Only)

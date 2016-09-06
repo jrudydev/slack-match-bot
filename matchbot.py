@@ -21,6 +21,7 @@ SLACK_BOTS_ALLOWED = True
 START_TOURNY = "start"
 REPORT_QUIT = "boot"
 NEXT_ROUND = "next"
+RESET_MATCH = "reset"
 
 # user commands
 HELP_COMMAND = "help"
@@ -82,7 +83,8 @@ def populate(bot_channel, is_doubles):
 def is_admin_command(tourny_command):
   return tourny_command.startswith(START_TOURNY) or \
       tourny_command.startswith(REPORT_QUIT) or \
-      tourny_command.startswith(NEXT_ROUND)
+      tourny_command.startswith(NEXT_ROUND) or \
+      tourny_command.startswith(RESET_MATCH)
 
 def admin_command(run_command, bot_channel):
   '''
@@ -111,6 +113,18 @@ def admin_command(run_command, bot_channel):
       boot_response = tournys.boot_slot(handle)
       response = "Disqualifying " + handle + "...\n" 
       response += boot_response + "\n"
+      response += tournys.get_tourny()
+    else: 
+      response = "Provide and handle to disqualify."
+
+  if run_command.startswith(RESET_MATCH):
+    parts = run_command.split()
+    if len(parts) >= 2:
+      # potential handle was provided for disqualification
+      handle = parts[1]
+      reset_response = tournys.reset_match(handle)
+      response = "Disqualifying " + handle + "...\n" 
+      response += reset_response + "\n"
       response += tournys.get_tourny()
     else: 
       response = "Provide and handle to disqualify."

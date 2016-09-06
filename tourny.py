@@ -75,6 +75,31 @@ class Tourny:
 
     return "Generated a doubles bracket."
 
+  def reset(self, handle):
+    '''
+    
+    '''
+    response = ""
+    for key in self.__players:
+      player = self.__players[key]
+      if handle == player.get_handle():
+        games = self.__bracket.get_games()
+
+        user = player.get_user()
+        player = self.__players[user]
+        match = games[player.get_match_id()]
+        match.reset_game(user)
+
+        if self.__is_doubles:
+          response = "Match has been reset."
+        else:
+          response = player.get_name() + "'s match has been reset"
+
+    if response == "":
+      response = "Player not found in tournament."
+
+    return response
+
   def boot(self, handle):
     '''
     Disqualify the user with the handle provided and give the win to the opponent.
@@ -90,10 +115,14 @@ class Tourny:
         match = games[player.get_match_id()]
         match.quit_player(user)
 
-        response = player.get_name() + " has been disqualified."
+        if self.__is_doubles:
+          response = match.get_loser().get_name() + " have been disqualified."
+        else:
+          response = player.get_name() + " has been disqualified."
 
     if response == "":
       response = "Player not found in tournament."
+
     return response
 
   def next(self):
@@ -130,7 +159,10 @@ class Tourny:
 
     response = ""
     if match.match_status() == MATCH_STATUS_COMPLETE:
-      response = player.get_name() + " wins the match."
+      if self.__is_doubles:
+        response = match.get_winner().get_name() + + " win the match."
+      else:
+        response = player.get_name() + " wins the match."
     else:
       response = player.get_name() + " repoted a win."
 

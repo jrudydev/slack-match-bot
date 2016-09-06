@@ -126,7 +126,19 @@ class Match():
     else:
       response += " has been disqualified."
     
-    print response 
+    print response
+
+  def reset_game(self, user):
+    '''
+    
+    '''
+    if self.match_status() == MATCH_STATUS_NOT_FULL:
+      print("Cannot reset a bye game.")
+      return
+    
+    self.__wins_tuple = (0, 0)
+
+    print "Match reset."
 
   def set_match_ids(self, match_id):
     '''
@@ -181,6 +193,25 @@ class Match():
         response = top
       if bottom_points == POINTS_TO_WIN:
         response = bottom 
+
+    return response
+
+  def get_loser(self):
+    '''
+    Return the side with has won the majority of the games and handle bye match
+    '''
+    response = None
+    if not self.is_complete():
+      print "This game has not been completed."
+    else:
+      top, bottom, top_points, bottom_points = self.__get_tuple()
+
+      if bottom == None:
+        response = bottom
+      if top_points == POINTS_TO_WIN:
+        response = bottom
+      if bottom_points == POINTS_TO_WIN:
+        response = top 
 
     return response 
 

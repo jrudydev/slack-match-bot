@@ -44,6 +44,10 @@ class TournyHelper():
     tourny = self.get_current_tourny()
     return tourny.boot(member_handle)
 
+  def reset_match(self, member_handle):
+    tourny = self.get_current_tourny()
+    return tourny.reset(member_handle)
+
   def add_player(self, member_info):
     '''
     Add the user to the tournament

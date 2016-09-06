@@ -152,16 +152,16 @@ class TournyTree(object):
       node.match.add_side(node.left.node.match.get_winner())
       node.match.add_side(node.right.node.match.get_winner())
 
-  def generate(self, players):
+  def generate(self, slots):
     '''
     Initalize and reset the tree with the players provided.
     '''
-    number_of_players = len(players)
+    number_of_slots = len(slots)
     
     self.__round = 1
     self.node = None
-    self.__set_height(number_of_players)
-    self.insert_matches(number_of_players, self.__height, players)
+    self.__set_height(number_of_slots)
+    self.insert_matches(number_of_slots, self.__height, slots)
 
     self.__create_round()
   
@@ -196,7 +196,7 @@ if __name__ == '__main__':
   for match in games:
     print match.get_score()
 
-  games[first_player.match_id].add_win("U555")
+  games[first_player.get_match_id()].add_win("U555")
 
   games = tree.get_games()
   for match in games:

@@ -34,22 +34,13 @@ class Player():
     return self.__handle
 
   def get_name(self):
-    '''
-    Returns a string with the first and last name unless they either do not exist, 
-    then it used the handle which always exists.
-    '''
-    first_name = self.__name_tuple[FNAME_INDEX]
-    last_name = self.__name_tuple[LNAME_INDEX]
+    return self.__handle
 
-    response = ""
-    if first_name == "" and last_name == "":
-      response = self.__handle
-    elif first_name != "":
-      response = first_name + ' ' +  last_name
-    else:
-      response = last_name
+  def set_match_id(self, match_id):
+    self.__match_id = match_id
 
-    return response
+  def get_match_id(self):
+    return self.__match_id
 
   # def get_record(self):
   #   wins = self.__record_tuple[WIN_INDEX]

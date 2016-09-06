@@ -12,7 +12,7 @@ from player import Player
 SIDE_1_INDEX = 0
 SIDE_2_INDEX = 1 
 
-BEST_OF = 1
+POINTS_TO_WIN = 1
 
 MATCH_STATUS_NOT_FULL = 0
 MATCH_STATUS_NOT_STARTED = 1
@@ -50,7 +50,6 @@ class Match():
     '''
     Register a win for the player with the slack user id provided.
     '''
-    response = ""
     if self.match_status() == MATCH_STATUS_COMPLETE:
       return "This game is complete."
 
@@ -58,14 +57,29 @@ class Match():
       return "Cannot win a bye game."
 
     top, bottom, top_points, bottom_points = self.__get_tuple()
-    if top.get_user() == user:
+
+    is_top_winner = False
+    is_bottom_winner = False
+    get_users = getattr(top, "get_users", None)
+    if callable(get_users):
+      if user in top.get_users():
+        is_top_winner = True
+      if user in bottom.get_users():
+        is_bottom_winner = True
+    else:
+      if top.get_user() == user:
+        is_top_winner = True
+      if bottom.get_user() == user:
+        is_bottom_winner = True
+
+    response = ""
+    if is_top_winner:
       self.__wins_tuple = (top_points + 1, bottom_points)
       response = top.get_name()
-
-    if bottom.get_user() == user:
+    if is_bottom_winner:
       self.__wins_tuple = (top_points, bottom_points + 1) 
       response = bottom.get_name()
-
+    
     if response == "":
       response = "Player not found in match."
     else:
@@ -82,17 +96,30 @@ class Match():
       print("Cannot win a bye game.")
       return
     
-    first_side = self.__sides_tuple[SIDE_1_INDEX]
-    second_side = self.__sides_tuple[SIDE_2_INDEX]
+    top_slot = self.__sides_tuple[SIDE_1_INDEX]
+    bottom_slot = self.__sides_tuple[SIDE_2_INDEX]
+
+    is_top_loser = False
+    is_bottom_loser = False
+    get_users = getattr(top_slot, "get_users", None)
+    if callable(get_users):
+      if user in top_slot.get_users():
+        is_top_loser = True
+      if user in bottom_slot.get_users():
+        is_bottom_loser = True
+    else:
+      if top_slot.get_user() == user:
+        is_top_loser = True
+      if bottom_slot.get_user() == user:
+        is_bottom_loser = True
 
     response = ""
-    if first_side.get_user() == user:
-      self.__wins_tuple = (0, BEST_OF - 1)
-      response = first_side.get_name()
-
-    if second_side.get_user() == user:
-      self.__wins_tuple = (BEST_OF - 1, 0) 
-      response = second_side.get_name()
+    if is_top_loser:
+      self.__wins_tuple = (0, POINTS_TO_WIN)
+      response = top_slot.get_name()
+    if is_bottom_loser:
+      self.__wins_tuple = (POINTS_TO_WIN, 0) 
+      response = bottom_slot.get_name()
 
     if response == "":
       response = "Player not found in match."
@@ -108,20 +135,19 @@ class Match():
     top = self.__sides_tuple[SIDE_1_INDEX]
     bottom = self.__sides_tuple[SIDE_2_INDEX]
     if top != None:
-      top.match_id = match_id
+      top.set_match_id(match_id)
     if bottom != None:
-      bottom.match_id = match_id
+      bottom.set_match_id(match_id)
 
   def match_status(self):
     top, bottom, top_points, bottom_points = self.__get_tuple()
-
+    
     response = None
-    games_to_win = BEST_OF - 1
     if top == None or bottom == None:
       response = MATCH_STATUS_NOT_FULL
     elif top_points == 0 and bottom_points == 0:
       response = MATCH_STATUS_NOT_STARTED
-    elif top_points >= games_to_win or bottom_points >= games_to_win:
+    elif top_points >= POINTS_TO_WIN or bottom_points >= POINTS_TO_WIN:
       response = MATCH_STATUS_COMPLETE
     else:
       response = MATCH_STATUS_IN_PROGRESS
@@ -133,7 +159,7 @@ class Match():
     return status == MATCH_STATUS_COMPLETE or status == MATCH_STATUS_NOT_FULL
 
   def get_sides(self):
-    return self.__sides_tuple[SIDE_1_INDEX], self.__sides_tuple[SIDE_2_INDEX] 
+    return self.__sides_tuple[SIDE_1_INDEX], self.__sides_tuple[SIDE_2_INDEX]
 
   def __get_tuple(self):
     return self.__sides_tuple[SIDE_1_INDEX], self.__sides_tuple[SIDE_2_INDEX], \
@@ -151,9 +177,9 @@ class Match():
 
       if bottom == None:
         response = top
-      if top_points == BEST_OF:
+      if top_points == POINTS_TO_WIN:
         response = top
-      if bottom_points == BEST_OF:
+      if bottom_points == POINTS_TO_WIN:
         response = bottom 
 
     return response 
@@ -182,7 +208,7 @@ class Match():
       if self.__sides_tuple[SIDE_1_INDEX] == None:
         output = "This is a bye game."
       else:
-        output = "This side is a bye."
+        output = "- BYE -"
     else:
       points = self.__wins_tuple[SIDE_2_INDEX]
       output = side.get_name() + ": " + str(points)
@@ -194,25 +220,25 @@ class Match():
 
 
 def main(): 
-  top_player = Player("U234135", "abc", "Pepe", "Rodo") 
-  bottom_player = Player("U234355", "ZXY", "Papi", "Chulo") 
+  top_side = Player("U234135", "abc", "Pepe", "Rodo") 
+  bottom_side = Player("U234355", "ZXY", "Papi", "Chulo") 
 
   match = Match()
   print match.get_bottom()
   match.print_score()
   print ""
 
-  match.add_side(top_player)
+  match.add_side(top_side)
   print match.get_top()
   print match.get_bottom()
   print ""
 
-  match.add_side(bottom_player)
+  match.add_side(bottom_side)
   print match.get_top()
   print match.get_bottom()
   print ""
 
-  match.add_win(top_player.get_user())
+  match.add_win(top_side.get_user())
 
   print match.get_score()
 

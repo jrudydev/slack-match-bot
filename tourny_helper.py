@@ -28,15 +28,19 @@ class TournyHelper():
 
     return tourny
 
-  def start_tourny(self):
+  def start_singles(self):
     tourny = self.get_current_tourny()
-    return tourny.start()
+    return tourny.singles()
 
-  def next_round(self, member_handle):
+  def start_doubles(self):
+    tourny = self.get_current_tourny()
+    return tourny.doubles()
+
+  def next_round(self):
     tourny = self.get_current_tourny()
     return tourny.next()
 
-  def boot_player(self, member_handle):
+  def boot_slot(self, member_handle):
     tourny = self.get_current_tourny()
     return tourny.boot(member_handle)
 

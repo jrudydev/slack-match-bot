@@ -160,7 +160,7 @@ class Tourny:
     response = ""
     if match.match_status() == MATCH_STATUS_COMPLETE:
       if self.__is_doubles:
-        response = match.get_winner().get_name() + + " win the match."
+        response = match.get_winner().get_name() + " win the match."
       else:
         response = player.get_name() + " wins the match."
     else:

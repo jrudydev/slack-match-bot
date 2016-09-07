@@ -34,17 +34,17 @@ class Team():
   def get_match_id(self):
     return self.__match_id
 
-  def get_user(self):
-    return self.__teammates[0].get_user() + self.__teammates[1].get_user()
-
-  def get_handle(self):
-    return self.__teammates[0].get_handle() + self.__teammates[1].get_handle()
-
   def get_users(self):
-    return [self.__teammates[0].get_user(), self.__teammates[1].get_user()]
+    users = []
+    for teammate in self.__teammates:
+      users.append(teammate.get_user())
+    return users
 
   def get_handles(self):
-    return [self.__teammates[0].get_handle(), self.__teammates[1].get_handle()]
+    handles = []
+    for teammate in self.__teammates:
+      handles.append(teammate.get_handle())
+    return handles
 
   def get_name(self):
     '''

@@ -56,29 +56,16 @@ class Match():
     if self.match_status() == MATCH_STATUS_NOT_FULL:
       return "Cannot win a bye game."
 
-    top, bottom, top_points, bottom_points = self.__get_tuple()
-
-    is_top_winner = False
-    is_bottom_winner = False
-    get_users = getattr(top, "get_users", None)
-    if callable(get_users):
-      if user in top.get_users():
-        is_top_winner = True
-      if user in bottom.get_users():
-        is_bottom_winner = True
-    else:
-      if top.get_user() == user:
-        is_top_winner = True
-      if bottom.get_user() == user:
-        is_bottom_winner = True
+    top_slot, bottom_slot, top_points, bottom_points = self.__get_tuple()
+    is_top_winner, is_bottom_winner = self.__are_users_winners(top_slot, bottom_slot, user)
 
     response = ""
     if is_top_winner:
       self.__wins_tuple = (top_points + 1, bottom_points)
-      response = top.get_name()
+      response = top_slot.get_name()
     if is_bottom_winner:
       self.__wins_tuple = (top_points, bottom_points + 1) 
-      response = bottom.get_name()
+      response = bottom_slot.get_name()
     
     if response == "":
       response = "Player not found in match."
@@ -96,22 +83,8 @@ class Match():
       print("Cannot win a bye game.")
       return
     
-    top_slot = self.__sides_tuple[SIDE_1_INDEX]
-    bottom_slot = self.__sides_tuple[SIDE_2_INDEX]
-
-    is_top_loser = False
-    is_bottom_loser = False
-    get_users = getattr(top_slot, "get_users", None)
-    if callable(get_users):
-      if user in top_slot.get_users():
-        is_top_loser = True
-      if user in bottom_slot.get_users():
-        is_bottom_loser = True
-    else:
-      if top_slot.get_user() == user:
-        is_top_loser = True
-      if bottom_slot.get_user() == user:
-        is_bottom_loser = True
+    top_slot, bottom_slot, top_points, bottom_points = self.__get_tuple()
+    is_top_loser, is_bottom_loser = self.__find_user(top_slot, bottom_slot, user)
 
     response = ""
     if is_top_loser:
@@ -173,6 +146,22 @@ class Match():
   def get_sides(self):
     return self.__sides_tuple[SIDE_1_INDEX], self.__sides_tuple[SIDE_2_INDEX]
 
+  def __find_user(self, top, bottom, user_id):
+    is_top_winner = False
+    is_bottom_winner = False
+    get_users = getattr(top, "get_users", None)
+    if callable(get_users):
+      if user_id in top.get_users():
+        is_top_winner = True
+      if user_id in bottom.get_users():
+        is_bottom_winner = True
+    else:
+      if top.get_user() == user_id:
+        is_top_winner = True
+      if bottom.get_user() == user_id:
+        is_bottom_winner = True
+    return (is_top_winner, is_bottom_winner)
+
   def __get_tuple(self):
     return self.__sides_tuple[SIDE_1_INDEX], self.__sides_tuple[SIDE_2_INDEX], \
       self.__wins_tuple[SIDE_1_INDEX], self.__wins_tuple[SIDE_2_INDEX]
@@ -223,9 +212,11 @@ class Match():
     side = self.__sides_tuple[SIDE_1_INDEX]
     if side == None:
       output = "This is a bye game."
+    elif self.__sides_tuple[SIDE_2_INDEX] == None:
+      output = "BYE:  " + side.get_name()
     else:
       points = self.__wins_tuple[SIDE_1_INDEX]
-      output = side.get_name() + ": " + str(points)
+      output = self.__get_status_label(points) + ":  " + side.get_name()
 
     return output
 
@@ -239,12 +230,27 @@ class Match():
       if self.__sides_tuple[SIDE_1_INDEX] == None:
         output = "This is a bye game."
       else:
-        output = "- BYE -"
+        output = "BYE:  - Bye -"
     else:
       points = self.__wins_tuple[SIDE_2_INDEX]
-      output = side.get_name() + ": " + str(points)
+      output = self.__get_status_label(points) + ":  " + side.get_name()
 
     return output
+
+  def __get_status_label(self, slot_points):
+    label = ""
+    status = self.match_status()
+    if status == MATCH_STATUS_NOT_STARTED or status == MATCH_STATUS_NOT_FULL:
+      label = "TBD"
+    elif status == MATCH_STATUS_COMPLETE:
+      if slot_points == POINTS_TO_WIN:
+        label = "W".center(5)
+      else:
+        label = "L".center(8)
+    else:
+      label = str(points).center(6)
+
+    return label
 
   def get_score(self):
     return "%s\n%s" % (self.get_top(), self.get_bottom())

@@ -22,6 +22,7 @@ START_TOURNY = "start"
 REPORT_QUIT = "boot"
 NEXT_ROUND = "next"
 RESET_MATCH = "reset"
+HANDLE_ADMIN = "admin"
 
 # user commands
 HELP_COMMAND = "help"
@@ -30,6 +31,7 @@ REPORT_WIN = "win"
 
 tournys = TournyHelper()
 slack_client = SlackClient(os.environ.get('SLACK_BOT_TOKEN'))
+admins = []
 
 def get_user_porfile(user_id):
   '''
@@ -80,11 +82,52 @@ def populate(bot_channel, is_doubles):
 
   return response
 
+def clear_admin_users():
+  del admins[:]
+
+  return "Removing all admins."
+
+def list_admin_users():
+  response = "Admins:\n"
+  if len(admins) == 0:
+    response += "None"
+
+  for admin in admins:
+    response += admin + "\n"
+
+  return response
+
+def add_admin_user(admin, channel):
+  response = ""
+  user_found = False
+  users = get_channel_users(channel)
+  for user_id in users:
+    user = get_user_porfile(user_id)
+    name = user.get("name")
+    if name == admin and not admin in admins:
+      user_found = True
+    
+  if user_found:
+    admins.append(admin)
+    response = admin + " is now an admin."
+  else:
+    response = "Could not make " + admin + " an admin."
+
+  return response
+
+def is_admin_user(profile):
+  is_admin = False
+  if profile.get("is_owner") or profile.get("name") in admins:
+      is_admin = True
+
+  return is_admin
+
 def is_admin_command(tourny_command):
   return tourny_command.startswith(START_TOURNY) or \
       tourny_command.startswith(REPORT_QUIT) or \
       tourny_command.startswith(NEXT_ROUND) or \
-      tourny_command.startswith(RESET_MATCH)
+      tourny_command.startswith(RESET_MATCH) or \
+      tourny_command.startswith(HANDLE_ADMIN)
 
 def admin_command(run_command, bot_channel):
   '''
@@ -115,7 +158,7 @@ def admin_command(run_command, bot_channel):
       response += boot_response + "\n"
       response += tournys.get_tourny()
     else: 
-      response = "Provide and handle to disqualify."
+      response = "Provide a handle to disqualify."
 
   if run_command.startswith(RESET_MATCH):
     parts = run_command.split()
@@ -127,12 +170,27 @@ def admin_command(run_command, bot_channel):
       response += reset_response + "\n"
       response += tournys.get_tourny()
     else: 
-      response = "Provide and handle to disqualify."
+      response = "Provide a handle to disqualify."
 
   if run_command.startswith(NEXT_ROUND):
     response = "Advancing to the next round...\n"
     response += tournys.next_round() + "\n"
     response += tournys.get_tourny()
+
+  if run_command.startswith(HANDLE_ADMIN):
+    response = ""
+    parts = run_command.split()
+    if len(parts) >= 2:
+      # potential handle was provided for disqualification
+      option = parts[1]
+      if option.startswith("show"):
+        response = list_admin_users()
+      elif option.startswith("clear"):
+        response = clear_admin_users()
+      else:
+        response = add_admin_user(option, bot_channel)
+    else: 
+      response = "Provide a handle to disqualify."
 
   return response
 
@@ -167,8 +225,7 @@ def handle_command(user, command, channel):
   tournys.set_current_tourny(channel)
 
   user_profile = get_user_porfile(user)
-  print user_profile
-  is_admin = user_profile.get("is_owner'")
+  is_admin = is_admin_user(user_profile)
   is_admin_command_bool = is_admin_command(command)
   if is_admin_command_bool and not is_admin:
     response = "Must be an admin to use this command."

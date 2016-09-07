@@ -1,4 +1,4 @@
-# Slack Match Bot
+# Slack Match Bot ![alt text](https://github.com/peperodo/slack-match-bot/blob/match-dev/img/mei.jpg "Logo Title Text 1")
 Slack MatchBot makes a list of users in a channel and generates a single elimination tournament bracket.
 
 ## Setup Local Virtual Environment

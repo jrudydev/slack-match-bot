@@ -200,7 +200,7 @@ def user_command(user_handle, run_command):
   '''
   response = ""
   if run_command.startswith(HELP_COMMAND):  
-    response = "Get a full list of commands and descriptions at:\n" + \
+    response = "Get the full list of commands here:\n" + \
       "https://github.com/peperodo/slack-match-bot"
 
   if run_command.startswith(PRINT_TOURNY):

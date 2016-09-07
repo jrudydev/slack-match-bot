@@ -57,7 +57,7 @@ class Match():
       return "Cannot win a bye game."
 
     top_slot, bottom_slot, top_points, bottom_points = self.__get_tuple()
-    is_top_winner, is_bottom_winner = self.__are_users_winners(top_slot, bottom_slot, user)
+    is_top_winner, is_bottom_winner = self.__find_user(top_slot, bottom_slot, user)
 
     response = ""
     if is_top_winner:
@@ -248,7 +248,7 @@ class Match():
       else:
         label = "L".center(8)
     else:
-      label = str(points).center(6)
+      label = str(points).center(10)
 
     return label
 

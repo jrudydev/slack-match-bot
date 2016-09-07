@@ -167,7 +167,8 @@ def handle_command(user, command, channel):
   tournys.set_current_tourny(channel)
 
   user_profile = get_user_porfile(user)
-  is_admin = user_profile.get("is_admin")
+  print user_profile
+  is_admin = user_profile.get("is_owner'")
   is_admin_command_bool = is_admin_command(command)
   if is_admin_command_bool and not is_admin:
     response = "Must be an admin to use this command."

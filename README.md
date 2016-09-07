@@ -12,14 +12,17 @@ $ source matchbot/bin/activate
 Find the Slack API key in the bot configuration section under Integration Setting -> API Token
 ```
 (matchbot)$ export SLACK_BOT_TOKEN='slack api token goes here'
-(matchbot)$ python print_bot_id.py
-> The matchbot BOT_ID is: BA3GH56Y #returned by slack api call
+(matchbot)$ python utils/print_bot_id.py
+> could not find bot user with the name matchbot
+> could not find bot user with the name matchbot
+> The matchbot BOT_ID is: BA3GH56Y   #returned by slack api call
+> could not find bot user with the name matchbot
 (matchbot)$ export BOT_ID='bot id returned by script'
 ```
 > SLACK_BOT_TOKEN should be exported before running the print_bot_id.py script.
 > then, export the returned string as BOT_ID before moving on.
 
-## Run Local Bot
+## Run Bot
 ```
 (matchbot)$ python matchbot.py
 > MatchBot connected and runing!
@@ -33,7 +36,7 @@ MatchBot makes it easy to setup whether you are on the web or native aplication.
 3. Invite matchbot to the team.
 4. Create a channel for the tournament.
 5. Invite matchbot and more friends to the channel.
-6. Complete steps listed above to 'Run Local Bot'.
+6. Complete steps listed above to 'Run Bot'.
 
 
 ## Commands

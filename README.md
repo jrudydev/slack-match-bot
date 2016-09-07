@@ -41,28 +41,29 @@ MatchBot makes it easy to setup whether you are on the web or native aplication.
 
 |COMMAND|DESCRIPTION                 |OPTIONS                       | ADMIN ONLY |
 |:-----:|----------------------------|:----------------------------:|:----------:|
-|help   |Print a readme file         |[COMMAND]  Ex: start          |            |
-|start  |Generate tournament         |[TYPE]  Ex: doubles           |x           |
+|help   |Print a readme file         |None                          |            |
+|start  |Generate tournament         |[OPTION]  Ex: doubles         |x           |
 |boot   |Disqualify player           |[HANDLE]  Ex: slackbot        |x           |
 |reset  |Reset match                 |[HANDLE]  Ex: slackbot        |x           |
 |next   |Move to next round          |None                          |x			 |
-|show   |Print tournmanet Bracket    |[OPTION]  Ex: all             |            |
+|admin  |Handle admin roles          |[OPTION]  Ex: show            |x			 |
+|show   |Print tournmanet bracket    |None                          |            |
 |win    |Report a win                |None                          |            |
 
 ---
 ### help
-Options: [COMMAND] = start | show | win | boot | next
+Options: None
 
 Example:
 ```
-@matchbot help start
+@matchbot help
 ```
 
 Description: Pull up more information about how to use MatchBot.
 
 ---
 ### start (Admin Only)
-Options: None
+Options: [OPTION] = singles | doubles
 
 Example:
 ```
@@ -105,8 +106,19 @@ Example:
 Description: Use to advance to the next round.
 
 ---
+### admin (Admin Only)
+Options: [OPTIONS] = slackbot | show | clear
+
+Example:
+```
+@matchbot admin show
+```
+
+Description: Use to give user admin privledges.
+
+---
 ### show
-Options: [OPTION] = me | all | handle
+Options: None
 
 Example:
 ```

@@ -200,7 +200,8 @@ def user_command(user_handle, run_command):
   '''
   response = ""
   if run_command.startswith(HELP_COMMAND):  
-    response = "Sure... write more code then I can do that!"
+    response = "Get a full list of commands and descriptions at:\n" + \
+      "https://github.com/peperodo/slack-match-bot"
 
   if run_command.startswith(PRINT_TOURNY):
     response = "Printing tournament bracket...\n"

@@ -98,6 +98,9 @@ def list_admin_users():
   return response
 
 def add_admin_user(admin, channel):
+  '''
+  Promote user to admin if they are in the channel and not already on the list
+  '''
   response = ""
   user_found = False
   users = get_channel_users(channel)
@@ -196,11 +199,12 @@ def admin_command(run_command, bot_channel):
 
 def user_command(user_handle, run_command):
   '''
-  These commands can only be used by administrators of the channel.
+  These commands can used by anyone in the channel.
   '''
   response = ""
   if run_command.startswith(HELP_COMMAND):  
-    response = "Sure... write more code then I can do that!"
+    response = "Get the full list of commands here:\n" + \
+      "https://github.com/peperodo/slack-match-bot"
 
   if run_command.startswith(PRINT_TOURNY):
     response = "Printing tournament bracket...\n"

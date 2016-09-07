@@ -3,12 +3,19 @@
 # Created by: JRG
 # Date: Sept 5, 2016
 #
-# Description: 
+# Description: This object is needed to handle multiple slack channels. An instance of the
+# tourny object is hashed with the channel id as the key. This current tourny
+# should be passed the channel id at the start of every command.
 
 from tourny import Tourny
 from player import Player
 
 class TournyHelper():
+  '''
+  This class keeps track of the current channel and handles that object
+  in the hash table.
+  '''
+
   __tourny_channels = {}
   __current_channel = None
 

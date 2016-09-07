@@ -12,14 +12,17 @@ $ source matchbot/bin/activate
 Find the Slack API key in the bot configuration section under Integration Setting -> API Token
 ```
 (matchbot)$ export SLACK_BOT_TOKEN='slack api token goes here'
-(matchbot)$ python print_bot_id.py
-> The matchbot BOT_ID is: BA3GH56Y #returned by slack api call
+(matchbot)$ python utils/print_bot_id.py
+> could not find bot user with the name matchbot
+> could not find bot user with the name matchbot
+> The matchbot BOT_ID is: BA3GH56Y   #returned by slack api call
+> could not find bot user with the name matchbot
 (matchbot)$ export BOT_ID='bot id returned by script'
 ```
 > SLACK_BOT_TOKEN should be exported before running the print_bot_id.py script.
 > then, export the returned string as BOT_ID before moving on.
 
-## Run Local Bot
+## Run Bot
 ```
 (matchbot)$ python matchbot.py
 > MatchBot connected and runing!
@@ -33,7 +36,7 @@ MatchBot makes it easy to setup whether you are on the web or native aplication.
 3. Invite matchbot to the team.
 4. Create a channel for the tournament.
 5. Invite matchbot and more friends to the channel.
-6. Complete steps listed above to 'Run Local Bot'.
+6. Complete steps listed above to 'Run Bot'.
 
 
 ## Commands
@@ -41,28 +44,29 @@ MatchBot makes it easy to setup whether you are on the web or native aplication.
 
 |COMMAND|DESCRIPTION                 |OPTIONS                       | ADMIN ONLY |
 |:-----:|----------------------------|:----------------------------:|:----------:|
-|help   |Print a readme file         |[COMMAND]  Ex: start          |            |
-|start  |Generate tournament         |[TYPE]  Ex: doubles           |x           |
+|help   |Print a readme file         |None                          |            |
+|start  |Generate tournament         |[OPTION]  Ex: doubles         |x           |
 |boot   |Disqualify player           |[HANDLE]  Ex: slackbot        |x           |
 |reset  |Reset match                 |[HANDLE]  Ex: slackbot        |x           |
 |next   |Move to next round          |None                          |x			 |
-|show   |Print tournmanet Bracket    |[OPTION]  Ex: all             |            |
+|admin  |Handle admin roles          |[OPTION]  Ex: show            |x			 |
+|show   |Print tournmanet bracket    |None                          |            |
 |win    |Report a win                |None                          |            |
 
 ---
 ### help
-Options: [COMMAND] = start | show | win | boot | next
+Options: None
 
 Example:
 ```
-@matchbot help start
+@matchbot help
 ```
 
 Description: Pull up more information about how to use MatchBot.
 
 ---
 ### start (Admin Only)
-Options: None
+Options: [OPTION] = singles | doubles
 
 Example:
 ```
@@ -105,8 +109,19 @@ Example:
 Description: Use to advance to the next round.
 
 ---
+### admin (Admin Only)
+Options: [OPTIONS] = slackbot | show | clear
+
+Example:
+```
+@matchbot admin show
+```
+
+Description: Use to give user admin privledges.
+
+---
 ### show
-Options: [OPTION] = me | all | handle
+Options: None
 
 Example:
 ```

@@ -3,7 +3,8 @@
 # Created by: JRG
 # Date: Sept 5, 2016
 #
-# Description: 
+# Description: This allows the creating of a doubles tournament bracket. It contains
+# two or more players objects and also handles setting their match ids.
 
 from player import Player
 

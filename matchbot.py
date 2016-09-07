@@ -98,6 +98,9 @@ def list_admin_users():
   return response
 
 def add_admin_user(admin, channel):
+  '''
+  Promote user to admin if they are in the channel and not already on the list
+  '''
   response = ""
   user_found = False
   users = get_channel_users(channel)
@@ -196,7 +199,7 @@ def admin_command(run_command, bot_channel):
 
 def user_command(user_handle, run_command):
   '''
-  These commands can only be used by administrators of the channel.
+  These commands can used by anyone in the channel.
   '''
   response = ""
   if run_command.startswith(HELP_COMMAND):  

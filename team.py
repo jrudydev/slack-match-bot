@@ -49,8 +49,7 @@ class Team():
 
   def get_name(self):
     '''
-    Returns a string with the first names unless it do not exist, 
-    then it used the handle which always exists.
+    Returns the handles separated by ampersand(&)
     '''
     handles = []
     for teammate in self.__teammates:

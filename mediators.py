@@ -50,6 +50,9 @@ class Mediators():
     return response
 
   def is_admin_user(self, profile):
+    '''
+    Check profile for is_owner flag and also list of admins
+    '''
     is_admin = False
     if profile.get("is_owner") or profile.get("name") in admins:
         is_admin = True

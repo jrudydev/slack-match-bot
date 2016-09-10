@@ -3,7 +3,7 @@ Slack MatchBot makes a list of users in a channel and generates a single elimina
 
 ## Setup Local Virtual Environment
 ```
-~$ git clone
+~$ git clone git@github.com:peperodo/slack-match-bot.git
 ~$ virtualenv env
 ~$ source env/bin/activate
 (env) ~$ pip install slackclient
@@ -43,16 +43,16 @@ It is easy and fast to get a tournament started with MatchBot.
 ## Commands
 > @matchbot [COMMAND] 
 
-|COMMAND|DESCRIPTION                 |OPTIONS                       | ADMIN ONLY |
-|:-----:|----------------------------|:----------------------------:|:----------:|
-|help   |Print a readme file         |None                          |            |
-|start  |Generate tournament         |[OPTION]  Ex: doubles         |x           |
-|boot   |Disqualify player           |[HANDLE]  Ex: slackbot        |x           |
-|reset  |Reset match                 |[HANDLE]  Ex: slackbot        |x           |
-|next   |Move to next round          |None                          |x			 |
-|admin  |Handle admin roles          |[OPTION]  Ex: show            |x			 |
-|show   |Print tournament bracket    |None                          |            |
-|win    |Report a win                |None                          |            |
+|COMMAND|DESCRIPTION                 |OPTIONS                       | ADMIN | OWNER |
+|:-----:|----------------------------|:----------------------------:|:-----:|:-----:|
+|help   |Print a readme file         |None                          |       |       |
+|start  |Generate tournament         |[OPTION]  Ex: doubles         |X      |       |
+|boot   |Disqualify player           |[HANDLE]  Ex: slackbot        |X      |       |
+|reset  |Reset match                 |[HANDLE]  Ex: slackbot        |X      |       |
+|next   |Move to next round          |None                          |X      |       |
+|admin  |Handle admin roles          |[OPTION]  Ex: show            | 	    |X      |
+|show   |Print tournament bracket    |None                          |       |       |
+|win    |Report a win                |None                          |       |       |
 
 ---
 ### help
@@ -66,7 +66,7 @@ Example:
 Description: Pull up more information about how to use MatchBot.
 
 ---
-### start (Admin Only)
+### start (Owner & Admin Only)
 Options: [OPTION] = singles | doubles
 
 Example:
@@ -77,7 +77,7 @@ Example:
 Description: Generate a tournament from all the players in the room.
 
 ---
-### boot (Admin Only)
+### boot (Owner & Admin Only)
 Options: [HANDLE] = (any handle for a player in the current round)
 
 Example:
@@ -88,7 +88,7 @@ Example:
 Description: Disqualify a player with matching slack handle.
 
 ---
-### reset (Admin Only)
+### reset (Owner & Admin Only)
 Options: [HANDLE] = (any handle for a player in the current round)
 
 Example:
@@ -99,7 +99,7 @@ Example:
 Description: Reset the match of player with matching slack handle.
 
 ---
-### next (Admin Only)
+### next (Owner & Admin Only)
 Options: None
 
 Example:
@@ -110,7 +110,7 @@ Example:
 Description: Use to advance to the next round.
 
 ---
-### admin (Admin Only)
+### admin (Owner Only)
 Options: [OPTIONS] = slackbot | show | clear
 
 Example:

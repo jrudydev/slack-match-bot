@@ -1,7 +1,7 @@
 # Slack Match Bot ![alt text](https://github.com/peperodo/slack-match-bot/blob/match-dev/img/mei.jpg "Logo Title Text 1")
 Slack MatchBot makes a list of users in a channel and generates a single elimination tournament bracket.
 
-## Setup Local Virtual Environment
+## Setup Local Environment
 ```
 ~$ git clone git@github.com:peperodo/slack-match-bot.git
 ~$ virtualenv env
@@ -10,7 +10,7 @@ Slack MatchBot makes a list of users in a channel and generates a single elimina
 (env) ~$ cd ~/slack-match-bot
 ```
 ## Export Environment Variables
-Find the Slack API key in the bot configuration section under Integration Setting -> API Token
+Find the **Slack API Key_** in the bot configuration section under **Integration Setting -> API Token**
 ```
 (env) ~$ /slack-match-bot: export SLACK_BOT_TOKEN='slack-api-token-goes-here'
 (env) ~$ /slack-match-bot: python utils/print_bot_id.py
@@ -20,10 +20,10 @@ Find the Slack API key in the bot configuration section under Integration Settin
 > could not find bot user with the name matchbot
 (env) ~$ /slack-match-bot: export BOT_ID='bot-id-returned-from-script'
 ```
-> SLACK_BOT_TOKEN should be exported before running the print_bot_id.py script.
-> then, export the returned string as BOT_ID before moving on.
+> **SLACK_BOT_TOKEN** should be exported before running the `print_bot_id.py` script.
+> then, export the returned string as **BOT_ID** before moving on.
 
-## Run Bot
+## Run Local Bot
 ```
 (env) ~$ /slack-match-bot: python bot/matchbot.py
 > MatchBot connected and running!
@@ -37,7 +37,7 @@ It is easy and fast to get a tournament started with MatchBot.
 3. Invite matchbot to the team.
 4. Create a channel for the tournament.
 5. Invite matchbot and more friends to the channel.
-6. Complete steps listed above to 'Run Bot'.
+6. Complete steps listed above to '**Run Local Bot**'.
 
 
 ## Commands

@@ -141,4 +141,3 @@ Example:
 ```
 
 Description: Report a win for the sender.
->>>>>>> master

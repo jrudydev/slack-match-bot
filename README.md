@@ -3,32 +3,33 @@ Slack MatchBot makes a list of users in a channel and generates a single elimina
 
 ## Setup Local Virtual Environment
 ```
-$ cd slack-match-bot
-$ virtualenv matchbot
-$ source matchbot/bin/activate
-(matchbot)$ pip install slackclient
+~$ git clone
+~$ virtualenv env
+~$ source env/bin/activate
+(env) ~$ pip install slackclient
+(env) ~$ cd ~/slack-match-bot
 ```
-## Export Environment Veriables
+## Export Environment Variables
 Find the Slack API key in the bot configuration section under Integration Setting -> API Token
 ```
-(matchbot)$ export SLACK_BOT_TOKEN='slack api token goes here'
-(matchbot)$ python utils/print_bot_id.py
+(env) ~$ /slack-match-bot: export SLACK_BOT_TOKEN='slack-api-token-goes-here'
+(env) ~$ /slack-match-bot: python utils/print_bot_id.py
 > could not find bot user with the name matchbot
 > could not find bot user with the name matchbot
 > The matchbot BOT_ID is: BA3GH56Y   #returned by slack api call
 > could not find bot user with the name matchbot
-(matchbot)$ export BOT_ID='bot id returned by script'
+(env) ~$ /slack-match-bot: export BOT_ID='bot-id-returned-from-script'
 ```
 > SLACK_BOT_TOKEN should be exported before running the print_bot_id.py script.
 > then, export the returned string as BOT_ID before moving on.
 
 ## Run Bot
 ```
-(matchbot)$ python matchbot.py
-> MatchBot connected and runing!
+(env) ~$ /slack-match-bot: python bot/matchbot.py
+> MatchBot connected and running!
 ```
 # Slack Client
-MatchBot makes it easy to setup whether you are on the web or native aplication.
+It is easy and fast to get a tournament started with MatchBot.
 
 ## Setup
 1. Create a Slack team (skip this step if you already have a team in mind).
@@ -50,7 +51,7 @@ MatchBot makes it easy to setup whether you are on the web or native aplication.
 |reset  |Reset match                 |[HANDLE]  Ex: slackbot        |x           |
 |next   |Move to next round          |None                          |x			 |
 |admin  |Handle admin roles          |[OPTION]  Ex: show            |x			 |
-|show   |Print tournmanet bracket    |None                          |            |
+|show   |Print tournament bracket    |None                          |            |
 |win    |Report a win                |None                          |            |
 
 ---
@@ -117,7 +118,7 @@ Example:
 @matchbot admin show
 ```
 
-Description: Use to give user admin privledges.
+Description: Use to give user admin privileges.
 
 ---
 ### show

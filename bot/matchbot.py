@@ -12,14 +12,13 @@ import json
 from slackclient import SlackClient
 import time
 from tournament.tourny_helper import TournyHelper
-from tournament.tourny_helper import START_TOURNY, REPORT_QUIT, NEXT_ROUND, RESET_MATCH, HANDLE_ADMIN, HELP_COMMAND, PRINT_TOURNY, REPORT_WIN
+from tournament.tourny_helper import START_TOURNY, REPORT_QUIT, NEXT_ROUND, \
+RESET_MATCH, HANDLE_ADMIN, HELP_COMMAND, PRINT_TOURNY, REPORT_WIN
 from mediators import Mediators
 
 BOT_ID = os.environ.get("BOT_ID") 
 AT_BOT = "<@" + BOT_ID  + ">"
 SLACK_BOTS_ALLOWED = True
-
-
 
 tournys = TournyHelper()
 slack_client = SlackClient(os.environ.get('SLACK_BOT_TOKEN'))

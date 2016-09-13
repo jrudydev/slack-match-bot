@@ -10,6 +10,22 @@
 from tourny import Tourny
 from player import Player
 
+# admin commands
+START_TOURNY = "start"
+REPORT_QUIT = "boot"
+NEXT_ROUND = "next"
+RESET_MATCH = "reset"
+HANDLE_ADMIN = "admin"
+
+# user commands
+HELP_COMMAND = "help"
+PRINT_TOURNY = "show"
+REPORT_WIN = "win"
+
+USER_INDEX = 0
+COMMAND_INDEX = 1
+
+
 class TournyHelper():
   '''
   This class keeps track of the current channel and handles that object
@@ -18,6 +34,7 @@ class TournyHelper():
 
   __tourny_channels = {}
   __current_channel = None
+  __current_command = (None, None, None)
 
   def set_current_tourny(self, channel):
     tourny = None
@@ -27,6 +44,19 @@ class TournyHelper():
     self.__current_channel = channel
 
     return tourny
+
+  def set_current_command(self, user, command, channel):
+    self.__current_command = (user, command)
+    self.set_current_tourny(channel)
+
+  def get_current_user(self):
+    return self.__current_command[USER_INDEX]
+
+  def get_current_command(self):
+    return self.__current_command[COMMAND_INDEX]
+
+  def get_current_channel(self):
+    return self.__current_channel
 
   def get_current_tourny(self):
     tourny = None
@@ -41,7 +71,7 @@ class TournyHelper():
 
   def start_doubles(self):
     tourny = self.get_current_tourny()
-    return tourny.doubles()
+    return tourny.doubles(self.get_current_user())
 
   def next_round(self):
     tourny = self.get_current_tourny()
@@ -74,6 +104,14 @@ class TournyHelper():
   def report_win(self, user_handle):
     tourny = self.get_current_tourny()
     return tourny.win(user_handle)
+
+  def is_admin_command(self):
+    command = self.__current_command[COMMAND_INDEX]
+    return command.startswith(START_TOURNY) or \
+      command.startswith(REPORT_QUIT) or \
+      command.startswith(NEXT_ROUND) or \
+      command.startswith(RESET_MATCH) or \
+      command.startswith(HANDLE_ADMIN)
 
   def get_tourny(self):
     tourny = self.get_current_tourny()

@@ -213,7 +213,7 @@ class Match():
     if side == None:
       output = "This is a bye game."
     elif self.__sides_tuple[SIDE_2_INDEX] == None:
-      output = "BYE:  " + side.get_name()
+      output = "_BYE_:  " + side.get_name()
     else:
       points = self.__wins_tuple[SIDE_1_INDEX]
       output = self.__get_status_label(points) + ":  " + side.get_name()
@@ -230,7 +230,7 @@ class Match():
       if self.__sides_tuple[SIDE_1_INDEX] == None:
         output = "This is a bye game."
       else:
-        output = "BYE:  - Bye -"
+        output = "_BYE_:  - Bye -"
     else:
       points = self.__wins_tuple[SIDE_2_INDEX]
       output = self.__get_status_label(points) + ":  " + side.get_name()
@@ -241,12 +241,12 @@ class Match():
     label = ""
     status = self.match_status()
     if status == MATCH_STATUS_NOT_STARTED or status == MATCH_STATUS_NOT_FULL:
-      label = "TBD"
+      label = "_TBD_"
     elif status == MATCH_STATUS_COMPLETE:
       if slot_points == POINTS_TO_WIN:
-        label = "W".center(5)
+        label = "_W_".center(5)
       else:
-        label = "L".center(8)
+        label = "_L_".center(8)
     else:
       label = str(points).center(10)
 

@@ -39,7 +39,6 @@ class TournyTree(object):
 
   def __init__(self):
     self.node = None
-    self.__players = {}
     self.__games = []
     self.__round = -1
     self.__height = -1
@@ -88,6 +87,21 @@ class TournyTree(object):
 
   def get_games(self):
     return self.__games
+
+  def __traverse_all_nodes(self):
+    '''
+    Traverse tree in order and return a row at the depth provided.
+    '''
+    result = []
+
+    if not self.node:
+      return result
+
+    result.extend(self.node.left.__traverse_all_nodes())
+    result.append(self.node)
+    result.extend(self.node.right.__traverse_all_nodes())
+
+    return result
 
   def __traverse_nodes(self, depth):
     '''
@@ -180,6 +194,15 @@ class TournyTree(object):
       response = "Tournament is over."
 
     return response
+
+  def destroy(self):
+    del self.__games[:]
+    self.__round = -1
+    self.__height = -1
+
+    nodes = self.__traverse_all_nodes()
+    del nodes[:]
+
 
 if __name__ == '__main__':
   tree = TournyTree()

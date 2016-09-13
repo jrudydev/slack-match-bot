@@ -28,6 +28,9 @@ class Tourny:
     self.__players[player.get_user()] = player
        
   def singles(self):
+    self.__bracket.destroy()
+    self.__is_doubles = False
+
     number_of_slots = len(self.__players)
     if number_of_slots < 2:
       return "There are not enough players."
@@ -37,18 +40,22 @@ class Tourny:
       slots.append(self.__players[key])
     self.__bracket.generate(slots)
 
-    return "Generated a singles bracket."
+    return "Singles bracket generated."
 
-  def doubles(self):
+  def doubles(self, user):
+    self.__bracket.destroy()
     self.__is_doubles = True
 
     number_of_slots = len(self.__players) / 2
-    is_odd = len(self.__players) % 2 == 1
+    is_odd = len(self.__players) % 2 == 1    
 
+    
     if number_of_slots < 2:
       return "There are not enough players."
+
     if is_odd:
-      return "There are not an even amount players."
+      # remove the send from the players list if the count is odd
+      del self.__players[user]
 
     players = []
     for key in self.__players:
@@ -73,7 +80,7 @@ class Tourny:
       i += 1
     self.__bracket.generate(slots)
 
-    return "Generated a doubles bracket."
+    return "Doubles bracket generated."
 
   def reset(self, handle):
     '''
@@ -160,9 +167,9 @@ class Tourny:
     response = ""
     if match.match_status() == MATCH_STATUS_COMPLETE:
       if self.__is_doubles:
-        response = match.get_winner().get_name() + " win the match."
+        response = "The match was won by " + match.get_winner().get_name()
       else:
-        response = player.get_name() + " wins the match."
+        response = "The match was won by " + player.get_name()
     else:
       response = player.get_name() + " repoted a win."
 
@@ -187,11 +194,15 @@ class Tourny:
     champ = ""
     for match in games:
       if champion:
-        champ = match.get_winner().get_name() + " is the tournament champion!!!\n"
+        if self.__is_doubles:
+          champ = match.get_winner().get_name() + " are the tournament champions!\n"
+        else:
+          champ = match.get_winner().get_name() + " is the tournament champion!\n"
+        champ += "Grand Prize: :tada: :trophy: :cookie:\n"
       if number_of_games == 1:
-        string = "%s\nChampionship: \n" % (string)
+        string = "%s\n*Championship Match*: \n" % (string)
       else:
-        string = "%s\nMatch: %d\n" % (string, i)
+        string = "%s\n*Match: %d*\n" % (string, i)
       string = "%s%s\n" % (string, match.get_score())
       i += 1
     

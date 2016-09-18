@@ -34,13 +34,28 @@ class Player():
     return self.__handle
 
   def get_name(self):
-    return self.__handle
+    first_name = self.__name_tuple[FNAME_INDEX]
+    last_name = self.__name_tuple[LNAME_INDEX]
+    names = []
+    if first_name != "":
+      names.append(first_name)
+    if last_name != "":
+      names.append(last_name)
+    return " ".join(names)
+
+  def get_handle_and_name(self):
+    response = self.get_handle()
+    if self.get_name() != "":
+      response += " (" + self.get_name() + ")"
+    return response
 
   def set_match_id(self, match_id):
     self.__match_id = match_id
 
   def get_match_id(self):
     return self.__match_id
+
+  
 
   # def get_record(self):
   #   wins = self.__record_tuple[WIN_INDEX]

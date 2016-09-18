@@ -56,6 +56,15 @@ class Team():
       handles.append(teammate.get_handle())
     return " & ".join(handles)
 
+  def get_handle_and_name(self):
+    '''
+    Returns the handles and names separated by ampersand(&)
+    '''
+    handles = []
+    for teammate in self.__teammates:
+      handles.append(teammate.get_handle_and_name())
+    return " & ".join(handles)
+
 
 def main():
   first_team = Team(["U2343255", "U2343256"], ["abcxyz", "ABCXYXZ"], ["Pepe", "Rodo"])

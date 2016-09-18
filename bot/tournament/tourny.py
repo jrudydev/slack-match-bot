@@ -40,11 +40,13 @@ class Tourny:
     if number_of_slots < 2:
       return "There are not enough players."
     
+    response = ""
     slots = []
     is_random = len(presets) == 0
     if is_random:
       for key in self.__players:
         slots.append(self.__players[key])
+      response = "Singles bracket randomly generated."
     else:
       for handle in presets:
         for key in self.__players:
@@ -52,10 +54,11 @@ class Tourny:
           if player.get_handle() == handle:
             slots.append(player)
           break
+      response = "Singles bracket generated from presets."
 
     self.__bracket.generate(slots, is_random)
 
-    return "Singles bracket generated."
+    return response
 
   def doubles(self, user, presets):
     self.__bracket.destroy()
@@ -81,6 +84,7 @@ class Tourny:
         # remove the send from the players list if the count is odd
         del self.__players[user]
 
+    response = ""
     team = None
     slots = []
     is_random = len(presets) == 0
@@ -99,6 +103,8 @@ class Tourny:
           team.add_teammate(random_player)
           slots.append(team)
         i += 1
+
+      response = "Doubles bracket randomly generated."
     else:
       for handle in presets:
         for key in self.__players:
@@ -113,10 +119,12 @@ class Tourny:
               slots.append(team)
             i += 1
             break
+
+      response = "Doubles bracket generated from presets."
     
     self.__bracket.generate(slots, is_random)
 
-    return "Doubles bracket generated."
+    return response
 
   def reset(self, handle):
     '''

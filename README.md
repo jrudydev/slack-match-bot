@@ -50,7 +50,7 @@ It is easy and fast to get a tournament started with MatchBot.
 
 |COMMAND|DESCRIPTION                 |ARGUMENTS                     | ADMIN | OWNER |
 |:-----:|----------------------------|:----------------------------:|:-----:|:-----:|
-|help   |Print a readme file         |None                          |       |       |
+|help   |Documentation link          |None                          |       |       |
 |show   |Print current round         |None                          |       |       |
 |win    |Report a win                |None                          |       |       |
 |start  |Generate tournament         |[TYPE]  Ex: doubles           |X      |       |

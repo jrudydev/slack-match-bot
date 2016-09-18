@@ -10,18 +10,6 @@
 from tourny import Tourny
 from player import Player
 
-# admin commands
-START_TOURNY = "start"
-REPORT_QUIT = "boot"
-NEXT_ROUND = "next"
-RESET_MATCH = "reset"
-HANDLE_ADMIN = "admin"
-
-# user commands
-HELP_COMMAND = "help"
-PRINT_TOURNY = "show"
-REPORT_WIN = "win"
-
 USER_INDEX = 0
 COMMAND_INDEX = 1
 
@@ -104,14 +92,6 @@ class TournyHelper():
   def report_win(self, user_handle):
     tourny = self.get_current_tourny()
     return tourny.win(user_handle)
-
-  def is_admin_command(self):
-    command = self.__current_command[COMMAND_INDEX]
-    return command.startswith(START_TOURNY) or \
-      command.startswith(REPORT_QUIT) or \
-      command.startswith(NEXT_ROUND) or \
-      command.startswith(RESET_MATCH) or \
-      command.startswith(HANDLE_ADMIN)
 
   def get_tourny(self):
     tourny = self.get_current_tourny()

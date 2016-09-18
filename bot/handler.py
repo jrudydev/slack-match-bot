@@ -10,6 +10,7 @@ from slackclient import SlackClient
 from tournament import TournyHelper
 from management import Mediators
 from management import Spectators
+from management import Presets
 
 SLACK_BOTS_ALLOWED = True
 
@@ -20,6 +21,7 @@ NEXT_ROUND = "next"
 RESET_MATCH = "reset"
 HANDLE_ADMIN = "admin"
 MAKE_WATCH = "watch"
+HANDLE_PRESET = "preset"
 
 # user commands
 HELP_COMMAND = "help"
@@ -37,6 +39,7 @@ class Client():
     self.__client = SlackClient(bot_access_token)
     self.__admins = Mediators()
     self.__spectators = Spectators()
+    self.__presets = Presets()
 
   def get_client(self):
     return self.__client
@@ -87,9 +90,9 @@ class Client():
           self.__tournys.add_player(member)
 
       if not is_doubles:
-        response = self.__tournys.start_singles()
+        response = self.__tournys.start_singles(self.__presets.get_all())
       else:
-        response = self.__tournys.start_doubles()
+        response = self.__tournys.start_doubles(self.__presets.get_all())
 
     return response
 
@@ -109,6 +112,14 @@ class Client():
 
     return self.__spectators.add_user(name, users)
 
+  def __add_preset(self, name):
+    users = []
+    user_ids = self.get_channel_users(self.__tournys.get_current_channel())
+    for user_id in user_ids:
+      users.append(self.get_user_porfile(user_id))
+
+    return self.__presets.add_user(name, users)
+
   def admin_command(self, user_name):
     '''
     These commands can only be used by administrators of the channel.
@@ -119,7 +130,8 @@ class Client():
     if command.startswith(START_TOURNY):
       doubles = ""
       parts = command.split()
-      if len(parts) >= 2:
+      size = len(parts)
+      if size >= 2:
         # possible doubles
         doubles = parts[1]
         
@@ -172,7 +184,10 @@ class Client():
         elif option.startswith("clear"):
           response = self.__admins.clear_users()
         else:
-          response = self.__add_admin(option)
+          options = parts[1:]
+          for name in options:
+            response += self.__add_admin(name)
+            response += "\n"
       else:
         response = "Provide the admin handle."
 
@@ -188,9 +203,31 @@ class Client():
         elif option.startswith("clear"):
           response = self.__spectators.clear_users()
         else:
-          response = self.__add_spectator(option)
+          options = parts[1:]
+          for name in options:
+            response += self.__add_spectator(name)
+            response += "\n"
       else:
         response = "Provide the spectator handle."
+
+    if command.startswith(HANDLE_PRESET):
+      response = ""
+      parts = command.split()
+      count = len(parts)
+      if count >= 2:
+        # potential handle was provided for disqualification
+        option = parts[1]
+        if option.startswith("show"):
+          response = self.__presets.list_users()
+        elif option.startswith("clear"):
+          response = self.__presets.clear_users()
+        else:
+          options = parts[1:]
+          for name in options:
+            response += self.__add_preset(name)
+            response += "\n"
+      else:
+        response = "Provide the preset handle."
 
     return response
 
@@ -257,7 +294,8 @@ class Client():
       command.startswith(REPORT_QUIT) or \
       command.startswith(NEXT_ROUND) or \
       command.startswith(RESET_MATCH) or \
-      command.startswith(MAKE_WATCH)
+      command.startswith(MAKE_WATCH) or \
+      command.startswith(HANDLE_PRESET)
 
 
 class Handler():

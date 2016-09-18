@@ -27,28 +27,47 @@ class Tourny:
   def add(self, player):
     self.__players[player.get_user()] = player
        
-  def singles(self):
+  def singles(self, presets):
     self.__bracket.destroy()
     self.__is_doubles = False
 
-    number_of_slots = len(self.__players)
+    number_of_slots = 0
+    if len(presets) > 0:
+      number_of_slots = len(presets)
+    else:
+      number_of_slots = len(self.__players)
+
     if number_of_slots < 2:
       return "There are not enough players."
     
     slots = []
-    for key in self.__players:
-      slots.append(self.__players[key])
-    self.__bracket.generate(slots)
+    is_random = len(presets) == 0
+    if is_random:
+      for key in self.__players:
+        slots.append(self.__players[key])
+    else:
+      for handle in presets:
+        for key in self.__players:
+          player = self.__players[key]
+          if player.get_handle() == handle:
+            slots.append(player)
+
+    self.__bracket.generate(slots, is_random)
 
     return "Singles bracket generated."
 
-  def doubles(self, user):
+  def doubles(self, user, presets):
     self.__bracket.destroy()
     self.__is_doubles = True
-
-    number_of_slots = len(self.__players) / 2
-    is_odd = len(self.__players) % 2 == 1    
-
+    
+    number_of_slots = 0
+    if len(presets) > 0:
+      number_of_players = len(presets)
+      number_of_slots = number_of_players / 2
+    else:
+      number_of_players = len(self.__players)
+      number_of_slots = number_of_players / 2
+    is_odd = number_of_players % 2 == 1    
     
     if number_of_slots < 2:
       return "There are not enough players."
@@ -63,22 +82,38 @@ class Tourny:
 
     team = None
     slots = []
+    is_random = len(presets) == 0
     i = 0
-    for key in self.__players:
-      number_of_players = len(players)
-      rand_int = random.choice(range(number_of_players))
-      random_player = players[rand_int]
-      del players[rand_int]
-      
-      if i % 2 == 0:
-        del(team)
-        team = Team()
-        team.add_teammate(random_player)
-      else:
-        team.add_teammate(random_player)
-        slots.append(team)
-      i += 1
-    self.__bracket.generate(slots)
+    if is_random:
+      for key in self.__players:
+        rand_int = random.choice(range(number_of_players))
+        random_player = players[rand_int]
+        del players[rand_int]
+        
+        if i % 2 == 0:
+          del(team)
+          team = Team()
+          team.add_teammate(random_player)
+        else:
+          team.add_teammate(random_player)
+          slots.append(team)
+        i += 1
+    else:
+      for handle in presets:
+        for key in self.__players:
+          player = self.__players[key]
+          if player.get_handle() == handle:
+            if i % 2 == 0:
+              del(team)
+              team = Team()
+              team.add_teammate(player)
+            else:
+              team.add_teammate(player)
+              slots.append(team)
+            i += 1
+            break
+    
+    self.__bracket.generate(slots, is_random)
 
     return "Doubles bracket generated."
 

@@ -53,13 +53,13 @@ class TournyHelper():
 
     return tourny
 
-  def start_singles(self):
+  def start_singles(self, presets):
     tourny = self.get_current_tourny()
-    return tourny.singles()
+    return tourny.singles(presets)
 
-  def start_doubles(self):
+  def start_doubles(self, presets):
     tourny = self.get_current_tourny()
-    return tourny.doubles(self.get_current_user())
+    return tourny.doubles(self.get_current_user(), presets)
 
   def next_round(self):
     tourny = self.get_current_tourny()

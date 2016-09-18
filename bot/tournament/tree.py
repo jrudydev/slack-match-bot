@@ -55,7 +55,7 @@ class TournyTree(object):
 
     self.__height = height
 
-  def insert_matches(self, key, count, players):
+  def insert_matches(self, key, count, players, is_random):
     '''
     Generates the tree of empty matches starting at the root node and
     adding players at the leaves.
@@ -70,18 +70,23 @@ class TournyTree(object):
       if count > 1:
         # non leaf nodes have an empty match object inserted to them
         half = key / 2
-        self.node.right.insert_matches(half, count - 1, players)
+        self.node.right.insert_matches(half, count - 1, players, is_random)
 
         if key % 2 == 1: half += 1
-        self.node.left.insert_matches(half, count - 1, players)
+        self.node.left.insert_matches(half, count - 1, players, is_random)
       else:
         # leaf node reached so add one or two players to the game
         for x in range(self.node.key):
-          # pop a random player
-          number_of_players = len(players)
-          rand_int = random.choice(range(number_of_players))
-          random_player = players[rand_int]
-          del players[rand_int]
+          if is_random:
+            # pop a random player
+            number_of_players = len(players)
+            index = random.choice(range(number_of_players))
+            random_player = players[index]
+          else:
+            index = 0
+            random_player = players[index]
+          
+          del players[index]
 
           self.node.match.add_side(random_player)
 
@@ -166,7 +171,7 @@ class TournyTree(object):
       node.match.add_side(node.left.node.match.get_winner())
       node.match.add_side(node.right.node.match.get_winner())
 
-  def generate(self, slots):
+  def generate(self, slots, random):
     '''
     Initalize and reset the tree with the players provided.
     '''
@@ -175,7 +180,7 @@ class TournyTree(object):
     self.__round = 1
     self.node = None
     self.__set_height(number_of_slots)
-    self.insert_matches(number_of_slots, self.__height, slots)
+    self.insert_matches(number_of_slots, self.__height, slots, random)
 
     self.__create_round()
   

@@ -26,8 +26,8 @@ class Spectators():
       response += "None"
     
     i = 0
-    for admin in self.__spectators:
-      response += admin + "\n"
+    for spectator in self.__spectators:
+      response += spectator + "\n"
       i += 1
 
     return response

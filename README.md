@@ -78,7 +78,7 @@ Options: [OPTION] = singles | doubles
 
 Example:
 ```
-@matchbot start **OR** @matchbot start singles
+@matchbot start
 @matchbot start doubles
 ```
 

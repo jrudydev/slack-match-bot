@@ -186,7 +186,7 @@ class Client():
       returns back what it needs for clarification.
     """
     response = "Not sure what you mean. Use the *" + HELP_COMMAND + \
-      "* command with numbers, deliminated by spaces."
+      "* command."
 
     self.__tournys.set_current_command(user, command, channel)
 

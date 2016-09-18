@@ -51,15 +51,16 @@ It is easy and fast to get a tournament started with MatchBot.
 |COMMAND|DESCRIPTION                 |ARGUMENTS                     | ADMIN | OWNER |
 |:-----:|----------------------------|:----------------------------:|:-----:|:-----:|
 |help   |Print a readme file         |None                          |       |       |
+|show   |Print current round         |None                          |       |       |
+|win    |Report a win                |None                          |       |       |
 |start  |Generate tournament         |[TYPE]  Ex: doubles           |X      |       |
 |boot   |Disqualify player           |[HANDLE]  Ex: slackuser       |X      |       |
 |reset  |Reset player match          |[HANDLE]  Ex: slackuser       |X      |       |
 |next   |Advance to next round       |None                          |X      |       |
-|watch  |Handle spectator users      |[OPTION]  Ex: slackuser       |X	    |       |
-|preset |Handle preset placement     |[OPTION]  Ex: clear           |X	    |       |
-|admin  |Handle admin roles          |[OPTION]  Ex: show            | 	    |X      |
-|show   |Print current round         |None                          |       |       |
-|win    |Report a win                |None                          |       |       |
+|watch  |Handle spectator users      |[OPTION]  Ex: slackuser       |X	     |       |
+|preset |Handle preset placement     |[OPTION]  Ex: clear           |X	     |       |
+|admin  |Handle admin roles          |[OPTION]  Ex: show            | 	     |X      |
+
 
 ---
 ### help
@@ -71,6 +72,28 @@ Example:
 ```
 
 Description: Pull up more information about how to use MatchBot and a link to the documentation.
+
+---
+### show
+Options: None
+
+Example:
+```
+@matchbot show
+```
+
+Description: Print the matches for the current round. The round is automatically shown after running other commands that modify the tournament.
+
+---
+### win
+Options: None
+
+Example:
+```
+@matchbot win
+```
+
+Description: Report a win for the sender. Once the win is registered, the game is complete and becomes immutable. For corrections contact an admin user.
 
 ---
 ### start (Owner & Admin Only)
@@ -156,25 +179,3 @@ Examples:
 ```
 
 Description: Use to give user admin privileges., show a list, and clear it. If the slack does not give users ownership of channels, send the ```admin``` command with no arguments.
-
----
-### show
-Options: None
-
-Example:
-```
-@matchbot show
-```
-
-Description: Print the matches for the current round. The round is automatically shown after running other commands that modify the tournament.
-
----
-### win
-Options: None
-
-Example:
-```
-@matchbot win
-```
-
-Description: Report a win for the sender. Once the win is registered, the game is complete and becomes immutable. For corrections contact an admin user.

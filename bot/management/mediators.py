@@ -5,7 +5,7 @@
 #
 # Description: This object manages the admin users for the bot. You can add
 # users, list them, and clear the entire list. There is also a convenience
-# method to check if a user is an admin by passing the profile.
+# method to check if a user is an admin.
 
 class Mediators():
   '''

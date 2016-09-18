@@ -37,21 +37,27 @@ It is easy and fast to get a tournament started with MatchBot.
 3. Invite matchbot to the team.
 4. Create a channel for the tournament.
 5. Invite matchbot and more friends to the channel.
-6. Complete steps listed above to '**Run Local Bot**'.
+7. Complete steps listed above to '**Run Local Bot**'.
+8. Start the tournament by typing ```@matchbot start```
 
 
+> Can't run a command without admin? If you are not the owner of the channel, type ```@matchbot admin```
+ 
+ 
 ## Commands
-> @matchbot [COMMAND] 
+> @matchbot  |COMMAND| |ARGUMENTS|
 
-|COMMAND|DESCRIPTION                 |OPTIONS                       | ADMIN | OWNER |
+|COMMAND|DESCRIPTION                 |ARGUMENTS                     | ADMIN | OWNER |
 |:-----:|----------------------------|:----------------------------:|:-----:|:-----:|
 |help   |Print a readme file         |None                          |       |       |
-|start  |Generate tournament         |[OPTION]  Ex: doubles         |X      |       |
-|boot   |Disqualify player           |[HANDLE]  Ex: slackbot        |X      |       |
-|reset  |Reset match                 |[HANDLE]  Ex: slackbot        |X      |       |
-|next   |Move to next round          |None                          |X      |       |
+|start  |Generate tournament         |[TYPE]  Ex: doubles           |X      |       |
+|boot   |Disqualify player           |[HANDLE]  Ex: slackuser       |X      |       |
+|reset  |Reset player match          |[HANDLE]  Ex: slackuser       |X      |       |
+|next   |Advance to next round       |None                          |X      |       |
+|watch  |Handle spectator users      |[OPTION]  Ex: slackuser       |X	    |       |
+|preset |Handle preset placement     |[OPTION]  Ex: clear           |X	    |       |
 |admin  |Handle admin roles          |[OPTION]  Ex: show            | 	    |X      |
-|show   |Print tournament bracket    |None                          |       |       |
+|show   |Print current round         |None                          |       |       |
 |win    |Report a win                |None                          |       |       |
 
 ---
@@ -63,7 +69,7 @@ Example:
 @matchbot help
 ```
 
-Description: Pull up more information about how to use MatchBot.
+Description: Pull up more information about how to use MatchBot and a link to the documentation.
 
 ---
 ### start (Owner & Admin Only)
@@ -71,32 +77,33 @@ Options: [OPTION] = singles | doubles
 
 Example:
 ```
-@matchbot start
+@matchbot start OR @matchbot start singles
+@matchbot start doubles
 ```
 
-Description: Generate a tournament from all the players in the room.
+Description: Generate a singles or doubles tournament by randomly selecting a player in the room. With presets, the presets list will be used to populate the tournament without randomizing.
 
 ---
 ### boot (Owner & Admin Only)
-Options: [HANDLE] = (any handle for a player in the current round)
+Options: [HANDLE] = (handle for any player in the current round)
 
 Example:
 ```
-@matchbot boot slackbot
+@matchbot boot slackuser
 ```
 
-Description: Disqualify a player with matching slack handle.
+Description: Disqualify a player with matching slack handle. The opponent will automatically be awarded the win and the match will be complete.
 
 ---
 ### reset (Owner & Admin Only)
-Options: [HANDLE] = (any handle for a player in the current round)
+Options: [HANDLE] = (handle for any player in the current round)
 
 Example:
 ```
-@matchbot reset slackbot
+@matchbot reset slackuser
 ```
 
-Description: Reset the match of player with matching slack handle.
+Description: Reset the match of player with matching slack handle. The match will go revert back to the 'To Be Determined' state.
 
 ---
 ### next (Owner & Admin Only)
@@ -107,18 +114,47 @@ Example:
 @matchbot next
 ```
 
-Description: Use to advance to the next round.
+Description: Use to advance to the next round. All matches for the current round most be complete or bye games. To forfeit a player user the ```boot``` command.
 
 ---
-### admin (Owner Only)
-Options: [OPTIONS] = slackbot | show | clear
+### watch (Owner & Admin Only)
+Options: [OPTIONS] = slackuser | show | clear
 
 Example:
 ```
-@matchbot admin show
+@matchbot watch slackuser
+@matchbot watch show
+@matchbot watch clear
 ```
 
-Description: Use to give user admin privileges.
+Description: Use to make a spectator, show a list, and clear it. Spectators can be in a channel while not having to participate in the tournament.
+
+---
+### preset (Owner & Admin Only)
+Options: [OPTIONS] = slackuser | show | clear
+
+Example:
+```
+@matchbot presets slackuser
+@matchbot presets show
+@matchbot presets clear
+```
+
+Description: Use to set a preset, show a list, and clear it. The bracket will not be random when after assigning presets, instead it populates from the presets and will be positioned in order.
+
+---
+### admin (Owner Only)
+Options: [OPTIONS] = slackuser | show | clear | (None)
+
+Examples:
+```
+@matchbot admin
+@matchbot admin slackuser
+@matchbot admin show
+@matchbot admin clear
+```
+
+Description: Use to give user admin privileges., show a list, and clear it. If the slack does not give users ownership of channels, send the ```admin``` command with no arguments.
 
 ---
 ### show
@@ -129,7 +165,7 @@ Example:
 @matchbot show
 ```
 
-Description: Print a match, round, or entire tree.
+Description: Print the matches for the current round. The round is automatically shown after running other commands that modify the tournament.
 
 ---
 ### win
@@ -140,4 +176,4 @@ Example:
 @matchbot win
 ```
 
-Description: Report a win for the sender.
+Description: Report a win for the sender. Once the win is registered, the game is complete and becomes immutable. For corrections contact an admin user.

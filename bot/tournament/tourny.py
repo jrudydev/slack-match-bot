@@ -51,6 +51,7 @@ class Tourny:
           player = self.__players[key]
           if player.get_handle() == handle:
             slots.append(player)
+          break
 
     self.__bracket.generate(slots, is_random)
 
@@ -61,7 +62,8 @@ class Tourny:
     self.__is_doubles = True
     
     number_of_slots = 0
-    if len(presets) > 0:
+    is_preset = len(presets) > 0
+    if is_preset:
       number_of_players = len(presets)
       number_of_slots = number_of_players / 2
     else:
@@ -73,12 +75,11 @@ class Tourny:
       return "There are not enough players."
 
     if is_odd:
-      # remove the send from the players list if the count is odd
-      del self.__players[user]
-
-    players = []
-    for key in self.__players:
-      players.append(self.__players[key])
+      if is_preset:
+        return "There is an odd number of presets."
+      else:
+        # remove the send from the players list if the count is odd
+        del self.__players[user]
 
     team = None
     slots = []
@@ -87,8 +88,8 @@ class Tourny:
     if is_random:
       for key in self.__players:
         rand_int = random.choice(range(number_of_players))
-        random_player = players[rand_int]
-        del players[rand_int]
+        random_player = self.__players[rand_int]
+        del self.__players[rand_int]
         
         if i % 2 == 0:
           del(team)

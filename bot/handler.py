@@ -8,7 +8,7 @@
 import os
 from slackclient import SlackClient
 from tournament.tourny_helper import TournyHelper
-from mediators import Mediators
+from management.mediators import Mediators
 
 SLACK_BOTS_ALLOWED = True
 

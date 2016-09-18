@@ -160,7 +160,7 @@ class Client():
         else:
           response = self.__add_admin(option)
       else:
-        response = "Provide a handle to disqualify."
+        response = "Provide the admin handle."
 
     return response
 

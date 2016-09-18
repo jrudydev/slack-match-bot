@@ -227,7 +227,7 @@ class Client():
 
 class Handler():
   '''
-  This class holds the array of teams initialized from sqlite table
+  This class holds the the team connection
   '''
 
   def __init__(self):

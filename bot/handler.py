@@ -87,7 +87,15 @@ class Client():
 
     return response
 
-  def admin_command(self):
+  def __add_admin(self, name):
+    users = []
+    user_ids = self.get_channel_users(self.__tournys.get_current_channel())
+    for user_id in user_ids:
+      users.append(self.get_user_porfile(user_id))
+
+    return self.__admins.add_user(name, users)
+
+  def admin_command(self, user_name):
     '''
     These commands can only be used by administrators of the channel.
     '''
@@ -135,11 +143,14 @@ class Client():
       response = "Advancing to the next round...\n"
       response += self.__tournys.next_round() + "\n"
       response += self.__tournys.get_tourny()
-
+   
     if command.startswith(HANDLE_ADMIN):
       response = ""
       parts = command.split()
-      if len(parts) >= 2:
+      count = len(parts)
+      if count == 1 and self.__admins.get_count() == 0:
+        response = self.__add_admin(user_name)
+      elif count >= 2:
         # potential handle was provided for disqualification
         option = parts[1]
         if option.startswith("show"):
@@ -147,12 +158,8 @@ class Client():
         elif option.startswith("clear"):
           response = self.__admins.clear_users()
         else:
-          users = []
-          user_ids = self.get_channel_users(self.__tournys.get_current_channel())
-          for user_id in user_ids:
-            users.append(self.get_user_porfile(user_id))
-          response = self.__admins.add_user(option, channel, users)
-      else: 
+          response = self.__add_admin(option)
+      else:
         response = "Provide a handle to disqualify."
 
     return response
@@ -191,14 +198,17 @@ class Client():
     self.__tournys.set_current_command(user, command, channel)
 
     user_profile = self.get_user_porfile(user)
-    is_admin = self.__admins.is_admin_user(user_profile)
+    name = user_profile['name']
+    is_admin = self.__admins.is_admin_user(name)
+    is_owner = self.__admins.is_owner_user(name)
+    owner_exists = self.__admins.get_owner() != ""
     is_admin_command_bool = self.is_admin_command(self.__tournys.get_current_command())
     if is_admin_command_bool and not is_admin:
       response = "Only an admin can use this command."
-    elif command == HANDLE_ADMIN and not user_profile.get('is_owner'):
+    elif command == HANDLE_ADMIN and (not is_owner and owner_exists):
       response = "Only the channel owner can use this command."
-    elif is_admin_command_bool:
-      admin_response = self.admin_command()
+    elif is_admin_command_bool or command.startswith(HANDLE_ADMIN):
+      admin_response = self.admin_command(name)
       if admin_response != "":
         response = admin_response
     else:
@@ -212,8 +222,7 @@ class Client():
     return command.startswith(START_TOURNY) or \
       command.startswith(REPORT_QUIT) or \
       command.startswith(NEXT_ROUND) or \
-      command.startswith(RESET_MATCH) or \
-      command.startswith(HANDLE_ADMIN)
+      command.startswith(RESET_MATCH)
 
 
 class Handler():

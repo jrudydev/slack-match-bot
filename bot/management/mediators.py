@@ -24,13 +24,18 @@ class Mediators():
     response = "Admins:\n"
     if len(self.__admins) == 0:
       response += "None"
-
+    
+    i = 0
     for admin in self.__admins:
-      response += admin + "\n"
+      response += admin
+      if i == 0:
+        response += " (Owner)"
+      response += "\n"
+      i += 1
 
     return response
 
-  def add_user(self, admin, channel, users):
+  def add_user(self, admin, users):
     '''
     Promote user to admin if they are in the channel and not already on the list
     '''
@@ -49,15 +54,35 @@ class Mediators():
 
     return response
 
-  def is_admin_user(self, profile):
+  def get_owner(self):
+    name = ""
+    if len(self.__admins) > 0:
+      name = self.__admins[0]
+
+    return name
+
+  def get_count(self):
+    return len(self.__admins)
+
+  def is_admin_user(self, name):
     '''
     Check profile for is_owner flag and also list of admins
     '''
     is_admin = False
-    if profile.get("is_owner") or profile.get("name") in self.__admins:
+    if name in self.__admins:
         is_admin = True
 
     return is_admin
+
+  def is_owner_user(self, name):
+    '''
+    Check profile for is_owner flag and also list of admins
+    '''
+    is_owner = False
+    if name == self.get_owner():
+      is_owner = True
+
+    return is_owner
 
 
 def main():

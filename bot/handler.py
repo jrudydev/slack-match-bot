@@ -199,8 +199,12 @@ class Client():
 
     user_profile = self.get_user_porfile(user)
     name = user_profile['name']
-    is_admin = self.__admins.is_admin_user(name)
-    is_owner = self.__admins.is_owner_user(name)
+    is_owner_profile = user_profile['is_owner']
+    if self.__admins.get_count() == 0 and is_owner_profile:
+      self.__add_admin(name)   # automatically add owner as admin
+
+    is_admin = self.__admins.is_admin_user(name) or is_owner_profile
+    is_owner = self.__admins.is_owner_user(name) or is_owner_profile
     owner_exists = self.__admins.get_owner() != ""
     is_admin_command_bool = self.is_admin_command(self.__tournys.get_current_command())
     if is_admin_command_bool and not is_admin:

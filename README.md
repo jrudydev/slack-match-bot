@@ -71,7 +71,7 @@ It is easy and fast to get a tournament started with MatchBot.
 @matchbot help
 ```
 
-**Description:** Pull up more information about how to use MatchBot and a link to the documentation.
+**Description:** Pull up more information about how to use MatchBot with a link to the documentation.
 
 ---
 ### show
@@ -159,9 +159,9 @@ It is easy and fast to get a tournament started with MatchBot.
 
 **Examples:**
 ```
-@matchbot presets slackuser
-@matchbot presets show
-@matchbot presets clear
+@matchbot preset slackuser
+@matchbot preset show
+@matchbot preset clear
 ```
 
 **Description:** Use to set a preset, show a list, and clear it. The bracket will not be random when after assigning presets, instead it populates from the presets and will be positioned in order.

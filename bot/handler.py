@@ -243,7 +243,7 @@ class Handler():
       print("MatchBot is reading events!")
     else:
       # delete the entery from the db maybe
-      print("Connection failed. Invalide Slack token or bot ID")
+      print("Connection failed. Invalid Slack token or bot ID")
 
   def get_team(self):
     return self.team

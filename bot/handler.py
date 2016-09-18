@@ -30,17 +30,13 @@ class Client():
   This class listens to the Slack Messaging Api and responds.
   '''
 
-  def __init__(self, team_info):
+  def __init__(self, bot_access_token):
     self.__tournys = TournyHelper()
-    self.__client = SlackClient(team_info.bot_access_token)
+    self.__client = SlackClient(bot_access_token)
     self.__admins = Mediators()
-    self.__info = team_info
 
   def get_client(self):
     return self.__client
-
-  def get_info(self):
-    return self.__info
 
   def get_user_porfile(self, user_id):
     '''
@@ -226,15 +222,15 @@ class Handler():
   '''
 
   def __init__(self):
-    self.slack_client = SlackClient(os.environ.get('SLACK_BOT_TOKEN'))
+    self.team = Client(os.environ.get('SLACK_BOT_TOKEN'))
     self.connect_to_slack()
 
   def connect_to_slack(self):
-    if self.slack_client.rtm_connect():
+    if self.team.get_client().rtm_connect():
       print("MatchBot is reading events!")
     else:
       # delete the entery from the db maybe
       print("Connection failed. Invalide Slack token or bot ID")
 
-  def get_client(self):
-    return self.slack_client
+  def get_team(self):
+    return self.team

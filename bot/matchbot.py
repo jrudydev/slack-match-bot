@@ -35,7 +35,9 @@ def main():
   READ_WEBSOCKET_DELAY = 1 # 1 second delay between reading from firehose
   handler = Handler()
   while True:
-    user, command, channel = parse_slack_output(handler.get_client().rtm_read())
+    team = handler.get_team()
+    client = team.get_client()
+    user, command, channel = parse_slack_output(client.rtm_read())
     if command and channel:
       team.handle_command(user, command, channel)
     time.sleep(READ_WEBSOCKET_DELAY)

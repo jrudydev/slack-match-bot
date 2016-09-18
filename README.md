@@ -71,7 +71,7 @@ It is easy and fast to get a tournament started with MatchBot.
 @matchbot help
 ```
 
-**Description:** Pull up more information about how to use MatchBot and a link to the documentation.
+**Description:** Pull up more information about how to use MatchBot with a link to the documentation.
 
 ---
 ### show

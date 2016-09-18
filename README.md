@@ -41,7 +41,8 @@ It is easy and fast to get a tournament started with MatchBot.
 8. Start the tournament by typing ```@matchbot start```
 
 
-> Can't run a command without admin? If you are not the owner of the channel, type ```@matchbot admin```
+> Can't run the start command without admin?
+> If you are not the owner of the channel, type ```@matchbot admin```
  
  
 ## Commands
@@ -77,7 +78,7 @@ Options: [OPTION] = singles | doubles
 
 Example:
 ```
-@matchbot start OR @matchbot start singles
+@matchbot start **OR** @matchbot start singles
 @matchbot start doubles
 ```
 

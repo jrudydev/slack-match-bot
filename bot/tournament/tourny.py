@@ -212,7 +212,7 @@ class Tourny:
 
     response = ""
     if match.match_status() == MATCH_STATUS_COMPLETE:
-      response = "The match was won by " + match.get_winner().get_name() + "."
+      response = "The match was won by " + match.get_winner().get_handle() + "."
     else:
       response = player.get_name() + " repoted a win."
 
@@ -241,10 +241,14 @@ class Tourny:
     champ = ""
     for match in games:
       if champion:
+        winner = match.get_winner()
+        name = winner.get_name()
+        if name == "":
+          name = winner.get_handle()
         if self.__is_doubles:
-          champ = "\n" + match.get_winner().get_name() + " are the tournament champions!\n"
+          champ = "\n" + name + " are the tournament champions!\n"
         else:
-          champ = "\n" + match.get_winner().get_name() + " is the tournament champion!\n"
+          champ = "\n" + name + " is the tournament champion!\n"
         champ += "Grand Prize: :tada: :trophy: :cookie:\n"
       if number_of_games == 1:
         string = "%s\n*Championship Match*: \n" % (string)

@@ -62,10 +62,10 @@ class Match():
     response = ""
     if is_top_winner:
       self.__wins_tuple = (top_points + 1, bottom_points)
-      response = top_slot.get_name()
+      response = top_slot.get_handle()
     if is_bottom_winner:
-      self.__wins_tuple = (top_points, bottom_points + 1) 
-      response = bottom_slot.get_name()
+      self.__wins_tuple = (top_points, bottom_points + 1)
+      response = bottom_slot.get_handle()
     
     if response == "":
       response = "Player not found in match."
@@ -89,10 +89,10 @@ class Match():
     response = ""
     if is_top_loser:
       self.__wins_tuple = (0, POINTS_TO_WIN)
-      response = top_slot.get_name()
+      response = top_slot.get_handle()
     if is_bottom_loser:
       self.__wins_tuple = (POINTS_TO_WIN, 0) 
-      response = bottom_slot.get_name()
+      response = bottom_slot.get_handle()
 
     if response == "":
       response = "Player not found in match."

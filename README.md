@@ -64,9 +64,9 @@ It is easy and fast to get a tournament started with MatchBot.
 
 ---
 ### help
-Options: None
+**Options:** None
 
-Example:
+**Example:**
 ```
 @matchbot help
 ```
@@ -75,9 +75,9 @@ Example:
 
 ---
 ### show
-Options: None
+**Options:** None
 
-Example:
+**Example:**
 ```
 @matchbot show
 ```
@@ -86,9 +86,9 @@ Example:
 
 ---
 ### win
-Options: None
+**Options:** None
 
-Example:
+**Example:**
 ```
 @matchbot win
 ```
@@ -97,9 +97,9 @@ Example:
 
 ---
 ### start (Owner & Admin Only)
-Options: [OPTION] = singles | doubles
+**Options:** [OPTION] = singles | doubles
 
-Example:
+**Examples:**
 ```
 @matchbot start
 @matchbot start doubles
@@ -109,9 +109,9 @@ Example:
 
 ---
 ### boot (Owner & Admin Only)
-Options: [HANDLE] = (handle for any player in the current round)
+**Options:** [HANDLE] = (handle for any player in the current round)
 
-Example:
+**Example:**
 ```
 @matchbot boot slackuser
 ```
@@ -120,9 +120,9 @@ Example:
 
 ---
 ### reset (Owner & Admin Only)
-Options: [HANDLE] = (handle for any player in the current round)
+**Options:** [HANDLE] = (handle for any player in the current round)
 
-Example:
+**Example:**
 ```
 @matchbot reset slackuser
 ```
@@ -131,9 +131,9 @@ Example:
 
 ---
 ### next (Owner & Admin Only)
-Options: None
+**Options:** None
 
-Example:
+**Example:**
 ```
 @matchbot next
 ```
@@ -142,9 +142,9 @@ Example:
 
 ---
 ### watch (Owner & Admin Only)
-Options: [OPTIONS] = slackuser | show | clear
+**Options:** [OPTIONS] = slackuser | show | clear
 
-Example:
+**Examples:**
 ```
 @matchbot watch slackuser
 @matchbot watch show
@@ -155,9 +155,9 @@ Example:
 
 ---
 ### preset (Owner & Admin Only)
-Options: [OPTIONS] = slackuser | show | clear
+**Options:** [OPTIONS] = slackuser | show | clear
 
-Example:
+**Examples:**
 ```
 @matchbot presets slackuser
 @matchbot presets show
@@ -168,9 +168,9 @@ Example:
 
 ---
 ### admin (Owner Only)
-Options: [OPTIONS] = slackuser | show | clear | (None)
+**Options:** [OPTIONS] = slackuser | show | clear | (None)
 
-Examples:
+**Examples:**
 ```
 @matchbot admin
 @matchbot admin slackuser

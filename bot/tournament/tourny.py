@@ -123,7 +123,7 @@ class Tourny:
         match.quit_player(user)
 
         if self.__is_doubles:
-          response = match.get_loser().get_name() + " have been disqualified."
+          response = "Player has been disqualified."
         else:
           response = player.get_name() + " has been disqualified."
 
@@ -166,10 +166,7 @@ class Tourny:
 
     response = ""
     if match.match_status() == MATCH_STATUS_COMPLETE:
-      if self.__is_doubles:
-        response = "The match was won by " + match.get_winner().get_name()
-      else:
-        response = "The match was won by " + player.get_name()
+      response = "The match was won by " + match.get_winner().get_name()
     else:
       response = player.get_name() + " repoted a win."
 

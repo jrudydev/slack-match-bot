@@ -39,7 +39,7 @@ class Tourny:
 
     if number_of_slots < 2:
       return "There are not enough players."
-    
+
     response = ""
     slots = []
     is_random = len(presets) == 0
@@ -53,7 +53,9 @@ class Tourny:
           player = self.__players[key]
           if player.get_handle() == handle:
             slots.append(player)
-          break
+            break
+
+      print slots
       response = "Singles bracket generated from presets."
 
     self.__bracket.generate(slots, is_random)

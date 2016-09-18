@@ -71,7 +71,7 @@ Example:
 @matchbot help
 ```
 
-Description: Pull up more information about how to use MatchBot and a link to the documentation.
+**Description:** Pull up more information about how to use MatchBot and a link to the documentation.
 
 ---
 ### show
@@ -82,7 +82,7 @@ Example:
 @matchbot show
 ```
 
-Description: Print the matches for the current round. The round is automatically shown after running other commands that modify the tournament.
+**Description:** Print the matches for the current round. The round is automatically shown after running other commands that modify the tournament.
 
 ---
 ### win
@@ -93,7 +93,7 @@ Example:
 @matchbot win
 ```
 
-Description: Report a win for the sender. Once the win is registered, the game is complete and becomes immutable. For corrections contact an admin user.
+**Description:** Report a win for the sender. Once the win is registered, the game is complete and becomes immutable. For corrections contact an admin user.
 
 ---
 ### start (Owner & Admin Only)
@@ -105,7 +105,7 @@ Example:
 @matchbot start doubles
 ```
 
-Description: Generate a singles or doubles tournament by randomly selecting a player in the room. With presets, the presets list will be used to populate the tournament without randomizing.
+**Description:** Generate a singles or doubles tournament by randomly selecting a player in the room. With presets, the presets list will be used to populate the tournament without randomizing.
 
 ---
 ### boot (Owner & Admin Only)
@@ -116,7 +116,7 @@ Example:
 @matchbot boot slackuser
 ```
 
-Description: Disqualify a player with matching slack handle. The opponent will automatically be awarded the win and the match will be complete.
+**Description:** Disqualify a player with matching slack handle. The opponent will automatically be awarded the win and the match will be complete.
 
 ---
 ### reset (Owner & Admin Only)
@@ -127,7 +127,7 @@ Example:
 @matchbot reset slackuser
 ```
 
-Description: Reset the match of player with matching slack handle. The match will go revert back to the 'To Be Determined' state.
+**Description:** Reset the match of player with matching slack handle. The match will go revert back to the 'To Be Determined' state.
 
 ---
 ### next (Owner & Admin Only)
@@ -138,7 +138,7 @@ Example:
 @matchbot next
 ```
 
-Description: Use to advance to the next round. All matches for the current round most be complete or bye games. To forfeit a player user the ```boot``` command.
+**Description:** Use to advance to the next round. All matches for the current round most be complete or bye games. To forfeit a player user the ```boot``` command.
 
 ---
 ### watch (Owner & Admin Only)
@@ -151,7 +151,7 @@ Example:
 @matchbot watch clear
 ```
 
-Description: Use to make a spectator, show a list, and clear it. Spectators can be in a channel while not having to participate in the tournament.
+**Description:** Use to make a spectator, show a list, and clear it. Spectators can be in a channel while not having to participate in the tournament.
 
 ---
 ### preset (Owner & Admin Only)
@@ -164,7 +164,7 @@ Example:
 @matchbot presets clear
 ```
 
-Description: Use to set a preset, show a list, and clear it. The bracket will not be random when after assigning presets, instead it populates from the presets and will be positioned in order.
+**Description:** Use to set a preset, show a list, and clear it. The bracket will not be random when after assigning presets, instead it populates from the presets and will be positioned in order.
 
 ---
 ### admin (Owner Only)
@@ -178,4 +178,4 @@ Examples:
 @matchbot admin clear
 ```
 
-Description: Use to give user admin privileges., show a list, and clear it. If the slack does not give users ownership of channels, send the ```admin``` command with no arguments.
+**Description:** Use to give user admin privileges., show a list, and clear it. If the slack does not give users ownership of channels, send the ```admin``` command with no arguments.

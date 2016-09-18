@@ -89,6 +89,10 @@ class TournyHelper():
     tourny = self.get_current_tourny()
     return tourny.add(Player(member_info["id"], member_info["name"], first_name, last_name))
 
+  def clear_players(self):
+    tourny = self.get_current_tourny()
+    return tourny.clear()
+
   def report_win(self, user_handle):
     tourny = self.get_current_tourny()
     return tourny.win(user_handle)

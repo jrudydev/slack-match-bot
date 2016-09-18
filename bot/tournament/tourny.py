@@ -172,6 +172,10 @@ class Tourny:
 
     return response
 
+  def clear(self):
+    self.__players.clear()
+    return "Players have been cleared."
+
   def get_printed(self):
     '''
     Loop through the list and print each game.

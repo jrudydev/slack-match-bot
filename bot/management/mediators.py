@@ -65,9 +65,6 @@ class Mediators():
     return len(self.__admins)
 
   def is_admin_user(self, name):
-    '''
-    Check profile for is_owner flag and also list of admins
-    '''
     is_admin = False
     if name in self.__admins:
         is_admin = True
@@ -75,9 +72,6 @@ class Mediators():
     return is_admin
 
   def is_owner_user(self, name):
-    '''
-    Check profile for is_owner flag and also list of admins
-    '''
     is_owner = False
     if name == self.get_owner():
       is_owner = True

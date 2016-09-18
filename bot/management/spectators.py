@@ -27,10 +27,7 @@ class Spectators():
     
     i = 0
     for admin in self.__spectators:
-      response += admin
-      if i == 0:
-        response += " (Owner)"
-      response += "\n"
+      response += admin + "\n"
       i += 1
 
     return response
@@ -58,9 +55,6 @@ class Spectators():
     return len(self.__spectators)
 
   def is_spectator_user(self, name):
-    '''
-    Check profile for is_owner flag and also list of admins
-    '''
     is_spectator = False
     if name in self.__spectators:
         is_spectator = True

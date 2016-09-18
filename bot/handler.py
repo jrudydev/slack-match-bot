@@ -9,6 +9,7 @@ import os
 from slackclient import SlackClient
 from tournament import TournyHelper
 from management import Mediators
+from management import Spectators
 
 SLACK_BOTS_ALLOWED = True
 
@@ -18,6 +19,7 @@ REPORT_QUIT = "boot"
 NEXT_ROUND = "next"
 RESET_MATCH = "reset"
 HANDLE_ADMIN = "admin"
+MAKE_WATCH = "watch"
 
 # user commands
 HELP_COMMAND = "help"
@@ -34,6 +36,7 @@ class Client():
     self.__tournys = TournyHelper()
     self.__client = SlackClient(bot_access_token)
     self.__admins = Mediators()
+    self.__spectators = Spectators()
 
   def get_client(self):
     return self.__client
@@ -72,12 +75,15 @@ class Client():
     if len(members) == 0:
       response =  "The channel does not have any members."
     else:
+      self.__tournys.clear_players()
       for member_id in members:
         # retrieve user info so we can get profile
         member = self.get_user_porfile(member_id)
         is_bot = member.get('is_bot')
-        if not is_bot or SLACK_BOTS_ALLOWED:
-          # only add real users if flag is set
+        name = member.get('name')
+        is_spectator = self.__spectators.is_spectator_user(name)
+        if (not is_bot or SLACK_BOTS_ALLOWED) and not is_spectator:
+          # only add real users that are not spectators
           self.__tournys.add_player(member)
 
       if not is_doubles:
@@ -94,6 +100,14 @@ class Client():
       users.append(self.get_user_porfile(user_id))
 
     return self.__admins.add_user(name, users)
+
+  def __add_spectator(self, name):
+    users = []
+    user_ids = self.get_channel_users(self.__tournys.get_current_channel())
+    for user_id in user_ids:
+      users.append(self.get_user_porfile(user_id))
+
+    return self.__spectators.add_user(name, users)
 
   def admin_command(self, user_name):
     '''
@@ -162,6 +176,22 @@ class Client():
       else:
         response = "Provide the admin handle."
 
+    if command.startswith(MAKE_WATCH):
+      response = ""
+      parts = command.split()
+      count = len(parts)
+      if count >= 2:
+        # potential handle was provided for disqualification
+        option = parts[1]
+        if option.startswith("show"):
+          response = self.__spectators.list_users()
+        elif option.startswith("clear"):
+          response = self.__spectators.clear_users()
+        else:
+          response = self.__add_spectator(option)
+      else:
+        response = "Provide the spectator handle."
+
     return response
 
   def user_command(self):
@@ -226,7 +256,8 @@ class Client():
     return command.startswith(START_TOURNY) or \
       command.startswith(REPORT_QUIT) or \
       command.startswith(NEXT_ROUND) or \
-      command.startswith(RESET_MATCH)
+      command.startswith(RESET_MATCH) or \
+      command.startswith(MAKE_WATCH)
 
 
 class Handler():

@@ -54,6 +54,8 @@ class Tourny:
           if player.get_handle() == handle:
             slots.append(player)
             break
+
+      slots = self.__get_oreder_preset(slots)
       response = "Singles bracket generated from presets."
 
     self.__bracket.generate(slots, is_random)
@@ -92,12 +94,12 @@ class Tourny:
     if is_random:
       players = []
       for key in self.__players:
-        players.append(self.__players[key])
+        players.append(self.__players[key]) 
 
       for key in self.__players:
-        rand_int = random.choice(range(len(self.__players)))
-        random_player = self.__players.values()[rand_int]
-        del self.__players.items()[rand_int]
+        rand_int = random.choice(range(len(players)))
+        random_player = players[rand_int]
+        del players[rand_int]
         
         if i % 2 == 0:
           del(team)
@@ -124,6 +126,7 @@ class Tourny:
             i += 1
             break
 
+      slots = self.__get_oreder_preset(slots)
       response = "Doubles bracket generated from presets."
     
     self.__bracket.generate(slots, is_random)
@@ -223,6 +226,23 @@ class Tourny:
   def clear(self):
     self.__players.clear()
     return "Players have been cleared."
+
+  def __get_oreder_preset(self, presets):
+    '''
+    Flip everyother postion in the list to feed it to tree generator.
+    '''
+    response = presets
+    size = len(response)
+
+    i = 0
+    j = 1
+    while j < size:
+      response[i], response[j] = response[j], response[i]
+      i += 2
+      j += 2
+
+    response.reverse()
+    return response
 
   def get_printed(self):
     '''

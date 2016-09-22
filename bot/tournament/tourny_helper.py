@@ -65,10 +65,6 @@ class TournyHelper():
     tourny = self.get_current_tourny()
     return tourny.next()
 
-  def boot_slot(self, member_handle):
-    tourny = self.get_current_tourny()
-    return tourny.boot(member_handle)
-
   def reset_match(self, member_handle):
     tourny = self.get_current_tourny()
     return tourny.reset(member_handle)
@@ -93,9 +89,21 @@ class TournyHelper():
     tourny = self.get_current_tourny()
     return tourny.clear()
 
+  def clear_games(self):
+    tourny = self.get_current_tourny()
+    return tourny.destroy()
+
   def report_win(self, user_handle):
     tourny = self.get_current_tourny()
     return tourny.win(user_handle)
+
+  def report_loss(self, user_handle):
+    tourny = self.get_current_tourny()
+    return tourny.loss(user_handle)
+
+  def is_tourny_in_progress(self):
+    tourny = self.get_current_tourny()
+    return tourny.is_in_progress()
 
   def get_tourny(self):
     tourny = self.get_current_tourny()

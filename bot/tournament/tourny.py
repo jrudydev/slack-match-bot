@@ -28,7 +28,6 @@ class Tourny:
     self.__players[player.get_user()] = player
        
   def singles(self, presets):
-    self.__bracket.destroy()
     self.__is_doubles = False
 
     number_of_slots = 0
@@ -63,7 +62,6 @@ class Tourny:
     return response
 
   def doubles(self, user, presets):
-    self.__bracket.destroy()
     self.__is_doubles = True
     
     number_of_slots = 0
@@ -158,31 +156,6 @@ class Tourny:
 
     return response
 
-  def boot(self, handle):
-    '''
-    Disqualify the user with the handle provided and give the win to the opponent.
-    '''
-    response = ""
-    for key in self.__players:
-      player = self.__players[key]
-      if handle == player.get_handle():
-        games = self.__bracket.get_games()
-
-        user = player.get_user()
-        player = self.__players[user]
-        match = games[player.get_match_id()]
-        match.quit_player(user)
-
-        if self.__is_doubles:
-          response = "Player has been disqualified."
-        else:
-          response = player.get_name() + " has been disqualified."
-
-    if response == "":
-      response = "Player not found in tournament."
-
-    return response
-
   def next(self):
     '''
     Advance the bracket to the next round if all the games are complete.
@@ -206,7 +179,7 @@ class Tourny:
     '''
     games = self.__bracket.get_games()
     if len(games) == 0:
-      return "The game was not found."
+      return "The tournament has not started."
 
     if user not in self.__players:
       return "Player not found in tournament."
@@ -223,9 +196,37 @@ class Tourny:
 
     return response
 
+  def loss(self, user):
+    '''
+    Report a loss if the game is not already complete 
+    '''
+  
+    games = self.__bracket.get_games()
+    if len(games) == 0:
+      return "The tournament has not started."
+
+    if user not in self.__players:
+      return "Player not found in tournament."
+
+    player = self.__players[user]
+    match = games[player.get_match_id()]
+    match.add_loss(user)
+
+    response = ""
+    if match.match_status() == MATCH_STATUS_COMPLETE:
+      response = "The match was won by " + match.get_winner().get_handle() + "."
+    else:
+      response = player.get_name() + " reported a loss."
+
+    return response
+
   def clear(self):
     self.__players.clear()
     return "Players have been cleared."
+
+  def destroy(self):
+    self.__bracket.destroy()
+    return "Games have been destroyed"
 
   def __get_oreder_preset(self, presets):
     '''
@@ -295,6 +296,9 @@ class Tourny:
           response = False
 
     return response
+
+  def is_in_progress(self):
+    return len(self.__bracket.get_games()) > 0
 
 
 def main():

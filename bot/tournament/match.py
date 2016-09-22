@@ -74,6 +74,34 @@ class Match():
     
     print response
 
+  def add_loss(self, user):
+    '''
+    Register a loss for the player with the slack user id provided.
+    '''
+    if self.match_status() == MATCH_STATUS_COMPLETE:
+      return "This game is complete."
+
+    if self.match_status() == MATCH_STATUS_NOT_FULL:
+      return "Cannot lose a bye game."
+
+    top_slot, bottom_slot, top_points, bottom_points = self.__get_tuple()
+    is_top_loser, is_bottom_loser = self.__find_user(top_slot, bottom_slot, user)
+
+    response = ""
+    if is_top_loser:
+      self.__wins_tuple = (top_points, bottom_points + 1)
+      response = top_slot.get_handle()
+    if is_bottom_loser:
+      self.__wins_tuple = (top_points + 1, bottom_points)
+      response = bottom_slot.get_handle()
+    
+    if response == "":
+      response = "Player not found in match."
+    else:
+      response += " losses a point."
+    
+    print response
+
   def quit_player(self, user):
     '''
     This method will disqualify a player with the slack user id provide and

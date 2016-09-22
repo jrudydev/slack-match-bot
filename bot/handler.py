@@ -16,7 +16,7 @@ SLACK_BOTS_ALLOWED = True
 
 # admin commands
 START_TOURNY = "start"
-REPORT_QUIT = "boot"
+STOP_TOURNY = "stop"
 NEXT_ROUND = "next"
 RESET_MATCH = "reset"
 HANDLE_ADMIN = "admin"
@@ -27,6 +27,8 @@ HANDLE_PRESET = "preset"
 HELP_COMMAND = "help"
 PRINT_TOURNY = "show"
 REPORT_WIN = "win"
+REPORT_LOSS = "loss"
+
 
 
 class Client():
@@ -77,6 +79,8 @@ class Client():
     members = self.get_channel_users(self.__tournys.get_current_channel())
     if len(members) == 0:
       response =  "The channel does not have any members."
+    elif self.__tournys.is_tourny_in_progress():
+      response =  "Another tournament is in progress.\nSend the *stop* command to terminate."
     else:
       self.__tournys.clear_players()
       for member_id in members:
@@ -95,6 +99,10 @@ class Client():
         response = self.__tournys.start_doubles(self.__presets.get_all())
 
     return response
+
+  def destroy(self):
+    self.__tournys.clear_games()
+    return "The tournament was destroyed."
 
   def __add_admin(self, name):
     users = []
@@ -139,19 +147,12 @@ class Client():
       populate_response = self.populate(is_doubles) 
       response = "Generating tournament bracket...\n"
       response += populate_response + "\n"
-      response += self.__tournys.get_tourny() 
+      response += self.__tournys.get_tourny()
 
-    if command.startswith(REPORT_QUIT):
-      parts = command.split()
-      if len(parts) >= 2:
-        # potential handle was provided for disqualification
-        handle = parts[1]
-        boot_response = self.__tournys.boot_slot(handle)
-        response = "Disqualifying " + handle + "...\n" 
-        response += boot_response + "\n"
-        response += self.__tournys.get_tourny()
-      else: 
-        response = "Provide a handle to disqualify."
+    if command.startswith(STOP_TOURNY):
+      destroy_response = self.destroy() 
+      response = "Destroying tournament bracket...\n"
+      response += destroy_response
 
     if command.startswith(RESET_MATCH):
       parts = command.split()
@@ -163,12 +164,36 @@ class Client():
         response += reset_response + "\n"
         response += self.__tournys.get_tourny()
       else: 
-        response = "Provide a handle to disqualify."
+        response = "Provide a handle to reset the match."
 
     if command.startswith(NEXT_ROUND):
       response = "Advancing to the next round...\n"
       response += self.__tournys.next_round() + "\n"
       response += self.__tournys.get_tourny()
+    
+    if command.startswith(REPORT_WIN):
+      parts = command.split()
+      if len(parts) >= 2:
+        # potential handle was provided for disqualification
+        handle = parts[1]
+        win_response = self.__tournys.report_win(handle)
+        response = "Reproting win for " + handle + "...\n" 
+        response += win_response + "\n"
+        response += self.__tournys.get_tourny()
+      else: 
+        response = "Provide a handle to win the match."
+
+    if command.startswith(REPORT_LOSS):
+      parts = command.split()
+      if len(parts) >= 2:
+        # potential handle was provided for disqualification
+        handle = parts[1]
+        loss_response = self.__tournys.report_loss(handle)
+        response = "Reproting loss for " + handle + "...\n" 
+        response += loss_response + "\n"
+        response += self.__tournys.get_tourny()
+      else: 
+        response = "Provide a handle to lose the match."
    
     if command.startswith(HANDLE_ADMIN):
       response = ""
@@ -251,6 +276,11 @@ class Client():
       response += self.__tournys.report_win(user) + "\n"
       response += self.__tournys.get_tourny()
 
+    if command.startswith(REPORT_LOSS):
+      response = "Reporting a loss...\n"
+      response += self.__tournys.report_loss(user) + "\n"
+      response += self.__tournys.get_tourny()
+
     return response
 
   def handle_command(self, user, command, channel):
@@ -290,12 +320,17 @@ class Client():
     self.__client.api_call("chat.postMessage", channel=channel, text=response, as_user=True)
 
   def is_admin_command(self, command):
-    return command.startswith(START_TOURNY) or \
-      command.startswith(REPORT_QUIT) or \
+    command_has_parts = len(command.split()) > 1
+    is_admin_command = command.startswith(START_TOURNY) or \
+      command.startswith(STOP_TOURNY) or \
       command.startswith(NEXT_ROUND) or \
       command.startswith(RESET_MATCH) or \
       command.startswith(MAKE_WATCH) or \
-      command.startswith(HANDLE_PRESET)
+      command.startswith(HANDLE_PRESET) or \
+      (command.startswith(REPORT_LOSS) and command_has_parts) or \
+      (command.startswith(REPORT_WIN) and command_has_parts)
+
+    return is_admin_command
 
 
 class Handler():

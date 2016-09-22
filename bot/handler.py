@@ -67,6 +67,24 @@ class Client():
 
     return users
 
+  def __get_singles_preset(self):
+    '''
+    Flip everyother postion in the list to feed it to tree generator.
+    '''
+    response = self.__presets.get_all()
+    size = len(response)
+
+    i = 0
+    j = 1
+    while j < size:
+      response[i], response[j] = response[j], response[i]
+      i += 2
+      j += 2
+
+    response.reverse()
+
+    return response
+
   def populate(self, is_doubles):
     '''
     Use the slack api to first get a list of channels for the team, find the
@@ -89,10 +107,11 @@ class Client():
           # only add real users that are not spectators
           self.__tournys.add_player(member)
 
+      presets = self.__get_singles_preset()
       if not is_doubles:
-        response = self.__tournys.start_singles(self.__presets.get_all())
+        response = self.__tournys.start_singles(presets)
       else:
-        response = self.__tournys.start_doubles(self.__presets.get_all())
+        response = self.__tournys.start_doubles(presets)
 
     return response
 

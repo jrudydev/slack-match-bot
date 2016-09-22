@@ -54,8 +54,6 @@ class Tourny:
           if player.get_handle() == handle:
             slots.append(player)
             break
-
-      print slots
       response = "Singles bracket generated from presets."
 
     self.__bracket.generate(slots, is_random)
@@ -92,10 +90,14 @@ class Tourny:
     is_random = len(presets) == 0
     i = 0
     if is_random:
+      players = []
       for key in self.__players:
-        rand_int = random.choice(range(number_of_players))
-        random_player = self.__players[rand_int]
-        del self.__players[rand_int]
+        players.append(self.__players[key])
+
+      for key in self.__players:
+        rand_int = random.choice(range(len(self.__players)))
+        random_player = self.__players.values()[rand_int]
+        del self.__players.items()[rand_int]
         
         if i % 2 == 0:
           del(team)

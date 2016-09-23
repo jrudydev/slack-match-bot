@@ -359,7 +359,7 @@ class Handler():
     slack_team.set_client()
     client = slack_team.get_client()
     if client.rtm_connect():
-      print("MatchBot is reading events!")
+      print("MatchBot is reading events again!")
     else:
       # delete the entery from the db maybe
       print("Connection failed. Invalid Slack token or bot ID")

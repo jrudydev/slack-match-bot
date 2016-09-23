@@ -39,12 +39,17 @@ class Client():
   def __init__(self, bot_access_token):
     self.__tournys = TournyHelper()
     self.__client = SlackClient(bot_access_token)
+    self.__access_token = bot_access_token
     self.__admins = Mediators()
     self.__spectators = Spectators()
     self.__presets = Presets()
 
   def get_client(self):
     return self.__client
+
+  def set_client(self):
+    del self.__client
+    self.__client = SlackClient(self.__access_token)
 
   def get_user_porfile(self, user_id):
     '''
@@ -339,15 +344,25 @@ class Handler():
   '''
 
   def __init__(self):
-    self.team = Client(os.environ.get('SLACK_BOT_TOKEN'))
-    self.connect_to_slack()
+    self.__team = Client(os.environ.get('SLACK_BOT_TOKEN'))
+    self.__connect(self.__team)
 
-  def connect_to_slack(self):
-    if self.team.get_client().rtm_connect():
+  def __connect(self, slack_team):
+    client = slack_team.get_client()
+    if client.rtm_connect():
+      print("MatchBot is reading events!")
+    else:
+      # delete the entery from the db maybe
+      print("Connection failed. Invalid Slack token or bot ID")
+
+  def reconnect(self, slack_team):
+    slack_team.set_client()
+    client = slack_team.get_client()
+    if client.rtm_connect():
       print("MatchBot is reading events!")
     else:
       # delete the entery from the db maybe
       print("Connection failed. Invalid Slack token or bot ID")
 
   def get_team(self):
-    return self.team
+    return self.__team

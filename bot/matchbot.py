@@ -7,6 +7,7 @@
 # demands to automate a single elimination bracket. The bot allows participants
 # to register their own wins and gives the admin full control of bracket progression.
 
+import socket
 import os
 import json
 import time
@@ -34,13 +35,18 @@ def parse_slack_output(slack_rtm_output):
 def main():
   READ_WEBSOCKET_DELAY = 1 # 1 second delay between reading from firehose
   handler = Handler()
+  team = handler.get_team()
   while True:
-    team = handler.get_team()
     client = team.get_client()
-    user, command, channel = parse_slack_output(client.rtm_read())
-    if command and channel:
-      team.handle_command(user, command, channel)
-    time.sleep(READ_WEBSOCKET_DELAY)
+    try:
+      user, command, channel = parse_slack_output(client.rtm_read())
+      if command and channel:
+        team.handle_command(user, command, channel)
+      time.sleep(READ_WEBSOCKET_DELAY)
+    except socket.timeout:
+      print "++++++ Socket Timeout ++++++"
+      handler.reconnect(team)
+    
 
 if __name__ == '__main__': 
   main()

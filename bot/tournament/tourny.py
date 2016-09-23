@@ -77,12 +77,8 @@ class Tourny:
     if number_of_slots < 2:
       return "There are not enough players."
 
-    if is_odd:
-      if is_preset:
-        return "There is an odd number of presets."
-      else:
-        # remove the send from the players list if the count is odd
-        del self.__players[user]
+    if is_odd and is_preset:
+      return "There is an odd number of presets."
 
     response = ""
     team = None
@@ -92,9 +88,10 @@ class Tourny:
     if is_random:
       players = []
       for key in self.__players:
-        players.append(self.__players[key]) 
+        if not is_odd or key != user:
+          players.append(self.__players[key]) 
 
-      for key in self.__players:
+      for x in range(len(players)):
         rand_int = random.choice(range(len(players)))
         random_player = players[rand_int]
         del players[rand_int]

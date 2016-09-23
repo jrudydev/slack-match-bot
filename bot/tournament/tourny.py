@@ -183,16 +183,19 @@ class Tourny:
 
     if user not in self.__players:
       return "Player not found in tournament."
-    
-    player = self.__players[user]
-    match = games[player.get_match_id()]
-    match.add_win(user)
 
     response = ""
-    if match.match_status() == MATCH_STATUS_COMPLETE:
-      response = "The match was won by " + match.get_winner().get_handle() + "."
+    player = self.__players[user]
+    match_id = player.get_match_id()
+    if match_id != None:
+      match = games[match_id]
+      match.add_win(user)
+      if match.match_status() == MATCH_STATUS_COMPLETE:
+        response = "The match was won by " + match.get_winner().get_handle() + "."
+      else:
+        response = player.get_name() + " repoted a win."
     else:
-      response = player.get_name() + " repoted a win."
+      response = "Player is not in the tournament."
 
     return response
 
@@ -208,15 +211,18 @@ class Tourny:
     if user not in self.__players:
       return "Player not found in tournament."
 
-    player = self.__players[user]
-    match = games[player.get_match_id()]
-    match.add_loss(user)
-
     response = ""
-    if match.match_status() == MATCH_STATUS_COMPLETE:
-      response = "The match was won by " + match.get_winner().get_handle() + "."
+    player = self.__players[user]
+    match_id = player.get_match_id()
+    if match_id != None:
+      match = games[match_id]
+      match.add_win(user)
+      if match.match_status() == MATCH_STATUS_COMPLETE:
+        response = "The match was lost by " + match.get_winner().get_handle() + "."
+      else:
+        response = player.get_name() + " reported a loss."
     else:
-      response = player.get_name() + " reported a loss."
+      response = "Player is not in the tournament."
 
     return response
 

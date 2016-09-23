@@ -53,13 +53,14 @@ It is easy and fast to get a tournament started with MatchBot.
 |help   |Documentation link          |None                          |       |       |
 |show   |Print current round         |None                          |       |       |
 |win    |Report a win                |None                          |       |       |
+|loss   |Report a loss               |None                          |       |       |
 |start  |Generate tournament         |[TYPE]  Ex: doubles           |X      |       |
-|boot   |Disqualify player           |[HANDLE]  Ex: slackuser       |X      |       |
+|stop   |Destroy the tournament      |None                          |X      |       |
 |reset  |Reset player match          |[HANDLE]  Ex: slackuser       |X      |       |
 |next   |Advance to next round       |None                          |X      |       |
-|watch  |Handle spectator users      |[OPTION]  Ex: slackuser       |X	     |       |
-|preset |Handle preset placement     |[OPTION]  Ex: clear           |X	     |       |
-|admin  |Handle admin roles          |[OPTION]  Ex: show            | 	     |X      |
+|watch  |Handle spectator users      |[OPTION]  Ex: slackuser       |X	    |       |
+|preset |Handle preset placement     |[OPTION]  Ex: clear           |X	    |       |
+|admin  |Handle admin roles          |[OPTION]  Ex: show            | 	    |X      |
 
 
 ---
@@ -93,7 +94,18 @@ It is easy and fast to get a tournament started with MatchBot.
 @matchbot win
 ```
 
-**Description:** Report a win for the sender. Once the win is registered, the game is complete and becomes immutable. For corrections contact an admin user.
+**Description:** Report a win for the sender. Once the win is registered, the game is complete and becomes immutable. For corrections contact an admin user. Admin users can pass a handle as and argument and register a win for the user.
+
+---
+### loss
+**Options:** None
+
+**Example:**
+```
+@matchbot loss
+```
+
+**Description:** Report a loss for the sender. Once the loss is registered, the game is complete and becomes immutable. For corrections contact an admin user. Admin users can pass a handle to this command and register a loss for the user.
 
 ---
 ### start (Owner & Admin Only)
@@ -106,6 +118,17 @@ It is easy and fast to get a tournament started with MatchBot.
 ```
 
 **Description:** Generate a singles or doubles tournament by randomly selecting a player in the room. With presets, the presets list will be used to populate the tournament without randomizing.
+
+---
+### stop (Owner & Admin Only)
+**Options:** None
+
+**Examples:**
+```
+@matchbot stop
+```
+
+**Description:** Destroys the tournament in order to start a new one. This command is a safe gaurd from losing all data if the *start* command is used while a tournament is in progress.
 
 ---
 ### boot (Owner & Admin Only)

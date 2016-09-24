@@ -11,7 +11,6 @@ from player import Player
 from team import Team
 from match import Match
 from tree import TournyTree
-from match import MATCH_STATUS_COMPLETE
 import random
 
 class Tourny:
@@ -141,12 +140,7 @@ class Tourny:
         user = player.get_user()
         player = self.__players[user]
         match = games[player.get_match_id()]
-        match.reset_game(user)
-
-        if self.__is_doubles:
-          response = "Match has been reset."
-        else:
-          response = player.get_name() + "'s match has been reset"
+        response = match.reset_game(user)
 
     if response == "":
       response = "Player not found in tournament."
@@ -178,7 +172,7 @@ class Tourny:
     if len(games) == 0:
       return "The tournament has not started."
 
-    if user not in self.__players:
+    if user == None or user not in self.__players:
       return "Player not found in tournament."
 
     response = ""
@@ -186,11 +180,7 @@ class Tourny:
     match_id = player.get_match_id()
     if match_id != None:
       match = games[match_id]
-      match.add_win(user)
-      if match.match_status() == MATCH_STATUS_COMPLETE:
-        response = "The match was won by " + match.get_winner().get_handle() + "."
-      else:
-        response = player.get_name() + " repoted a win."
+      response = match.add_win(user)
     else:
       response = "Player is not in the tournament."
 
@@ -205,7 +195,7 @@ class Tourny:
     if len(games) == 0:
       return "The tournament has not started."
 
-    if user not in self.__players:
+    if user == None or user not in self.__players:
       return "Player not found in tournament."
 
     response = ""
@@ -213,11 +203,7 @@ class Tourny:
     match_id = player.get_match_id()
     if match_id != None:
       match = games[match_id]
-      match.add_win(user)
-      if match.match_status() == MATCH_STATUS_COMPLETE:
-        response = "The match was lost by " + match.get_winner().get_handle() + "."
-      else:
-        response = player.get_name() + " reported a loss."
+      response = match.add_loss(user)
     else:
       response = "Player is not in the tournament."
 
@@ -302,6 +288,15 @@ class Tourny:
 
   def is_in_progress(self):
     return len(self.__bracket.get_games()) > 0
+
+  def get_user_id(self, handle):
+    response = None
+    for key in self.__players:
+      if self.__players[key].get_handle() == handle:
+        response = key
+        break
+
+    return response
 
 
 def main():

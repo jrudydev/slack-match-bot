@@ -93,13 +93,27 @@ class TournyHelper():
     tourny = self.get_current_tourny()
     return tourny.destroy()
 
-  def report_win(self, user_handle):
+  def report_win(self, user_id):
     tourny = self.get_current_tourny()
-    return tourny.win(user_handle)
+    return tourny.win(user_id)
 
-  def report_loss(self, user_handle):
+  def report_win_with_handle(self, user_handle):
+    response = ''
     tourny = self.get_current_tourny()
-    return tourny.loss(user_handle)
+    user_id = tourny.get_user_id(user_handle)
+
+    return tourny.win(user_id)
+
+  def report_loss(self, user_id):
+    tourny = self.get_current_tourny()
+    return tourny.loss(user_id)
+
+  def report_loss_with_handle(self, user_handle):
+    response = ''
+    tourny = self.get_current_tourny()
+    user_id = tourny.get_user_id(user_handle)
+
+    return tourny.loss(user_id)
 
   def is_tourny_in_progress(self):
     tourny = self.get_current_tourny()

@@ -51,7 +51,7 @@ class Match():
     Register a win for the player with the slack user id provided.
     '''
     if self.match_status() == MATCH_STATUS_COMPLETE:
-      return "This game is complete."
+      return "The match was won by " + self.get_losser().get_handle() + "."
 
     if self.match_status() == MATCH_STATUS_NOT_FULL:
       return "Cannot win a bye game."
@@ -62,24 +62,28 @@ class Match():
     response = ""
     if is_top_winner:
       self.__wins_tuple = (top_points + 1, bottom_points)
-      response = top_slot.get_handle()
+      response = top_slot.get_handle_and_name()
     if is_bottom_winner:
       self.__wins_tuple = (top_points, bottom_points + 1)
-      response = bottom_slot.get_handle()
+      response = bottom_slot.get_handle_and_name()
     
+    is_team = self.__is_team(top_slot)
     if response == "":
       response = "Player not found in match."
     else:
-      response += " gains a point."
+      if is_team:
+        response += " win!"
+      else:
+        response += " wins!"
     
-    print response
+    return response
 
   def add_loss(self, user):
     '''
     Register a loss for the player with the slack user id provided.
     '''
     if self.match_status() == MATCH_STATUS_COMPLETE:
-      return "This game is complete."
+      return "The match was lost by " + self.get_loser().get_handle() + "."
 
     if self.match_status() == MATCH_STATUS_NOT_FULL:
       return "Cannot lose a bye game."
@@ -90,56 +94,32 @@ class Match():
     response = ""
     if is_top_loser:
       self.__wins_tuple = (top_points, bottom_points + 1)
-      response = top_slot.get_handle()
+      response = top_slot.get_handle_and_name()
     if is_bottom_loser:
       self.__wins_tuple = (top_points + 1, bottom_points)
-      response = bottom_slot.get_handle()
+      response = bottom_slot.get_handle_and_name()
     
+    is_team = self.__is_team(top_slot)
     if response == "":
       response = "Player not found in match."
     else:
-      response += " losses a point."
+      if is_team:
+        response += " lose!"
+      else:
+        response += " losses!"
     
-    print response
-
-  def quit_player(self, user):
-    '''
-    This method will disqualify a player with the slack user id provide and
-    consiquently give the win to the oppenent.
-    '''
-    if self.match_status() == MATCH_STATUS_NOT_FULL:
-      print("Cannot win a bye game.")
-      return
-    
-    top_slot, bottom_slot, top_points, bottom_points = self.__get_tuple()
-    is_top_loser, is_bottom_loser = self.__find_user(top_slot, bottom_slot, user)
-
-    response = ""
-    if is_top_loser:
-      self.__wins_tuple = (0, POINTS_TO_WIN)
-      response = top_slot.get_handle()
-    if is_bottom_loser:
-      self.__wins_tuple = (POINTS_TO_WIN, 0) 
-      response = bottom_slot.get_handle()
-
-    if response == "":
-      response = "Player not found in match."
-    else:
-      response += " has been disqualified."
-    
-    print response
+    return response
 
   def reset_game(self, user):
     '''
     
     '''
     if self.match_status() == MATCH_STATUS_NOT_FULL:
-      print("Cannot reset a bye game.")
-      return
+      return "Cannot reset a bye game."
     
     self.__wins_tuple = (0, 0)
 
-    print "Match reset."
+    return "Match has been reset."
 
   def set_match_ids(self, match_id):
     '''
@@ -154,7 +134,7 @@ class Match():
 
   def match_status(self):
     top, bottom, top_points, bottom_points = self.__get_tuple()
-    
+
     response = None
     if top == None or bottom == None:
       response = MATCH_STATUS_NOT_FULL
@@ -173,6 +153,14 @@ class Match():
 
   def get_sides(self):
     return self.__sides_tuple[SIDE_1_INDEX], self.__sides_tuple[SIDE_2_INDEX]
+
+  def __is_team(self, team):
+    is_team = False
+    handles = getattr(team, "get_handles", None)
+    if callable(handles):
+      is_team = True
+
+    return is_team
 
   def __find_user(self, top, bottom, user_id):
     is_top_winner = False
@@ -274,7 +262,7 @@ class Match():
       if slot_points == POINTS_TO_WIN:
         label = "_W_".center(5)
       else:
-        label = "_L_".center(8)
+        label = "_L_".center(7)
     else:
       label = str(points).center(10)
 

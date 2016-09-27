@@ -131,17 +131,13 @@ class Tourny:
     '''
     
     '''
-    response = ""
-    for key in self.__players:
-      player = self.__players[key]
-      if handle == player.get_handle():
-        games = self.__bracket.get_games()
 
-        user = player.get_user()
-        player = self.__players[user]
-        match = games[player.get_match_id()]
-        response = match.reset_game(user)
+    user_id = self.__user_ids[handle]
+    player = self.__players[user_id]
+    games = self.__bracket.get_games()
+    match = games[player.get_match_id()]
 
+    response = match.reset_game(user_id)
     if response == "":
       response = "Player not found in tournament."
 

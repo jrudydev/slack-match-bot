@@ -264,6 +264,131 @@ class Client():
         response = "Provide the preset handle."
 
     return response
+  
+  def user_command(self):
+    '''
+    These commands can used by anyone in the channel.
+    '''
+    response = ""
+    user = self.__tournys.get_current_user()
+    command = self.__tournys.get_current_command()
+    if command.startswith(HELP_COMMAND):  
+      response = "Get the full list of commands here:\n" + \
+        "https://github.com/peperodo/slack-match-bot"
+
+    if command.startswith(PRINT_TOURNY):
+      response = "Printing tournament bracket...\n"
+      response += self.__tournys.get_tourny()
+      
+    if command.startswith(REPORT_WIN):
+      response = "Reporting a win...\n"
+      response += self.__tournys.report_win(user) + "\n"
+      response += self.__tournys.get_tourny()
+
+    if command.startswith(REPORT_LOSS):
+      response = "Reporting a loss...\n"
+      response += self.__tournys.report_loss(user) + "\n"
+      response += self.__tournys.get_tourny()
+
+    return response
+
+  def handle_command(self, user, command, channel):
+    """
+      Recieves commands directed to the bot and determins if they
+      are valid commands. If so, then acts on teh commands. If not,
+      returns back what it needs for clarification.
+    """
+    response = "Not sure what you mean. Use the *" + HELP_COMMAND + \
+      "* command."
+
+    self.__tournys.set_current_command(user, command, channel)
+
+    user_profile = self.get_user_porfile(user)
+    name = user_profile['name']
+    is_owner_profile = user_profile['is_owner']
+    if self.__admins.get_count() == 0 and is_owner_profile:
+      self.__add_admin(name)   # automatically add owner as admin
+
+    is_admin = self.__admins.is_admin_user(name) or is_owner_profile
+    is_owner = self.__admins.is_owner_user(name) or is_owner_profile
+    owner_exists = self.__admins.get_owner() != ""
+    is_admin_command_bool = self.is_admin_command(self.__tournys.get_current_command())
+    if is_admin_command_bool and not is_admin:
+      response = "Only an admin can use this command."
+    elif command == HANDLE_ADMIN and (not is_owner and owner_exists):
+      response = "Only the channel owner can use this command."
+    elif is_admin_command_bool or command.startswith(HANDLE_ADMIN):
+      admin_response = self.admin_command(name)
+      if admin_response != "":
+        response = admin_response
+    else:
+      user_response = self.user_command()
+      if user_response != "":
+        response = user_response
+
+    self.__client.api_call("chat.postMessage", channel=channel, text=response, as_user=True)
+
+  def is_admin_command(self, command):
+    command_has_parts = len(command.split()) > 1
+    is_admin_command = command.startswith(START_TOURNY) or \
+      command.startswith(STOP_TOURNY) or \
+      command.startswith(NEXT_ROUND) or \
+      command.startswith(RESET_MATCH) or \
+      command.startswith(MAKE_WATCH) or \
+      command.startswith(HANDLE_PRESET) or \
+      (command.startswith(REPORT_LOSS) and command_has_parts) or \
+      (command.startswith(REPORT_WIN) and command_has_parts)
+
+    return is_admin_command
+
+  def handle_command(self, user, command, channel):
+    """
+      Recieves commands directed to the bot and determins if they
+      are valid commands. If so, then acts on teh commands. If not,
+      returns back what it needs for clarification.
+    """
+    response = "Not sure what you mean. Use the *" + HELP_COMMAND + \
+      "* command."
+
+    self.__tournys.set_current_command(user, command, channel)
+
+    user_profile = self.get_user_porfile(user)
+    name = user_profile['name']
+    is_owner_profile = user_profile['is_owner']
+    if self.__admins.get_count() == 0 and is_owner_profile:
+      self.__add_admin(name)   # automatically add owner as admin
+
+    is_admin = self.__admins.is_admin_user(name) or is_owner_profile
+    is_owner = self.__admins.is_owner_user(name) or is_owner_profile
+    owner_exists = self.__admins.get_owner() != ""
+    is_admin_command_bool = self.is_admin_command(self.__tournys.get_current_command())
+    if is_admin_command_bool and not is_admin:
+      response = "Only an admin can use this command."
+    elif command == HANDLE_ADMIN and (not is_owner and owner_exists):
+      response = "Only the channel owner can use this command."
+    elif is_admin_command_bool or command.startswith(HANDLE_ADMIN):
+      admin_response = self.admin_command(name)
+      if admin_response != "":
+        response = admin_response
+    else:
+      user_response = self.user_command()
+      if user_response != "":
+        response = user_response
+
+    self.__client.api_call("chat.postMessage", channel=channel, text=response, as_user=True)
+
+  def is_admin_command(self, command):
+    command_has_parts = len(command.split()) > 1
+    is_admin_command = command.startswith(START_TOURNY) or \
+      command.startswith(STOP_TOURNY) or \
+      command.startswith(NEXT_ROUND) or \
+      command.startswith(RESET_MATCH) or \
+      command.startswith(MAKE_WATCH) or \
+      command.startswith(HANDLE_PRESET) or \
+      (command.startswith(REPORT_LOSS) and command_has_parts) or \
+      (command.startswith(REPORT_WIN) and command_has_parts)
+
+    return is_admin_command
 
 
 class Handler():

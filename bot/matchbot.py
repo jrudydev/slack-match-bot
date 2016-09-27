@@ -43,8 +43,7 @@ def main():
       if command and channel:
         team.handle_command(user, command, channel)
       time.sleep(READ_WEBSOCKET_DELAY)
-    except socket.timeout:
-      print "++++++ Socket Timeout ++++++"
+    except Exception:
       handler.reconnect(team)
     
 

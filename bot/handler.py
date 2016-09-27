@@ -52,6 +52,7 @@ class Client():
 
   def set_client(self):
     del self.__client
+    print self.__access_token
     self.__client = SlackClient(self.__access_token)
 
   def get_user_porfile(self, user_id):
@@ -288,7 +289,6 @@ class Handler():
     if client.rtm_connect():
       print("MatchBot is reading events again!")
     else:
-      # delete the entery from the db maybe
       print("Connection failed. Invalid Slack token or bot ID")
 
   def get_team(self):

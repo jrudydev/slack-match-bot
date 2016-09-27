@@ -50,8 +50,8 @@ class Match():
     '''
     Register a win for the player with the slack user id provided.
     '''
-    if self.match_status() == MATCH_STATUS_COMPLETE:
-      return "The match was won by " + self.get_losser().get_handle() + "."
+    if self.is_complete():
+      return "The match was won by " + self.get_winner().get_handle() + "."
 
     if self.match_status() == MATCH_STATUS_NOT_FULL:
       return "Cannot win a bye game."
@@ -82,8 +82,8 @@ class Match():
     '''
     Register a loss for the player with the slack user id provided.
     '''
-    if self.match_status() == MATCH_STATUS_COMPLETE:
-      return "The match was lost by " + self.get_loser().get_handle() + "."
+    if self.is_complete():
+      return "The match was won by " + self.get_winner().get_handle() + "."
 
     if self.match_status() == MATCH_STATUS_NOT_FULL:
       return "Cannot lose a bye game."

@@ -211,6 +211,7 @@ class Tourny:
 
   def clear(self):
     self.__players.clear()
+    self.__user_ids.clear()
     return "Players have been cleared."
 
   def destroy(self):

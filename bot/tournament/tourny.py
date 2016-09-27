@@ -20,11 +20,13 @@ class Tourny:
 
   def __init__(self):
     self.__players = {}
+    self.__user_ids = {}
     self.__bracket = TournyTree()
     self.__is_doubles = False
   
   def add(self, player):
     self.__players[player.get_user()] = player
+    self.__user_ids[player.get_handle()] = player.get_user()
        
   def singles(self, presets):
     self.__is_doubles = False
@@ -47,11 +49,10 @@ class Tourny:
       response = "Singles bracket randomly generated."
     else:
       for handle in presets:
-        for key in self.__players:
-          player = self.__players[key]
-          if player.get_handle() == handle:
-            slots.append(player)
-            break
+        user_id = self.__user_ids[handle]
+        player = self.__players[user_id]
+        if player.get_handle() == handle:
+          slots.append(player)
 
       slots = self.__get_oreder_preset(slots)
       response = "Singles bracket generated from presets."
@@ -107,18 +108,17 @@ class Tourny:
       response = "Doubles bracket randomly generated."
     else:
       for handle in presets:
-        for key in self.__players:
-          player = self.__players[key]
-          if player.get_handle() == handle:
-            if i % 2 == 0:
-              del(team)
-              team = Team()
-              team.add_teammate(player)
-            else:
-              team.add_teammate(player)
-              slots.append(team)
-            i += 1
-            break
+        user_id = self.__user_ids[handle]
+        player = self.__players[user_id]
+        if player.get_handle() == handle:
+          if i % 2 == 0:
+            del(team)
+            team = Team()
+            team.add_teammate(player)
+          else:
+            team.add_teammate(player)
+            slots.append(team)
+          i += 1
 
       slots = self.__get_oreder_preset(slots)
       response = "Doubles bracket generated from presets."
@@ -290,13 +290,7 @@ class Tourny:
     return len(self.__bracket.get_games()) > 0
 
   def get_user_id(self, handle):
-    response = None
-    for key in self.__players:
-      if self.__players[key].get_handle() == handle:
-        response = key
-        break
-
-    return response
+    return self.__user_ids[handle]
 
 
 def main():

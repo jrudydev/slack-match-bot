@@ -285,11 +285,7 @@ class Handler():
 
   def reconnect(self, slack_team):
     slack_team.set_client()
-    client = slack_team.get_client()
-    if client.rtm_connect():
-      print("MatchBot is reading events again!")
-    else:
-      print("Connection failed. Invalid Slack token or bot ID")
+    self.__connect(slack_team)
 
   def get_team(self):
     return self.__team

@@ -50,11 +50,11 @@ class Match():
     '''
     Register a win for the player with the slack user id provided.
     '''
-    if self.is_complete():
-      return "The match was won by " + self.get_winner().get_handle() + "."
-
     if self.match_status() == MATCH_STATUS_NOT_FULL:
       return "Cannot win a bye game."
+
+    if self.is_complete():
+      return "Match already won by " + self.get_winner().get_handle_and_name() + "."
 
     top_slot, bottom_slot, top_points, bottom_points = self.__get_tuple()
     is_top_winner, is_bottom_winner = self.__find_user(top_slot, bottom_slot, user)
@@ -82,11 +82,11 @@ class Match():
     '''
     Register a loss for the player with the slack user id provided.
     '''
-    if self.is_complete():
-      return "The match was won by " + self.get_winner().get_handle() + "."
-
     if self.match_status() == MATCH_STATUS_NOT_FULL:
       return "Cannot lose a bye game."
+
+    if self.is_complete():
+      return "Match already been lost by " + self.get_winner().get_handle_and_name() + "."
 
     top_slot, bottom_slot, top_points, bottom_points = self.__get_tuple()
     is_top_loser, is_bottom_loser = self.__find_user(top_slot, bottom_slot, user)
@@ -106,7 +106,7 @@ class Match():
       if is_team:
         response += " lose!"
       else:
-        response += " losses!"
+        response += " loses!"
     
     return response
 
@@ -147,9 +147,13 @@ class Match():
 
     return response
 
+  def is_bye(self):
+    status = self.match_status()
+    return status == MATCH_STATUS_NOT_FULL
+
   def is_complete(self):
     status = self.match_status()
-    return status == MATCH_STATUS_COMPLETE or status == MATCH_STATUS_NOT_FULL
+    return status == MATCH_STATUS_COMPLETE or self.is_bye()
 
   def get_sides(self):
     return self.__sides_tuple[SIDE_1_INDEX], self.__sides_tuple[SIDE_2_INDEX]
@@ -262,7 +266,7 @@ class Match():
       if slot_points == POINTS_TO_WIN:
         label = "_W_".center(5)
       else:
-        label = "_L_".center(7)
+        label = " _L_".center(8)
     else:
       label = str(points).center(10)
 

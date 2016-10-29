@@ -22,9 +22,8 @@ def parse_slack_output(slack_rtm_output):
     This parsing function returns None unless a messagte is
     directed at the Bot, based on its ID.
   """
-  output_list = slack_rtm_output
-  if output_list and len(output_list) > 0:
-    for output in output_list:
+  if slack_rtm_output and len(slack_rtm_output) > 0:
+    for output in slack_rtm_output:
       if output and 'text' in output and AT_BOT in output['text'] and 'user' in output:
         # return text after the @ mention, whitespace removed
         return output['user'], output['text'].split(AT_BOT)[1].strip(' ').lower(), output['channel']
@@ -35,7 +34,9 @@ def parse_slack_output(slack_rtm_output):
 def main():
   READ_WEBSOCKET_DELAY = 1 # 1 second delay between reading from firehose
   handler = Handler()
-  team = handler.get_team()
+  handler.add_team(os.environ.get('SLACK_BOT_TOKEN'))
+  teams = handler.get_teams()
+  team = teams[0]
   while True:
     client = team.get_client()
     try:

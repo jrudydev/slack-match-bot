@@ -8,9 +8,10 @@
 # presents the winner.
 
 from player import Player
+from team import PlayerTeam
 
-SIDE_1_INDEX = 0
-SIDE_2_INDEX = 1 
+TOP_INDEX = 0
+BOTTOM_INDEX = 1 
 
 POINTS_TO_WIN = 1
 
@@ -18,7 +19,7 @@ MATCH_STATUS_NOT_FULL = 0
 MATCH_STATUS_NOT_STARTED = 1
 MATCH_STATUS_IN_PROGRESS = 2
 MATCH_STATUS_COMPLETE = 3
-
+MATCH_STATUS_PENDING = 4
  
 class Match():
   '''
@@ -27,20 +28,26 @@ class Match():
   '''
 
   def __init__(self):
-    self.__sides_tuple = (None, None)
+    self.__slots_tuple = (None, None)
     self.__wins_tuple = (0, 0)
+    # self.__match_number = match_number
+    self.__is_pending = False
 
-  def add_side(self, side):
+  def add_slot(self, slot):
     '''
-    Try to add a side to the top and the to the bottom slot  if there is room.
+    Try to add a slot to the top and the to the bottom slot  if there is room.
     '''
     response = ""
-    if self.__sides_tuple[0] == None:
-      self.__sides_tuple = (side, None)
-      response = "Player added added to top."
-    elif self.__sides_tuple[1] == None:
-      self.__sides_tuple = (self.__sides_tuple[SIDE_1_INDEX], side)
-      response = "Player added added to bottom."
+    if self.__slots_tuple[0] == None:
+      self.__slots_tuple = (slot, None)
+      #To-Do: check if slot is of type pending and set instance veriable
+      response = "Top player added."
+      # response = "Top player added to match {}.".format(str(self.__match_number))
+    elif self.__slots_tuple[1] == None:
+      self.__slots_tuple = (self.__slots_tuple[TOP_INDEX], slot)
+      #To-Do: check if slot is of type pending and set instance veriable
+      response = "Bottom player added."
+      # response = "Bottom player added to match {}.".format(str(self.__match_number))
     else:
       response = "This game is full!"
 
@@ -50,15 +57,15 @@ class Match():
     '''
     Register a win for the player with the slack user id provided.
     '''
-    if self.match_status() == MATCH_STATUS_NOT_FULL:
-      return "Cannot win a bye game."
+    if self.is_bye_pending():
+      return "Cannot reset a bye/pending match."
 
     if self.is_complete():
       return "Match already won by " + self.get_winner().get_handle_and_name() + "."
 
-    top_slot, bottom_slot, top_points, bottom_points = self.__get_tuple()
-    is_top_winner, is_bottom_winner = self.__find_user(top_slot, bottom_slot, user)
-
+    top_slot, bottom_slot, top_points, bottom_points = self.__get_tuples()
+    is_top_winner, is_bottom_winner = self.__get_user_slot(top_slot, bottom_slot, user)
+ 
     response = ""
     if is_top_winner:
       self.__wins_tuple = (top_points + 1, bottom_points)
@@ -67,29 +74,30 @@ class Match():
       self.__wins_tuple = (top_points, bottom_points + 1)
       response = bottom_slot.get_handle_and_name()
     
-    is_team = self.__is_team(top_slot)
+    is_singles = top_slot.is_single_player()
     if response == "":
       response = "Player not found in match."
     else:
-      if is_team:
-        response += " win!"
-      else:
+      if is_singles:
         response += " wins!"
+      else:
+        response += " win!"
     
+    print response
     return response
 
   def add_loss(self, user):
     '''
     Register a loss for the player with the slack user id provided.
     '''
-    if self.match_status() == MATCH_STATUS_NOT_FULL:
-      return "Cannot lose a bye game."
+    if self.is_bye_pending():
+      return "Cannot reset a bye/pending match."
 
     if self.is_complete():
       return "Match already been lost by " + self.get_winner().get_handle_and_name() + "."
 
-    top_slot, bottom_slot, top_points, bottom_points = self.__get_tuple()
-    is_top_loser, is_bottom_loser = self.__find_user(top_slot, bottom_slot, user)
+    top_slot, bottom_slot, top_points, bottom_points = self.__get_tuples()
+    is_top_loser, is_bottom_loser = self.__get_user_slot(top_slot, bottom_slot, user)
 
     response = ""
     if is_top_loser:
@@ -99,14 +107,14 @@ class Match():
       self.__wins_tuple = (top_points + 1, bottom_points)
       response = bottom_slot.get_handle_and_name()
     
-    is_team = self.__is_team(top_slot)
+    is_singles = bottom_slot.is_singles()
     if response == "":
       response = "Player not found in match."
     else:
-      if is_team:
-        response += " lose!"
-      else:
+      if is_singles:
         response += " loses!"
+      else:
+        response += " lose!"
     
     return response
 
@@ -114,8 +122,8 @@ class Match():
     '''
     
     '''
-    if self.match_status() == MATCH_STATUS_NOT_FULL:
-      return "Cannot reset a bye game."
+    if self.is_bye_pending():
+      return "Cannot reset a bye/pending match."
     
     self.__wins_tuple = (0, 0)
 
@@ -125,19 +133,21 @@ class Match():
     '''
     Sets the match ids for the players in the game to later grab them from a list.
     '''
-    top = self.__sides_tuple[SIDE_1_INDEX]
-    bottom = self.__sides_tuple[SIDE_2_INDEX]
+    top = self.__slots_tuple[TOP_INDEX]
+    bottom = self.__slots_tuple[BOTTOM_INDEX]
     if top != None:
       top.set_match_id(match_id)
     if bottom != None:
       bottom.set_match_id(match_id)
 
   def match_status(self):
-    top, bottom, top_points, bottom_points = self.__get_tuple()
+    top, bottom, top_points, bottom_points = self.__get_tuples()
 
     response = None
     if top == None or bottom == None:
       response = MATCH_STATUS_NOT_FULL
+    if self.__is_pending:
+      response = MATCH_STATUS_PENDING
     elif top_points == 0 and bottom_points == 0:
       response = MATCH_STATUS_NOT_STARTED
     elif top_points >= POINTS_TO_WIN or bottom_points >= POINTS_TO_WIN:
@@ -147,54 +157,29 @@ class Match():
 
     return response
 
-  def is_bye(self):
+  def is_bye_pending(self):
     status = self.match_status()
-    return status == MATCH_STATUS_NOT_FULL
+    return status == MATCH_STATUS_NOT_FULL or status == MATCH_STATUS_PENDING
 
   def is_complete(self):
     status = self.match_status()
-    return status == MATCH_STATUS_COMPLETE or self.is_bye()
+    return status == MATCH_STATUS_COMPLETE or status == MATCH_STATUS_NOT_FULL
 
   def get_sides(self):
-    return self.__sides_tuple[SIDE_1_INDEX], self.__sides_tuple[SIDE_2_INDEX]
+    return self.__slots_tuple[TOP_INDEX], self.__slots_tuple[BOTTOM_INDEX]
 
-  def __is_team(self, team):
-    is_team = False
-    handles = getattr(team, "get_handles", None)
-    if callable(handles):
-      is_team = True
-
-    return is_team
-
-  def __find_user(self, top, bottom, user_id):
-    is_top_winner = False
-    is_bottom_winner = False
-    get_users = getattr(top, "get_users", None)
-    if callable(get_users):
-      if user_id in top.get_users():
-        is_top_winner = True
-      if user_id in bottom.get_users():
-        is_bottom_winner = True
-    else:
-      if top.get_user() == user_id:
-        is_top_winner = True
-      if bottom.get_user() == user_id:
-        is_bottom_winner = True
-    return (is_top_winner, is_bottom_winner)
-
-  def __get_tuple(self):
-    return self.__sides_tuple[SIDE_1_INDEX], self.__sides_tuple[SIDE_2_INDEX], \
-      self.__wins_tuple[SIDE_1_INDEX], self.__wins_tuple[SIDE_2_INDEX]
+  def get_score(self):
+    return "%s\n%s" % (self.get_top(), self.get_bottom())
 
   def get_winner(self):
     '''
-    Return the side with has won the majority of the games and handle bye match
+    Return the slot that has won the match and handle bye match
     '''
     response = None
     if not self.is_complete():
       print "This game has not been completed."
     else:
-      top, bottom, top_points, bottom_points = self.__get_tuple()
+      top, bottom, top_points, bottom_points = self.__get_tuples()
 
       if bottom == None:
         response = top
@@ -207,13 +192,13 @@ class Match():
 
   def get_loser(self):
     '''
-    Return the side with has won the majority of the games and handle bye match
+    Return the lost the match and handle bye match
     '''
     response = None
     if not self.is_complete():
       print "This game has not been completed."
     else:
-      top, bottom, top_points, bottom_points = self.__get_tuple()
+      top, bottom, top_points, bottom_points = self.__get_tuples()
 
       if bottom == None:
         response = bottom
@@ -226,34 +211,34 @@ class Match():
 
   def get_top(self):
     '''
-    Display the top side along with the score.
+    Display the top slot along with the score.
     '''
     output = ""
-    side = self.__sides_tuple[SIDE_1_INDEX]
-    if side == None:
+    slot = self.__slots_tuple[TOP_INDEX]
+    if slot == None:
       output = "This is a bye game."
-    elif self.__sides_tuple[SIDE_2_INDEX] == None:
-      output = "_BYE_:  " + side.get_handle_and_name()
+    elif self.__slots_tuple[BOTTOM_INDEX] == None:
+      output = "_BYE_:  " + slot.get_handle_and_name()
     else:
-      points = self.__wins_tuple[SIDE_1_INDEX]
-      output = self.__get_status_label(points) + ":  " + side.get_handle_and_name()
+      points = self.__wins_tuple[TOP_INDEX]
+      output = self.__get_status_label(points) + ":  " + slot.get_handle_and_name()
 
     return output
 
   def get_bottom(self):
     '''
-    Display the bottom side along with the score.
+    Display the bottom slot along with the score.
     '''
     output = ""
-    side = self.__sides_tuple[SIDE_2_INDEX]
-    if side == None:
-      if self.__sides_tuple[SIDE_1_INDEX] == None:
+    slot = self.__slots_tuple[BOTTOM_INDEX]
+    if slot == None:
+      if self.__slots_tuple[TOP_INDEX] == None:
         output = "This is a bye game."
       else:
         output = "_BYE_:  - Bye -"
     else:
-      points = self.__wins_tuple[SIDE_2_INDEX]
-      output = self.__get_status_label(points) + ":  " + side.get_handle_and_name()
+      points = self.__wins_tuple[BOTTOM_INDEX]
+      output = self.__get_status_label(points) + ":  " + slot.get_handle_and_name()
 
     return output
 
@@ -266,36 +251,51 @@ class Match():
       if slot_points == POINTS_TO_WIN:
         label = "_W_".center(5)
       else:
-        label = " _L_".center(8)
+        label = "_L_".center(5)
     else:
       label = str(points).center(10)
 
     return label
 
-  def get_score(self):
-    return "%s\n%s" % (self.get_top(), self.get_bottom())
+  def __get_user_slot(self, top, bottom, user_id):
+    is_top_slot = False
+    is_bottom_slot = False
+    if user_id in top.get_users():
+      is_top_slot = True
+    if user_id in bottom.get_users():
+      is_bottom_slot = True
+    return (is_top_slot, is_bottom_slot)
+
+  def __get_tuples(self):
+    return self.__slots_tuple[TOP_INDEX], self.__slots_tuple[BOTTOM_INDEX], \
+      self.__wins_tuple[TOP_INDEX], self.__wins_tuple[BOTTOM_INDEX]
 
 
-def main(): 
-  top_side = Player("U234135", "abc", "Pepe", "Rodo") 
-  bottom_side = Player("U234355", "ZXY", "Papi", "Chulo") 
+def main():
+  top_player = Player("U234135", "abc", "Pepe", "Rodo")
+  top_slot = PlayerTeam()
+  top_slot.add_player(top_player)
 
+  bottom_player = Player("U234355", "ZXY", "Papi", "Chulo")
+  bottom_slot = PlayerTeam()
+  bottom_slot.add_player(bottom_player)
+  
   match = Match()
   print match.get_bottom()
-  match.print_score()
+  print match.get_score()
   print ""
 
-  match.add_side(top_side)
+  match.add_slot(top_slot)
   print match.get_top()
   print match.get_bottom()
   print ""
 
-  match.add_side(bottom_side)
+  match.add_slot(bottom_slot)
   print match.get_top()
   print match.get_bottom()
   print ""
 
-  match.add_win(top_side.get_user())
+  match.add_win("U234135")
 
   print match.get_score()
 

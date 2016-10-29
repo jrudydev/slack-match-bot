@@ -97,7 +97,7 @@ class Player():
 def main():
   first_player = Player("U2343255", "abcxyz", "Pepe", "Rodo")
   print first_player.get_name() + first_player.get_record()
-  print first_player.print_win_percent_string()
+  # print first_player.print_win_percent_string()
   print first_player.get_name() 
 
 if __name__ == '__main__':

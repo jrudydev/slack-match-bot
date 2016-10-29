@@ -1,1 +1,1 @@
-from tourny_helper import TournyHelper
+from tourney_helper import TourneyHelper

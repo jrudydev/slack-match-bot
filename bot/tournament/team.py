@@ -14,37 +14,51 @@ LNAME_INDEX = 1
 WIN_INDEX = 0
 LOSS_INDEX = 1
 
+class PendingTeam():
+  '''
+  This is a place holder object for pending matches.
+  '''
+  def __init__(self):
+    # self.__match_id
+    self.__pending_match_number = None
 
-class Team():
+  def set_pending_match_number(self, match_number):
+    self.__pending_match_number = match_number
+
+  def get_pending_match_number(self):
+    return self.__pending_match_number
+
+
+class PlayerTeam():
   '''
   The team object can have as many players as needed.
   '''
 
   def __init__(self):
-    self.__teammates = []
+    self.__players = []
     self.__match_id = None
 
-  def add_teammate(self, teammate):
-    self.__teammates.append(teammate)
+  def add_player(self, player):
+    self.__players.append(player)
 
   def set_match_id(self, match_id):
     self.__match_id = match_id
-    self.__teammates[0].set_match_id(match_id)
-    self.__teammates[1].set_match_id(match_id)
+    for player in self.__players:
+      player.set_match_id(match_id)
 
   def get_match_id(self):
     return self.__match_id
 
   def get_users(self):
     users = []
-    for teammate in self.__teammates:
-      users.append(teammate.get_user())
+    for player in self.__players:
+      users.append(player.get_user())
     return users
 
   def get_handles(self):
     handles = []
-    for teammate in self.__teammates:
-      handles.append(teammate.get_handle())
+    for player in self.__players:
+      handles.append(player.get_handle())
     return handles
 
   def get_name(self):
@@ -52,8 +66,8 @@ class Team():
     Returns the handles separated by ampersand(&)
     '''
     handles = []
-    for teammate in self.__teammates:
-      handles.append(teammate.get_handle())
+    for player in self.__players:
+      handles.append(player.get_handle())
     return " & ".join(handles)
 
   def get_handle_and_name(self):
@@ -61,9 +75,12 @@ class Team():
     Returns the handles and names separated by ampersand(&)
     '''
     handles = []
-    for teammate in self.__teammates:
-      handles.append(teammate.get_handle_and_name())
+    for player in self.__players:
+      handles.append(player.get_handle_and_name())
     return " & ".join(handles)
+
+  def is_single_player(self):
+    return len(self.__players) == 1
 
 
 def main():

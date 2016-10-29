@@ -3,17 +3,19 @@
 # Created by: JRG
 # Date: Aug 31, 2016
 #
-# Description: The tourny object will allow the slack bot to create a
+# Description: The tournament object will allow the slack bot to create a
 # tournament with the users in the channel. It also provides methods to
 # prgress the tournament and eventually crown a winner.
 
 from player import Player
-from team import Team
+from team import PlayerTeam
 from match import Match
-from tree import TournyTree
+from tree import TourneyTree
+from spectators import Spectators
+from presets import Presets
 import random
 
-class Tourny:
+class Tourney:
   '''
   This class provides methods to manage the tournament tree bracket.
   '''
@@ -21,15 +23,23 @@ class Tourny:
   def __init__(self):
     self.__players = {}
     self.__user_ids = {}
-    self.__bracket = TournyTree()
-    self.__is_doubles = False
+    self.__bracket = TourneyTree()
+    self.__last_post = None
+    self.spectators = Spectators()
+    self.presets = Presets()
+
+  def set_last_post(self, last_post):
+    self.__last_post = last_post
+ 
+  def get_last_post(self):
+    return self.__last_post
   
   def add(self, player):
     self.__players[player.get_user()] = player
     self.__user_ids[player.get_handle()] = player.get_user()
        
   def singles(self, presets):
-    self.__is_doubles = False
+    self.__last_post = None
 
     number_of_slots = 0
     if len(presets) > 0:
@@ -41,20 +51,26 @@ class Tourny:
       return "There are not enough players."
 
     response = ""
+    team = None
     slots = []
     is_random = len(presets) == 0
     if is_random:
       for key in self.__players:
-        slots.append(self.__players[key])
+        del(team)
+        team = PlayerTeam()
+        team.add_player(self.__players[key])
+        slots.append(team)
       response = "Singles bracket randomly generated."
     else:
       for handle in presets:
         user_id = self.__user_ids[handle]
         player = self.__players[user_id]
-        if player.get_handle() == handle:
-          slots.append(player)
+        del(team)
+        team = PlayerTeam()
+        team.add_player(player)
+        slots.append(team)
 
-      slots = self.__get_oreder_preset(slots)
+      slots = self.__get_order_preset(slots)
       response = "Singles bracket generated from presets."
 
     self.__bracket.generate(slots, is_random)
@@ -62,7 +78,7 @@ class Tourny:
     return response
 
   def doubles(self, user, presets):
-    self.__is_doubles = True
+    self.__last_post = None
     
     number_of_slots = 0
     is_preset = len(presets) > 0
@@ -98,10 +114,10 @@ class Tourny:
         
         if i % 2 == 0:
           del(team)
-          team = Team()
-          team.add_teammate(random_player)
+          team = PlayerTeam()
+          team.add_player(random_player)
         else:
-          team.add_teammate(random_player)
+          team.add_player(random_player)
           slots.append(team)
         i += 1
 
@@ -114,13 +130,13 @@ class Tourny:
           if i % 2 == 0:
             del(team)
             team = Team()
-            team.add_teammate(player)
+            team.add_player(player)
           else:
-            team.add_teammate(player)
+            team.add_player(player)
             slots.append(team)
           i += 1
 
-      slots = self.__get_oreder_preset(slots)
+      slots = self.__get_order_preset(slots)
       response = "Doubles bracket generated from presets."
     
     self.__bracket.generate(slots, is_random)
@@ -131,13 +147,14 @@ class Tourny:
     '''
     
     '''
+    response = ""
+    if handle in self.__user_ids:
+      user_id = self.__user_ids[handle]
+      player = self.__players[user_id]
+      games = self.__bracket.get_matches()
+      match = games[player.get_match_id()]
+      response = match.reset_game(user_id)
 
-    user_id = self.__user_ids[handle]
-    player = self.__players[user_id]
-    games = self.__bracket.get_games()
-    match = games[player.get_match_id()]
-
-    response = match.reset_game(user_id)
     if response == "":
       response = "Player not found in tournament."
 
@@ -149,6 +166,7 @@ class Tourny:
     '''
     response = ""
     if self.is_complete():
+      self.__last_post = None
       response = self.__bracket.advance()
     else:
       response = "The matches are not all complete."
@@ -164,7 +182,7 @@ class Tourny:
     Report a win if the game is not already complete and also
     check for a champion.
     '''
-    games = self.__bracket.get_games()
+    games = self.__bracket.get_matches()
     if len(games) == 0:
       return "The tournament has not started."
 
@@ -187,7 +205,7 @@ class Tourny:
     Report a loss if the game is not already complete 
     '''
   
-    games = self.__bracket.get_games()
+    games = self.__bracket.get_matches()
     if len(games) == 0:
       return "The tournament has not started."
 
@@ -214,7 +232,7 @@ class Tourny:
     self.__bracket.destroy()
     return "Games have been destroyed"
 
-  def __get_oreder_preset(self, presets):
+  def __get_order_preset(self, presets):
     '''
     Flip everyother postion in the list to feed it to tree generator.
     '''
@@ -235,7 +253,7 @@ class Tourny:
     '''
     Loop through the list and print each game.
     '''
-    games = self.__bracket.get_games()
+    games = self.__bracket.get_matches()
 
     string = ""
     number_of_games = len(games)
@@ -254,10 +272,10 @@ class Tourny:
         name = winner.get_name()
         if name == "":
           name = winner.get_handle()
-        if self.__is_doubles:
-          champ = "\n" + name + " are the tournament champions!\n"
-        else:
+        if winner.is_single_player():
           champ = "\n" + name + " is the tournament champion!\n"
+        else:
+          champ = "\n" + name + " are the tournament champions!\n"
         champ += "Grand Prize: :tada: :trophy: :cookie:\n"
       if number_of_games == 1:
         string = "%s\n*Championship Match*: \n" % (string)
@@ -273,7 +291,7 @@ class Tourny:
     Check if all the matches in the current round are complete.
     '''
     response = True
-    games = self.__bracket.get_games()
+    games = self.__bracket.get_matches()
     if len(games) == 0:
       response = False
     else:
@@ -284,27 +302,43 @@ class Tourny:
     return response
 
   def is_in_progress(self):
-    return len(self.__bracket.get_games()) > 0
+    return len(self.__bracket.get_matches()) > 0 and not self.is_complete()
+
+  def get_user(self, user_id):
+    response = None
+    user_upper = user_id.upper()
+    if user_upper in self.__players:
+      response = self.__players[user_upper]
+
+    return response
 
   def get_user_id(self, handle):
-    return self.__user_ids[handle]
+    response = None
+    if handle in self.__user_ids:
+      response = self.__user_ids[handle]
+      
+    return response
+
+  # To-Do: May not need this after creating messanger app, can get matches from db
+  def get_round_games(self):
+    return self.__bracket.get_matches()
 
 
 def main():
-  tourny = Tourny()
-  tourny.add(Player("U123", "abc", "fabc", "labc"))
-  tourny.add(Player("U456", "def", "fdef", "ldef"))
+  tourney = Tourney()
+  tourney.add(Player("U123", "abc", "fabc", "labc"))
+  tourney.add(Player("U456", "def", "fdef", "ldef"))
 
-  tourny.start()
+  tourney.singles([])
   print ""
   
-  print tourny.get_printed()
+  print tourney.get_printed()
   print ""
 
-  tourny.win("U123")
+  tourney.win("U123")
   print ""
 
-  print tourny.get_printed()
+  print tourney.get_printed()
 
 if __name__ == '__main__':
   main()

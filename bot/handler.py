@@ -5,18 +5,16 @@
 # will also have its own tournament helper, team info, and admins list. The teams
 # are populated during initialization of the helper class from the sqlite db.
 
-import os
 from slackclient import SlackClient
-from tournament import TournyHelper
+from tournament import TourneyHelper
 from management import Mediators
-from management import Spectators
-from management import Presets
+import re
 
 SLACK_BOTS_ALLOWED = True
 
 # admin commands
-START_TOURNY = "start"
-STOP_TOURNY = "stop"
+START_TOURNEY = "start"
+STOP_TOURNEY = "stop"
 NEXT_ROUND = "next"
 RESET_MATCH = "reset"
 HANDLE_ADMIN = "admin"
@@ -25,7 +23,7 @@ HANDLE_PRESET = "preset"
 
 # user commands
 HELP_COMMAND = "help"
-PRINT_TOURNY = "show"
+PRINT_TOURNEY = "show"
 REPORT_WIN = "win"
 REPORT_LOSS = "loss"
 
@@ -36,23 +34,21 @@ class Client():
   This class listens to the Slack Messaging Api and responds.
   '''
 
-  def __init__(self, bot_access_token):
-    self.__tournys = TournyHelper()
-    self.__client = SlackClient(bot_access_token)
-    self.__access_token = bot_access_token
+  def __init__(self, team_info):
+    self.__tourneys = TourneyHelper()
+    self.__client = SlackClient(team_info.bot_access_token)
+    self.__access_token = team_info.bot_access_token
     self.__admins = Mediators()
-    self.__spectators = Spectators()
-    self.__presets = Presets()
+    self.__info = team_info
 
-  def get_client(self):
-    return self.__client
+  def get_info(self):
+    return self.__info
 
   def get_client(self):
     return self.__client
 
   def set_client(self):
     del self.__client
-    print self.__access_token
     self.__client = SlackClient(self.__access_token)
 
   def get_user_porfile(self, user_id):
@@ -78,139 +74,144 @@ class Client():
 
     return users
 
+  def __get_channel_user_pofiles(self):
+    channel = self.__tourneys.get_current_channel()
+    user_ids = self.get_channel_users(channel)
+    users = []
+    for user_id in user_ids:
+      users.append(self.get_user_porfile(user_id))
+
+    return users
+
   def populate(self, is_doubles):
     '''
     Use the slack api to first get a list of channels for the team, find the
     one containing matchbot, then get a list of channel memebers, and finally
     create a player object and add it to the tournament.
     '''
-    response = "" 
-    members = self.get_channel_users(self.__tournys.get_current_channel())
+    response = ""
+    channel = self.__tourneys.get_current_channel()
+    tourney = self.__tourneys.get_current_tourney()
+    members = self.get_channel_users(channel)
     if len(members) == 0:
       response =  "The channel does not have any members."
-    elif self.__tournys.is_tourny_in_progress():
-      response =  "Another tournament is in progress.\nSend the *stop* command to terminate."
+    elif self.__tourneys.is_tourney_in_progress():
+      response =  "Another tournament is in progress.\nSend the `stop` command to terminate."
     else:
-      self.__tournys.clear_players()
+      self.__tourneys.clear_players()
       for member_id in members:
         # retrieve user info so we can get profile
         member = self.get_user_porfile(member_id)
         is_bot = member.get('is_bot')
         name = member.get('name')
-        is_spectator = self.__spectators.is_spectator_user(name)
+        is_spectator = tourney.spectators.is_spectator_user(name)
         if (not is_bot or SLACK_BOTS_ALLOWED) and not is_spectator:
           # only add real users that are not spectators
-          self.__tournys.add_player(member)
+          self.__tourneys.add_player(member)
 
       if not is_doubles:
-        response = self.__tournys.start_singles(self.__presets.get_all())
+        response = self.__tourneys.start_singles(tourney.presets.get_all())
       else:
-        response = self.__tournys.start_doubles(self.__presets.get_all())
+        response = self.__tourneys.start_doubles(tourney.presets.get_all())
 
     return response
 
-  def destroy(self):
-    self.__tournys.clear_games()
+  def destroy(self, tourney):
+    self.__tourneys.clear_games(tourney)
     return "The tournament was destroyed."
-
-  def __add_admin(self, name):
-    users = []
-    user_ids = self.get_channel_users(self.__tournys.get_current_channel())
-    for user_id in user_ids:
-      users.append(self.get_user_porfile(user_id))
-
-    return self.__admins.add_user(name, users)
-
-  def __add_spectator(self, name):
-    users = []
-    user_ids = self.get_channel_users(self.__tournys.get_current_channel())
-    for user_id in user_ids:
-      users.append(self.get_user_porfile(user_id))
-
-    return self.__spectators.add_user(name, users)
-
-  def __add_preset(self, name):
-    users = []
-    user_ids = self.get_channel_users(self.__tournys.get_current_channel())
-    for user_id in user_ids:
-      users.append(self.get_user_porfile(user_id))
-
-    return self.__presets.add_user(name, users)
 
   def admin_command(self, user_name):
     '''
     These commands can only be used by administrators of the channel.
     '''
     response = ""
-    command = self.__tournys.get_current_command()
-    channel = self.__tournys.get_current_channel()
-    if command.startswith(START_TOURNY):
+    command = self.__tourneys.get_current_command()
+    channel = self.__tourneys.get_current_channel()
+    tourney = self.__tourneys.get_current_tourney()
+    if command.startswith(START_TOURNEY):
       doubles = ""
       parts = command.split()
-      size = len(parts)
-      if size >= 2:
+      if len(parts) >= 2 and not self.__is_slack_shortcode(parts[1]):
         # possible doubles
         doubles = parts[1]
         
       is_doubles = doubles == "doubles"
       populate_response = self.populate(is_doubles) 
-      response = "Generating tournament bracket...\n"
-      response += populate_response + "\n"
-      response += self.__tournys.get_tourny()
+      request = "Generating tournament bracket...\n"
+      response = request + populate_response + "\n"
+      response += self.__tourneys.get_tourney()
 
-    if command.startswith(STOP_TOURNY):
-      destroy_response = self.destroy() 
-      response = "Destroying tournament bracket...\n"
-      response += destroy_response
+    if command.startswith(STOP_TOURNEY):
+      request = "Destroying tournament bracket...\n"
+      destroy_response = self.destroy(tourney) 
+      response = request + destroy_response
 
     if command.startswith(RESET_MATCH):
       parts = command.split()
-      if len(parts) >= 2:
+      if len(parts) >= 2 and not self.__is_slack_shortcode(parts[1]):
         # potential handle was provided for disqualification
         handle = parts[1]
-        reset_response = self.__tournys.reset_match(handle)
-        response = "Resetting " + handle + "'s match...\n" 
-        response += reset_response + "\n"
-        response += self.__tournys.get_tourny()
+        reset_response = self.__tourneys.reset_match(handle)
+        request = "Resetting " + handle + "'s match...\n"
+        response = request + reset_response + "\n"
+        response += self.__tourneys.get_tourney()
       else: 
         response = "Provide a handle to reset the match."
 
     if command.startswith(NEXT_ROUND):
-      response = "Advancing to the next round...\n"
-      response += self.__tournys.next_round() + "\n"
-      response += self.__tournys.get_tourny()
+      request = "Advancing to the next round...\n"
+      next_response = self.__tourneys.next_round()
+      response = request + next_response + "\n"
+      response += self.__tourneys.get_tourney()
     
     if command.startswith(REPORT_WIN):
       parts = command.split()
       if len(parts) >= 2:
-        # potential handle was provided for disqualification
-        handle = parts[1]
-        win_response = self.__tournys.report_win_with_handle(handle)
-        response = "Reproting win for " + handle + "...\n" 
-        response += win_response + "\n"
-        response += self.__tournys.get_tourny()
+        win_response = ""
+        handles = parts[1:]
+        for handle in handles:
+          if not self.__is_slack_shortcode(handle):
+            # potential handle was provided for disqualification
+            win_response += self.__tourneys.report_win_with_handle(handle) + "\n"
+
+        if len(handles) == 1:
+          request = "Reproting win for " + handle + "...\n"
+        else:
+          handles_output = " & ".join(handles)
+          request = "Reporting wins for " + handles_output + "...\n"
+        response = request + win_response + "\n"
+        response += self.__tourneys.get_tourney()
       else: 
-        response = "Provide a handle to win the match."
+        response = "Provide a handle to report the win."
 
     if command.startswith(REPORT_LOSS):
       parts = command.split()
       if len(parts) >= 2:
-        # potential handle was provided for disqualification
-        handle = parts[1]
-        loss_response = self.__tournys.report_loss_with_handle(handle)
-        response = "Reproting loss for " + handle + "...\n" 
-        response += loss_response + "\n"
-        response += self.__tournys.get_tourny()
+        loss_response = ""
+        handles = parts[1:]
+        for handle in handles:
+          if not self.__is_slack_shortcode(handle):
+            # potential handle was provided for disqualification
+            loss_response += self.__tourneys.report_loss_with_handle(handle) + "\n"
+        
+        if len(handles) == 1:
+          request = "Reproting loss for " + handle + "...\n" 
+        else:
+          handles_output = " & ".join(handles)
+          request = "Reporting losses for " + handles_output + "...\n"
+        response = request + loss_response + "\n"
+        response += self.__tourneys.get_tourney()
       else: 
-        response = "Provide a handle to lose the match."
+        response = "Provide a handle to report the loss."
    
     if command.startswith(HANDLE_ADMIN):
+      users = self.__get_channel_user_pofiles()
       response = ""
       parts = command.split()
       count = len(parts)
       if count == 1 and self.__admins.get_count() == 0:
-        response = self.__add_admin(user_name)
-      elif count >= 2:
+        response = self.__admins.add_user(user_name, users)
+      elif count >= 2 and not self.__is_slack_shortcode(parts[1]):
         # potential handle was provided for disqualification
         option = parts[1]
         if option.startswith("show"):
@@ -220,7 +221,7 @@ class Client():
         else:
           options = parts[1:]
           for name in options:
-            response += self.__add_admin(name)
+            response += self.__admins.add_user(name, users)
             response += "\n"
       else:
         response = "Provide the admin handle."
@@ -229,17 +230,18 @@ class Client():
       response = ""
       parts = command.split()
       count = len(parts)
-      if count >= 2:
+      if count >= 2 and not self.__is_slack_shortcode(parts[1]):
         # potential handle was provided for disqualification
         option = parts[1]
         if option.startswith("show"):
-          response = self.__spectators.list_users()
+          response = tourney.spectators.list_users()
         elif option.startswith("clear"):
-          response = self.__spectators.clear_users()
+          response = tourney.spectators.clear_users()
         else:
           options = parts[1:]
+          users = self.__get_channel_user_pofiles()
           for name in options:
-            response += self.__add_spectator(name)
+            response += tourney.spectators.add_user(name, users)
             response += "\n"
       else:
         response = "Provide the spectator handle."
@@ -248,47 +250,51 @@ class Client():
       response = ""
       parts = command.split()
       count = len(parts)
-      if count >= 2:
+      if count >= 2 and not self.__is_slack_shortcode(parts[1]):
         # potential handle was provided for disqualification
         option = parts[1]
         if option.startswith("show"):
-          response = self.__presets.list_users()
+          response = tourney.presets.list_users()
         elif option.startswith("clear"):
-          response = self.__presets.clear_users()
+          response = tourney.presets.clear_users()
         else:
           options = parts[1:]
+          users = self.__get_channel_user_pofiles()
           for name in options:
-            response += self.__add_preset(name)
+            response += tourney.presets.add_user(name, users)
             response += "\n"
       else:
         response = "Provide the preset handle."
 
     return response
-  
+
   def user_command(self):
     '''
     These commands can used by anyone in the channel.
     '''
     response = ""
-    user = self.__tournys.get_current_user()
-    command = self.__tournys.get_current_command()
+    user = self.__tourneys.get_current_user()
+    command = self.__tourneys.get_current_command()
+    tourney = self.__tourneys.get_current_tourney()
     if command.startswith(HELP_COMMAND):  
       response = "Get the full list of commands here:\n" + \
         "https://github.com/peperodo/slack-match-bot"
 
-    if command.startswith(PRINT_TOURNY):
-      response = "Printing tournament bracket...\n"
-      response += self.__tournys.get_tourny()
+    if command.startswith(PRINT_TOURNEY):
+      request = "Printing tournament bracket...\n"
+      response = request + self.__tourneys.get_tourney()
       
     if command.startswith(REPORT_WIN):
-      response = "Reporting a win...\n"
-      response += self.__tournys.report_win(user) + "\n"
-      response += self.__tournys.get_tourny()
+      request = "Reporting a win...\n"
+      win_response = self.__tourneys.report_win(user)
+      response = request + win_response + "\n"
+      response += self.__tourneys.get_tourney()
 
     if command.startswith(REPORT_LOSS):
-      response = "Reporting a loss...\n"
-      response += self.__tournys.report_loss(user) + "\n"
-      response += self.__tournys.get_tourny()
+      request = "Reporting a loss...\n"
+      loss_response = self.__tourneys.report_loss(user)
+      response = request + loss_response + "\n"
+      response += self.__tourneys.get_tourney()
 
     return response
 
@@ -298,26 +304,28 @@ class Client():
       are valid commands. If so, then acts on teh commands. If not,
       returns back what it needs for clarification.
     """
-    response = "Not sure what you mean. Use the *" + HELP_COMMAND + \
-      "* command."
+    response = "Not sure what you mean. Use the `" + HELP_COMMAND + \
+      "` command."
 
-    self.__tournys.set_current_command(user, command, channel)
-
+    clean_command = self.__get_clean_options(command)
+    self.__tourneys.set_current_command(user, clean_command, channel)
+    
+    users = self.__get_channel_user_pofiles()
     user_profile = self.get_user_porfile(user)
     name = user_profile['name']
     is_owner_profile = user_profile['is_owner']
     if self.__admins.get_count() == 0 and is_owner_profile:
-      self.__add_admin(name)   # automatically add owner as admin
+      self.__admins.add_user(name, users)   # automatically add owner as admin
 
     is_admin = self.__admins.is_admin_user(name) or is_owner_profile
     is_owner = self.__admins.is_owner_user(name) or is_owner_profile
     owner_exists = self.__admins.get_owner() != ""
-    is_admin_command_bool = self.is_admin_command(self.__tournys.get_current_command())
+    is_admin_command_bool = self.is_admin_command(clean_command)
     if is_admin_command_bool and not is_admin:
       response = "Only an admin can use this command."
-    elif command == HANDLE_ADMIN and (not is_owner and owner_exists):
+    elif clean_command == HANDLE_ADMIN and (not is_owner and owner_exists):
       response = "Only the channel owner can use this command."
-    elif is_admin_command_bool or command.startswith(HANDLE_ADMIN):
+    elif is_admin_command_bool or clean_command.startswith(HANDLE_ADMIN):
       admin_response = self.admin_command(name)
       if admin_response != "":
         response = admin_response
@@ -325,13 +333,14 @@ class Client():
       user_response = self.user_command()
       if user_response != "":
         response = user_response
-
+    
     self.__client.api_call("chat.postMessage", channel=channel, text=response, as_user=True)
 
   def is_admin_command(self, command):
-    command_has_parts = len(command.split()) > 1
-    is_admin_command = command.startswith(START_TOURNY) or \
-      command.startswith(STOP_TOURNY) or \
+    parts = command.split()
+    command_has_parts = len(parts) > 1
+    is_admin_command = command.startswith(START_TOURNEY) or \
+      command.startswith(STOP_TOURNEY) or \
       command.startswith(NEXT_ROUND) or \
       command.startswith(RESET_MATCH) or \
       command.startswith(MAKE_WATCH) or \
@@ -341,76 +350,67 @@ class Client():
 
     return is_admin_command
 
-  def handle_command(self, user, command, channel):
-    """
-      Recieves commands directed to the bot and determins if they
-      are valid commands. If so, then acts on teh commands. If not,
-      returns back what it needs for clarification.
-    """
-    response = "Not sure what you mean. Use the *" + HELP_COMMAND + \
-      "* command."
+  def __is_slack_shortcode(self, handle):
+    response = False
+    if handle.startswith("<@"):
+      response = True
 
-    self.__tournys.set_current_command(user, command, channel)
+    return response
 
-    user_profile = self.get_user_porfile(user)
-    name = user_profile['name']
-    is_owner_profile = user_profile['is_owner']
-    if self.__admins.get_count() == 0 and is_owner_profile:
-      self.__add_admin(name)   # automatically add owner as admin
+  def __get_clean_options(self, command):
+    parts = command.split()
+    if len(parts) > 1 and parts[0] == ':':
+      parts = parts[1:]
+    
+    # replace all the user shortcodes with the handles if they are in the tournament
+    current_tourney = self.__tourneys.get_current_tourney()
+    new_parts = []
+    for part in parts:
+      match = re.search(r'<@(u)([\w\d]+)>', part)
+      if match:
+        user_id = match.group(1) + match.group(2)
+        player = current_tourney.get_user(user_id)
+        if player != None:
+          new_parts.append(player.get_handle())
+        else:
+          new_parts.append(part)
+      else:
+        new_parts.append(part)
 
-    is_admin = self.__admins.is_admin_user(name) or is_owner_profile
-    is_owner = self.__admins.is_owner_user(name) or is_owner_profile
-    owner_exists = self.__admins.get_owner() != ""
-    is_admin_command_bool = self.is_admin_command(self.__tournys.get_current_command())
-    if is_admin_command_bool and not is_admin:
-      response = "Only an admin can use this command."
-    elif command == HANDLE_ADMIN and (not is_owner and owner_exists):
-      response = "Only the channel owner can use this command."
-    elif is_admin_command_bool or command.startswith(HANDLE_ADMIN):
-      admin_response = self.admin_command(name)
-      if admin_response != "":
-        response = admin_response
-    else:
-      user_response = self.user_command()
-      if user_response != "":
-        response = user_response
+    return " ".join(new_parts)
 
-    self.__client.api_call("chat.postMessage", channel=channel, text=response, as_user=True)
 
-  def is_admin_command(self, command):
-    command_has_parts = len(command.split()) > 1
-    is_admin_command = command.startswith(START_TOURNY) or \
-      command.startswith(STOP_TOURNY) or \
-      command.startswith(NEXT_ROUND) or \
-      command.startswith(RESET_MATCH) or \
-      command.startswith(MAKE_WATCH) or \
-      command.startswith(HANDLE_PRESET) or \
-      (command.startswith(REPORT_LOSS) and command_has_parts) or \
-      (command.startswith(REPORT_WIN) and command_has_parts)
+class SlackTeam():
+  '''
+  Placeholder object to mock db
+  '''
 
-    return is_admin_command
+  def __init__(self, access_token):
+    self.bot_access_token = access_token
 
 
 class Handler():
   '''
-  This class holds the the team connection
+  This class holds the array of teams initialized from sqlite table
   '''
 
   def __init__(self):
-    self.__team = Client(os.environ.get('SLACK_BOT_TOKEN'))
-    self.__connect(self.__team)
+    self.__teams = []
+
+  def add_team(self, slack_bot_token):
+    team_object = SlackTeam(slack_bot_token)
+    self.__connect(Client(team_object))
 
   def __connect(self, slack_team):
-    client = slack_team.get_client()
-    if client.rtm_connect():
+    if slack_team.get_client().rtm_connect():
       print("MatchBot is reading events!")
+      self.__teams.append(slack_team)
     else:
-      # delete the entery from the db maybe
-      print("Connection failed. Invalid Slack token or bot ID")
+      print("Connection failed. Invalid Slack token or bot ID.")
 
   def reconnect(self, slack_team):
     slack_team.set_client()
     self.__connect(slack_team)
 
-  def get_team(self):
-    return self.__team
+  def get_teams(self):
+    return self.__teams

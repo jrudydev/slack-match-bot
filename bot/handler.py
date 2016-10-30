@@ -28,7 +28,7 @@ PRINT_TOURNEY = "show"
 REPORT_WIN = "win"
 REPORT_LOSS = "loss"
 REPORT_JOIN = "join"
-REPORT_LEAVE = "leave"
+REPORT_BOOT = "boot"
 
 
 class Client():
@@ -183,8 +183,27 @@ class Client():
         request = "Players joining the tournament...\n"
         response_parts = []
         for name in options:
-          user_id = self.__tourneys.get_current_tourney().get_user_id(name)
+          user_id = tourney.get_user_id(name)
           response_parts.append(self.__join_tourney(user_id))
+        response += "\n".join(response_parts)
+        response = request + response
+        response += "\nSend the `join` command to participate."
+        response += tourney.list_players()
+      else:
+        response = "Provide a handle for the participant."
+
+    if command.startswith(REPORT_BOOT):
+      response = ""
+      parts = command.split()
+      count = len(parts)
+      if count >= 2 and not self.__is_slack_shortcode(parts[1]):
+        # potential handle was provided for participant
+        options = parts[1:]
+        request = "Players leaving the tournament...\n"
+        response_parts = []
+        for name in options:
+          user_id = tourney.get_user_id(name)
+          response_parts.append(self.__boot_tourney(user_id))
         response += "\n".join(response_parts)
         response = request + response
         response += "\nSend the `join` command to participate."
@@ -249,6 +268,13 @@ class Client():
       response += "\nSend the `join` command to participate."
       response += tourney.list_players()
 
+    if command.startswith(REPORT_BOOT):
+      request = "Player is leaving the tournament...\n"
+      boot_response = self.__boot_tourney(user)
+      response = request + boot_response
+      response += "\nSend the `join` command to participate."
+      response += tourney.list_players()
+
     return response
 
   def handle_command(self, user, command, channel):
@@ -262,14 +288,15 @@ class Client():
 
     clean_command = self.__get_clean_options(command)
     self.__tourneys.set_current_command(user, clean_command, channel)
-    if len(self.__tourneys.get_current_tourney().get_channel_users()) == 0:
+
+    tourney = self.__tourneys.get_current_tourney()
+    if len(tourney.get_channel_users()) == 0:
       self.__set_tourney_channel_users()
 
     user_profile = self.__get_user_porfile(user)
     name = user_profile['name']
     is_owner_profile = user_profile['is_owner']
     if self.__admins.get_count() == 0 and is_owner_profile:
-      tourney = self.__tourneys.get_current_tourney()
       self.__admins.add_user(name, tourney.get_channel_users())   # automatically add owner as admin
 
     is_admin = self.__admins.is_admin_user(name) or is_owner_profile
@@ -304,7 +331,8 @@ class Client():
       command.startswith(HANDLE_PRESET) or \
       (command.startswith(REPORT_LOSS) and command_has_parts) or \
       (command.startswith(REPORT_WIN) and command_has_parts) or \
-      (command.startswith(REPORT_JOIN) and command_has_parts)
+      (command.startswith(REPORT_JOIN) and command_has_parts) or \
+      (command.startswith(REPORT_BOOT) and command_has_parts)
 
     return is_admin_command
 
@@ -381,6 +409,19 @@ class Client():
 
     self.__set_tourney_channel_users()
     response = self.__tourneys.report_join(user)
+
+    return response
+
+  def __boot_tourney(self, user):
+    '''
+    Remove the player from the tournament.
+    '''
+    if not self.__tourneys.get_current_tourney().is_joinable:
+      return "The tournament is not joinable."
+    if self.__tourneys.is_tourney_in_progress():
+      return  "Cannot join a tournament in progress."
+
+    response = self.__tourneys.report_boot(user)
 
     return response
 

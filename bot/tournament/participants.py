@@ -39,7 +39,7 @@ class Participants():
 
     return response
 
-  def remove_user(self, player, users):
+  def boot_user(self, player, users):
   	'''
   	Use this method to remove players from the participant list before the tournament starts
   	'''
@@ -47,7 +47,7 @@ class Participants():
   	user_found = False
   	i = 0
   	for user in users:
-  	  name = user.get("name")
+  	  name = user.get_handle()
   	  if player in self.__handles:
   	  	user_found = True
   	  	break

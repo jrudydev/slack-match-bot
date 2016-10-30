@@ -122,6 +122,10 @@ class TourneyHelper():
     tourney = self.get_current_tourney()
     return tourney.add_participant(user_id)
 
+  def report_boot(self, user_id):
+    tourney = self.get_current_tourney()
+    return tourney.boot_participant(user_id)
+
   def is_tourney_in_progress(self):
     tourney = self.get_current_tourney()
     number_of_matches = len(tourney.get_round_matches())

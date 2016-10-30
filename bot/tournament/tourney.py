@@ -359,6 +359,16 @@ class Tourney:
 
     return response
 
+  def boot_participant(self, user_id):
+    response = ""
+    if user_id in self.__channel_users:
+      player = self.__channel_users[user_id]
+      response = self.participants.boot_user(player.get_handle(), self.get_channel_users())
+    else:
+      response = "Player not found."
+
+    return response
+
   def list_players(self):
     number_of_players = self.participants.get_count()
     response = "\n*Registered Players ({})*:\n".format(number_of_players)

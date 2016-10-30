@@ -84,12 +84,19 @@ class Tourney:
       response = "Singles bracket randomly generated."
     else:
       for handle in self.presets.get_all():
-        user_id = self.__user_ids[handle]
-        player = self.__channel_users[user_id]
-        del(team)
-        team = PlayerTeam()
-        team.add_player(player)
-        slots.append(team)
+        if handle == "-bye-":
+          del(team)
+          team = PlayerTeam()
+          slots.append(team)
+        else:
+          del(team)
+          team = PlayerTeam()
+
+          user_id = self.__user_ids[handle]
+          player = self.__channel_users[user_id]
+          team.add_player(player)
+
+          slots.append(team)
 
       slots = self.__get_order_preset(slots)
       response = "Singles bracket generated from presets."
@@ -125,9 +132,18 @@ class Tourney:
     i = 0
     if is_random:
       players = []
-      for key in self.__channel_users:
-        if not is_odd or key != user:
-          players.append(self.__channel_users[key]) 
+      if self.is_joinable:
+        users = {}
+        for participant in self.participants.get_handles():
+          user_id = self.__user_ids[participant]
+          users[user_id] = participant
+        for key in users:
+          if not is_odd or key != user:
+            players.append(self.__channel_users[key]) 
+      else:
+        for key in self.__channel_users:
+          if not is_odd or key != user:
+            players.append(self.__channel_users[key]) 
 
       for x in range(len(players)):
         rand_int = random.choice(range(len(players)))
@@ -148,10 +164,14 @@ class Tourney:
       for handle in self.presets.get_all():
         user_id = self.__user_ids[handle]
         player = self.__channel_users[user_id]
-        if player.get_handle() == handle:
+        if handle == "-bye-":
+          del(team)
+          team = PlayerTeam()
+          slots.append(team)
+        elif player.get_handle() == handle:
           if i % 2 == 0:
             del(team)
-            team = Team()
+            team = PlayerTeam()
             team.add_player(player)
           else:
             team.add_player(player)

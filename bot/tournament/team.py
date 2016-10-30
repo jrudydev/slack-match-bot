@@ -82,6 +82,9 @@ class PlayerTeam():
   def is_single_player(self):
     return len(self.__players) == 1
 
+  def is_empty(self):
+    return len(self.__players) == 0
+
 
 def main():
   first_team = Team(["U2343255", "U2343256"], ["abcxyz", "ABCXYXZ"], ["Pepe", "Rodo"])

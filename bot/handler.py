@@ -262,6 +262,8 @@ class Client():
 
     clean_command = self.__get_clean_options(command)
     self.__tourneys.set_current_command(user, clean_command, channel)
+    if len(self.__tourneys.get_current_tourney().get_channel_users()) == 0:
+      self.__set_tourney_channel_users()
 
     user_profile = self.__get_user_porfile(user)
     name = user_profile['name']

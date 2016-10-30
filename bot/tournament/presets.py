@@ -40,7 +40,7 @@ class Presets():
       if name == preset and not preset in self.__presets:
         user_found = True
     
-    if user_found:
+    if user_found or preset == "-bye-":
       self.__presets.append(preset)
       response = preset + " is now preset."
     else:

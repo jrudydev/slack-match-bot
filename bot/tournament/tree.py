@@ -77,7 +77,8 @@ class TourneyTree(object):
           
           del slots[index]
 
-          self.node.match.add_slot(random_slot)
+          if not random_slot.is_empty():
+            self.node.match.add_slot(random_slot)
 
   def generate(self, slots, random):
     '''

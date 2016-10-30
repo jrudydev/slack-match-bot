@@ -11,7 +11,7 @@ from player import Player
 from team import PlayerTeam
 from match import Match
 from tree import TourneyTree
-from spectators import Spectators
+from participants import Participants
 from presets import Presets
 import random
 
@@ -21,12 +21,13 @@ class Tourney:
   '''
 
   def __init__(self):
-    self.__players = {}
+    self.__channel_users = {}
     self.__user_ids = {}
     self.__bracket = TourneyTree()
     self.__last_post = None
-    self.spectators = Spectators()
+    self.participants = Participants()
     self.presets = Presets()
+    self.is_joinable = False
 
   def set_last_post(self, last_post):
     self.__last_post = last_post
@@ -34,18 +35,31 @@ class Tourney:
   def get_last_post(self):
     return self.__last_post
   
-  def add(self, player):
-    self.__players[player.get_user()] = player
+  def add_channel_user(self, player):
+    self.__channel_users[player.get_user()] = player
     self.__user_ids[player.get_handle()] = player.get_user()
+
+  # def remove_channel_user(self, player_id):
+  #   player = self.__channel_users[player_id]
+  #   user_id = player.get_user()
+  #   handle =player.get_handle()
+
+  #   del self.__channel_users[user_id]
+  #   del self.__user_ids[handle]
        
-  def singles(self, presets):
+  def singles(self):
     self.__last_post = None
 
     number_of_slots = 0
-    if len(presets) > 0:
-      number_of_slots = len(presets)
+    number_of_presets = len(self.presets.get_all())
+    is_random = number_of_presets == 0
+    if is_random:
+      if self.is_joinable:
+        number_of_slots = len(self.participants.get_handles())
+      else:
+        number_of_slots = len(self.__channel_users)
     else:
-      number_of_slots = len(self.__players)
+      number_of_slots = number_of_presets
 
     if number_of_slots < 2:
       return "There are not enough players."
@@ -53,18 +67,25 @@ class Tourney:
     response = ""
     team = None
     slots = []
-    is_random = len(presets) == 0
     if is_random:
-      for key in self.__players:
+      users = {}
+      if self.is_joinable:
+        for participant in self.participants.get_handles():
+          user_id = self.__user_ids[participant]
+          users[user_id] = participant
+      else:
+        users = self.__channel_users
+
+      for key in users:
         del(team)
         team = PlayerTeam()
-        team.add_player(self.__players[key])
+        team.add_player(self.__channel_users[key])
         slots.append(team)
       response = "Singles bracket randomly generated."
     else:
-      for handle in presets:
+      for handle in self.presets.get_all():
         user_id = self.__user_ids[handle]
-        player = self.__players[user_id]
+        player = self.__channel_users[user_id]
         del(team)
         team = PlayerTeam()
         team.add_player(player)
@@ -77,17 +98,19 @@ class Tourney:
 
     return response
 
-  def doubles(self, user, presets):
+  def doubles(self, user):
     self.__last_post = None
     
     number_of_slots = 0
-    is_preset = len(presets) > 0
-    if is_preset:
-      number_of_players = len(presets)
+    number_of_presets = len(self.presets.get_all())
+    is_random = number_of_presets == 0
+    if is_random:
+      number_of_players = len(self.__channel_users)
       number_of_slots = number_of_players / 2
     else:
-      number_of_players = len(self.__players)
+      number_of_players = number_of_presets
       number_of_slots = number_of_players / 2
+      
     is_odd = number_of_players % 2 == 1    
     
     if number_of_slots < 2:
@@ -99,13 +122,12 @@ class Tourney:
     response = ""
     team = None
     slots = []
-    is_random = len(presets) == 0
     i = 0
     if is_random:
       players = []
-      for key in self.__players:
+      for key in self.__channel_users:
         if not is_odd or key != user:
-          players.append(self.__players[key]) 
+          players.append(self.__channel_users[key]) 
 
       for x in range(len(players)):
         rand_int = random.choice(range(len(players)))
@@ -123,9 +145,9 @@ class Tourney:
 
       response = "Doubles bracket randomly generated."
     else:
-      for handle in presets:
+      for handle in self.presets.get_all():
         user_id = self.__user_ids[handle]
-        player = self.__players[user_id]
+        player = self.__channel_users[user_id]
         if player.get_handle() == handle:
           if i % 2 == 0:
             del(team)
@@ -150,8 +172,8 @@ class Tourney:
     response = ""
     if handle in self.__user_ids:
       user_id = self.__user_ids[handle]
-      player = self.__players[user_id]
-      games = self.__bracket.get_matches()
+      player = self.__channel_users[user_id]
+      games = self.__bracket.get_round_matches()
       match = games[player.get_match_id()]
       response = match.reset_game(user_id)
 
@@ -165,7 +187,10 @@ class Tourney:
     Advance the bracket to the next round if all the games are complete.
     '''
     response = ""
-    if self.is_complete():
+    games = self.__bracket.get_round_matches()
+    if len(games) == 0:
+      response = "The tournament has not started."
+    elif self.is_round_complete():
       self.__last_post = None
       response = self.__bracket.advance()
     else:
@@ -182,15 +207,15 @@ class Tourney:
     Report a win if the game is not already complete and also
     check for a champion.
     '''
-    games = self.__bracket.get_matches()
+    games = self.__bracket.get_round_matches()
     if len(games) == 0:
       return "The tournament has not started."
 
-    if user == None or user not in self.__players:
+    if user == None or user not in self.__channel_users:
       return "Player not found in tournament."
 
     response = ""
-    player = self.__players[user]
+    player = self.__channel_users[user]
     match_id = player.get_match_id()
     if match_id != None:
       match = games[match_id]
@@ -205,15 +230,15 @@ class Tourney:
     Report a loss if the game is not already complete 
     '''
   
-    games = self.__bracket.get_matches()
+    games = self.__bracket.get_round_matches()
     if len(games) == 0:
       return "The tournament has not started."
 
-    if user == None or user not in self.__players:
+    if user == None or user not in self.__channel_users:
       return "Player not found in tournament."
 
     response = ""
-    player = self.__players[user]
+    player = self.__channel_users[user]
     match_id = player.get_match_id()
     if match_id != None:
       match = games[match_id]
@@ -223,13 +248,19 @@ class Tourney:
 
     return response
 
-  def clear(self):
-    self.__players.clear()
+  def clear_users(self):
+    self.__channel_users.clear()
     self.__user_ids.clear()
     return "Players have been cleared."
 
   def destroy(self):
+    self.clear_users()
     self.__bracket.destroy()
+    self.__last_post = None
+    self.participants.clear_users()
+    self.presets.clear_users()
+    self.is_joinable = False
+    
     return "Games have been destroyed"
 
   def __get_order_preset(self, presets):
@@ -253,7 +284,7 @@ class Tourney:
     '''
     Loop through the list and print each game.
     '''
-    games = self.__bracket.get_matches()
+    games = self.__bracket.get_round_matches()
 
     string = ""
     number_of_games = len(games)
@@ -261,7 +292,7 @@ class Tourney:
       return "The tournament has not started."
     
     champion = False
-    if number_of_games == 1 and self.is_complete():
+    if number_of_games == 1 and self.is_round_complete():
       champion = True 
 
     i = 1
@@ -286,29 +317,46 @@ class Tourney:
     
     return champ + string
 
-  def is_complete(self):
+  def is_round_complete(self):
     '''
     Check if all the matches in the current round are complete.
     '''
     response = True
-    games = self.__bracket.get_matches()
-    if len(games) == 0:
-      response = False
-    else:
-      for match in games:
-        if match.is_complete() == False:
-          response = False
+    games = self.__bracket.get_round_matches()
+    for match in games:
+      if match.is_complete() == False:
+        response = False
 
     return response
 
-  def is_in_progress(self):
-    return len(self.__bracket.get_matches()) > 0 and not self.is_complete()
+  def add_participant(self, user_id):
+    response = ""
+    if user_id in self.__channel_users:
+      player = self.__channel_users[user_id]
+      response = self.participants.add_user(player.get_handle(), self.get_channel_users())
+    else:
+      response = "Player not found."
+
+    return response
+
+  def list_players(self):
+    number_of_players = self.participants.get_count()
+    response = "\n*Registered Players ({})*:\n".format(number_of_players)
+    if number_of_players == 0:
+      response += "None"
+    
+    for handle in self.participants.get_handles():
+      user_id = self.__user_ids[handle]
+      player = self.__channel_users[user_id]
+      response += player.get_handle_and_name() + "\n"
+
+    return response
 
   def get_user(self, user_id):
     response = None
     user_upper = user_id.upper()
-    if user_upper in self.__players:
-      response = self.__players[user_upper]
+    if user_upper in self.__channel_users:
+      response = self.__channel_users[user_upper]
 
     return response
 
@@ -319,9 +367,16 @@ class Tourney:
       
     return response
 
+  def get_channel_users(self):
+    users = []
+    for user_id in self.__channel_users:
+      users.append(self.__channel_users[user_id])
+
+    return users
+
   # To-Do: May not need this after creating messanger app, can get matches from db
-  def get_round_games(self):
-    return self.__bracket.get_matches()
+  def get_round_matches(self):
+    return self.__bracket.get_round_matches()
 
 
 def main():

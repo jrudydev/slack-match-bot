@@ -42,7 +42,7 @@ class Mediators():
     response = ""
     user_found = False
     for user in users:
-      name = user.get("name")
+      name = user.get_handle()
       if name == admin and not admin in self.__admins:
         user_found = True
     

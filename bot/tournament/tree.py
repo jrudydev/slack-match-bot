@@ -110,7 +110,7 @@ class TourneyTree(object):
 
     return response
 
-  def get_matches(self):
+  def get_round_matches(self):
     return self.__matches
 
   def destroy(self):
@@ -208,8 +208,8 @@ class TourneyTree(object):
     Draw the winners from the previous round to populate the current one.
     '''
     for node in self.__load_round_nodes():
-      node.match.add_side(node.left.node.match.get_winner())
-      node.match.add_side(node.right.node.match.get_winner())
+      node.match.add_slot(node.left.node.match.get_winner())
+      node.match.add_slot(node.right.node.match.get_winner())
   
 
 if __name__ == '__main__':
@@ -238,7 +238,7 @@ if __name__ == '__main__':
     slot_4]
   tree.generate(slots, False)
 
-  matches = tree.get_matches()
+  matches = tree.get_round_matches()
   for match in matches:
     print match.get_score()
 

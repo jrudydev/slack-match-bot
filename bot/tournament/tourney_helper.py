@@ -53,13 +53,13 @@ class TourneyHelper():
 
     return tourney
 
-  def start_singles(self, presets):
+  def start_singles(self):
     tourney = self.get_current_tourney()
-    return tourney.singles(presets)
+    return tourney.singles()
 
-  def start_doubles(self, presets):
+  def start_doubles(self):
     tourney = self.get_current_tourney()
-    return tourney.doubles(self.get_current_user(), presets)
+    return tourney.doubles(self.get_current_user())
 
   def next_round(self):
     tourney = self.get_current_tourney()
@@ -69,7 +69,7 @@ class TourneyHelper():
     tourney = self.get_current_tourney()
     return tourney.reset(member_handle)
 
-  def add_player(self, member_info):
+  def add_user(self, member_info):
     '''
     Add the user to the tournament
     '''
@@ -83,11 +83,15 @@ class TourneyHelper():
       last_name = profile.get("last_name")
 
     tourney = self.get_current_tourney()
-    return tourney.add(Player(member_info["id"], member_info["name"], first_name, last_name))
+    return tourney.add_channel_user(Player(member_info["id"], member_info["name"], first_name, last_name))
 
-  def clear_players(self):
+  def remove(self, player_id):
     tourney = self.get_current_tourney()
-    return tourney.clear()
+    return tourney.remove_player(player_id)
+
+  def clear_current(self):
+    tourney = self.get_current_tourney()
+    return tourney.clear_users()
 
   def clear_games(self, tourney):
     return tourney.destroy()
@@ -114,9 +118,14 @@ class TourneyHelper():
 
     return tourney.loss(user_id)
 
+  def report_join(self, user_id):
+    tourney = self.get_current_tourney()
+    return tourney.add_participant(user_id)
+
   def is_tourney_in_progress(self):
     tourney = self.get_current_tourney()
-    return tourney.is_in_progress()
+    number_of_matches = len(tourney.get_round_matches())
+    return not tourney.is_round_complete() or number_of_matches > 1
 
   def get_tourney(self):
     tourney = self.get_current_tourney()

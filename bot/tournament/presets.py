@@ -24,10 +24,8 @@ class Presets():
     if len(self.__presets) == 0:
       response += "None"
     
-    i = 0
     for preset in self.__presets:
       response += preset + "\n"
-      i += 1
 
     return response
 
@@ -38,7 +36,7 @@ class Presets():
     response = ""
     user_found = False
     for user in users:
-      name = user.get("name")
+      name = user.get_handle()
       if name == preset and not preset in self.__presets:
         user_found = True
     
@@ -46,7 +44,7 @@ class Presets():
       self.__presets.append(preset)
       response = preset + " is now preset."
     else:
-      response = "Could not preset " + preset + "."
+      response = "Could not add " + preset + " as a preset."
 
     return response
 

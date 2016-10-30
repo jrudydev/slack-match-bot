@@ -146,7 +146,7 @@ class Match():
     response = None
     if top == None or bottom == None:
       response = MATCH_STATUS_NOT_FULL
-    if self.__is_pending:
+    elif self.__is_pending:
       response = MATCH_STATUS_PENDING
     elif top_points == 0 and bottom_points == 0:
       response = MATCH_STATUS_NOT_STARTED

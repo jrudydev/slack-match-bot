@@ -90,7 +90,7 @@ It is easy and fast to get a tournament started with MatchBot.
 
 ---
 ### win
-**Options:** (Admin Options) - [HANDLE] = Ex: slackuser
+**Admin Options:** [HANDLE] = Ex: slackuser
 
 **Example:**
 ```
@@ -101,7 +101,7 @@ It is easy and fast to get a tournament started with MatchBot.
 
 ---
 ### loss
-**Options:** (Admin Options) - [HANDLE] = Ex: slackuser
+**Admin Options:** [HANDLE] = Ex: slackuser
 
 **Example:**
 ```
@@ -112,7 +112,7 @@ It is easy and fast to get a tournament started with MatchBot.
 
 ---
 ### join
-**Options:** (Admin Options) - [HANDLE] = Ex: slackuser
+**Admin Options:** [HANDLE] = Ex: slackuser
 
 **Example:**
 ```
@@ -123,7 +123,7 @@ It is easy and fast to get a tournament started with MatchBot.
 
 ---
 ### boot
-**Options:** (Admin Options) - [HANDLE] = Ex: slackuser
+**Admin Options:** [HANDLE] = Ex: slackuser
 
 **Example:**
 ```

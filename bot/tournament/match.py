@@ -30,8 +30,25 @@ class Match():
   def __init__(self):
     self.__slots_tuple = (None, None)
     self.__wins_tuple = (0, 0)
-    # self.__match_number = match_number
     self.__is_pending = False
+    self.__match_number = None
+
+  def set_match_ids(self, match_id):
+    '''
+    Sets the match ids for the players in the game to later grab them from a list.
+    '''
+    top = self.__slots_tuple[TOP_INDEX]
+    bottom = self.__slots_tuple[BOTTOM_INDEX]
+    if top != None:
+      top.set_match_id(match_id)
+    if bottom != None:
+      bottom.set_match_id(match_id)
+
+  def set_match_number(self, match_number):
+    self.__match_number = match_number
+
+  def get_match_number(self):
+    return self.__match_number
 
   def add_slot(self, slot):
     '''
@@ -128,17 +145,6 @@ class Match():
     self.__wins_tuple = (0, 0)
 
     return "Match has been reset."
-
-  def set_match_ids(self, match_id):
-    '''
-    Sets the match ids for the players in the game to later grab them from a list.
-    '''
-    top = self.__slots_tuple[TOP_INDEX]
-    bottom = self.__slots_tuple[BOTTOM_INDEX]
-    if top != None:
-      top.set_match_id(match_id)
-    if bottom != None:
-      bottom.set_match_id(match_id)
 
   def match_status(self):
     top, bottom, top_points, bottom_points = self.__get_tuples()

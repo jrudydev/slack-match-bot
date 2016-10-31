@@ -315,7 +315,6 @@ class Tourney:
     if number_of_games == 1 and self.is_round_complete():
       champion = True 
 
-    i = 1
     champ = ""
     for match in games:
       if champion:
@@ -327,13 +326,17 @@ class Tourney:
           champ = "\n" + name + " is the tournament champion!\n"
         else:
           champ = "\n" + name + " are the tournament champions!\n"
-        champ += "Grand Prize: :tada: :trophy: :cookie:\n"
+        champ += "Grand Prize: :tada: :champagne: :cookie:\n"
+
+      match_number = match.get_match_number()
       if number_of_games == 1:
-        string = "%s\n*Championship Match*: \n" % (string)
+        if champion:
+          string = "%s\n*Match: %d* _Championship_ :trophy:\n" % (string, match_number)
+        else:
+          string = "%s\n*Match: %d* _Championship_ :trophy:\n" % (string, match_number)
       else:
-        string = "%s\n*Match: %d*\n" % (string, i)
+        string = "%s\n*Match: %d*\n" % (string, match_number)
       string = "%s%s\n" % (string, match.get_score())
-      i += 1
     
     return champ + string
 

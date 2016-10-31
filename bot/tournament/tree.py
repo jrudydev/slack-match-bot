@@ -10,7 +10,7 @@
 from match import Match
 from player import Player
 from team import PlayerTeam
-import random
+import math, random
 
 class TourneyNode(object):
   '''
@@ -201,8 +201,18 @@ class TourneyTree(object):
     Assign the match ids to the slots before every round.
     '''
     self.__matches = self.__load_round_matches()
+    
+    # Cacluate match number, this might change when add double elimination
+    starting_of_slots = math.pow(2, (self.__height - 1))
+    offset = 0
+    for x in range(1, self.__round):
+      offset += starting_of_slots / x
+
+    current_match_number = 1 + offset
     for x in range(len(self.__matches)):
+      self.__matches[x].set_match_number(current_match_number)
       self.__matches[x].set_match_ids(x)
+      current_match_number += 1
 
   def __promote_winners(self):
     '''

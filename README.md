@@ -90,44 +90,72 @@ It is easy and fast to get a tournament started with MatchBot.
 
 ---
 ### win
-**Admin Options:** [HANDLE] = Ex: slackuser
+**Options:** None
 
 **Example:**
 ```
 @matchbot win
 ```
 
+**Admin Options:** [HANDLE] = Ex: slackuser
+
+**Example:**
+```
+@matchbot win slackuser
+```
+
 **Description:** Report a win for the sender. Once the win is registered, the game is complete and becomes immutable. For corrections contact an admin user. Admin users can pass a handle as and argument and register a win for the user.
 
 ---
 ### loss
-**Admin Options:** [HANDLE] = Ex: slackuser
+**Options:** None
 
 **Example:**
 ```
 @matchbot loss
 ```
 
+**Admin Options:** [HANDLE] = Ex: slackuser
+
+**Example:**
+```
+@matchbot loss slackuser
+```
+
 **Description:** Report a loss for the sender. Once the loss is registered, the game is complete and becomes immutable. For corrections contact an admin user. Admin users can pass a handle to this command and register a loss for the user.
 
 ---
 ### join
-**Admin Options:** [HANDLE] = Ex: slackuser
+**Options:** None
 
 **Example:**
 ```
 @matchbot join
 ```
 
-**Description:** Add the sender as a participant. Admin users can pass a handle as and argument to register the join for the user.
-
----
-### boot
 **Admin Options:** [HANDLE] = Ex: slackuser
 
 **Example:**
 ```
-@matchbot bott
+@matchbot join slackuser
+```
+
+**Description:** Add the sender as a participant. Admin users can pass a handle as and argument to register the join for the user.
+
+---
+### boot
+**Options:** None
+
+**Example:**
+```
+@matchbot boot
+```
+
+**Admin Options:** [HANDLE] = Ex: slackuser
+
+**Admin Example:**
+```
+@matchbot boot slackuser
 ```
 
 **Description:** Remove the sender as a participant. Admin users can pass a handle as and argument to remove the user.

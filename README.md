@@ -1,6 +1,9 @@
 # Slack Match Bot ![alt text](https://github.com/peperodo/slack-match-bot/blob/match-dev/img/mei.jpg "Logo Title Text 1")
 Slack MatchBot makes a list of users in a channel and generates a single elimination tournament bracket.
 
+## New Features
+- New opt-in option via ```join``` command, also opt-out with ```boot```
+
 ## Setup Local Environment
 ```
 ~$ git clone git@github.com:peperodo/slack-match-bot.git
@@ -52,14 +55,14 @@ It is easy and fast to get a tournament started with MatchBot.
 |:-----:|----------------------------|:----------------------------:|:-----:|:-----:|
 |help   |Documentation link          |None                          |       |       |
 |show   |Print current round         |None                          |       |       |
-|win    |Report a win                |None                          |       |       |
-|loss   |Report a loss               |None                          |       |       |
+|win    |Report a win                |(Admin)[HANDLE] Ex: slackuser |X      |X      |
+|loss   |Report a loss               |(Admin)[HANDLE] Ex: slackuser |X      |X      |
+|join   |Opt-in of open tourney      |(Admin)[HANDLE] Ex: slackuser |X      |X      |
+|boot   |Opt-out of open tourney     |(Admin)[HANDLE] Ex: slackuser |X      |X      |
 |start  |Generate tournament         |[TYPE]  Ex: doubles           |X      |       |
 |stop   |Destroy the tournament      |None                          |X      |       |
 |reset  |Reset player match          |[HANDLE]  Ex: slackuser       |X      |       |
 |next   |Advance to next round       |None                          |X      |       |
-|watch  |Handle spectator users      |[OPTION]  Ex: slackuser       |X	    |       |
-|preset |Handle preset placement     |[OPTION]  Ex: clear           |X	    |       |
 |admin  |Handle admin roles          |[OPTION]  Ex: show            | 	    |X      |
 
 
@@ -87,7 +90,7 @@ It is easy and fast to get a tournament started with MatchBot.
 
 ---
 ### win
-**Options:** None
+**Options:** (Admin)[HANDLE] = Ex: slackuser
 
 **Example:**
 ```
@@ -98,7 +101,7 @@ It is easy and fast to get a tournament started with MatchBot.
 
 ---
 ### loss
-**Options:** None
+**Options:** (Admin)[HANDLE] = Ex: slackuser
 
 **Example:**
 ```
@@ -106,6 +109,28 @@ It is easy and fast to get a tournament started with MatchBot.
 ```
 
 **Description:** Report a loss for the sender. Once the loss is registered, the game is complete and becomes immutable. For corrections contact an admin user. Admin users can pass a handle to this command and register a loss for the user.
+
+---
+### join
+**Options:** (Admin)[HANDLE] = Ex: slackuser
+
+**Example:**
+```
+@matchbot join
+```
+
+**Description:** Add the sender as a participant. Admin users can pass a handle as and argument to register the join for the user.
+
+---
+### boot
+**Options:** (Admin)[HANDLE] = Ex: slackuser
+
+**Example:**
+```
+@matchbot bott
+```
+
+**Description:** Remove the sender as a participant. Admin users can pass a handle as and argument to remove the user.
 
 ---
 ### start (Owner & Admin Only)
@@ -131,17 +156,6 @@ It is easy and fast to get a tournament started with MatchBot.
 **Description:** Destroys the tournament in order to start a new one. This command is a safe gaurd from losing all data if the *start* command is used while a tournament is in progress.
 
 ---
-### boot (Owner & Admin Only)
-**Options:** [HANDLE] = (handle for any player in the current round)
-
-**Example:**
-```
-@matchbot boot slackuser
-```
-
-**Description:** Disqualify a player with matching slack handle. The opponent will automatically be awarded the win and the match will be complete.
-
----
 ### reset (Owner & Admin Only)
 **Options:** [HANDLE] = (handle for any player in the current round)
 
@@ -162,32 +176,6 @@ It is easy and fast to get a tournament started with MatchBot.
 ```
 
 **Description:** Use to advance to the next round. All matches for the current round most be complete or bye games. To forfeit a player user the ```boot``` command.
-
----
-### watch (Owner & Admin Only)
-**Options:** [OPTIONS] = slackuser | show | clear
-
-**Examples:**
-```
-@matchbot watch slackuser
-@matchbot watch show
-@matchbot watch clear
-```
-
-**Description:** Use to make a spectator, show a list, and clear it. Spectators can be in a channel while not having to participate in the tournament.
-
----
-### preset (Owner & Admin Only)
-**Options:** [OPTIONS] = slackuser | show | clear
-
-**Examples:**
-```
-@matchbot preset slackuser
-@matchbot preset show
-@matchbot preset clear
-```
-
-**Description:** Use to set a preset, show a list, and clear it. The bracket will not be random when after assigning presets, instead it populates from the presets and will be positioned in order.
 
 ---
 ### admin (Owner Only)

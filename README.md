@@ -68,9 +68,9 @@ It is easy and fast to get a tournament started with MatchBot.
 
 ---
 ### help
-**Options:** None
+**_Options:_** None
 
-_Example:_
+Example:
 ```
 @matchbot help
 ```
@@ -79,9 +79,9 @@ _Example:_
 
 ---
 ### show
-**Options:** None
+**_Options:_** None
 
-_Example:_
+Example:
 ```
 @matchbot show
 ```
@@ -90,16 +90,16 @@ _Example:_
 
 ---
 ### win
-**Options:** None
+**_Options:_** None
 
-_Example:_
+Example:
 ```
 @matchbot win
 ```
 
-**Admin Options:** [HANDLE] = Ex: slackuser
+**_Admin Options:_** [HANDLE] = Ex: slackuser
 
-_Example:_
+Example:
 ```
 @matchbot win slackuser
 ```
@@ -108,16 +108,16 @@ _Example:_
 
 ---
 ### loss
-**Options:** None
+**_Options:_**
 
-_Example:_
+Example:
 ```
 @matchbot loss
 ```
 
-**Admin Options:** [HANDLE] = Ex: slackuser
+**_Admin Options:_** [HANDLE] = Ex: slackuser
 
-_Example:_
+Example:
 ```
 @matchbot loss slackuser
 ```
@@ -126,16 +126,16 @@ _Example:_
 
 ---
 ### join
-**Options:** None
+**_Options:_** None
 
-_Example:_
+Example:
 ```
 @matchbot join
 ```
 
-**Admin Options:** [HANDLE] = Ex: slackuser
+**_Admin Options:_** [HANDLE] = Ex: slackuser
 
-_Example:_
+Example:
 ```
 @matchbot join slackuser
 ```
@@ -144,16 +144,16 @@ _Example:_
 
 ---
 ### boot
-**Options:** None
+**_Options:_** None
 
-_Example:_
+Example:
 ```
 @matchbot boot
 ```
 
-**Admin Options:** [HANDLE] = Ex: slackuser
+**_Admin Options:_** [HANDLE] = Ex: slackuser
 
-_Example:_
+Example:
 ```
 @matchbot boot slackuser
 ```
@@ -162,9 +162,9 @@ _Example:_
 
 ---
 ### start (Owner & Admin Only)
-**Options:** [OPTION] = singles | doubles
+**_Options:_** [OPTION] = singles | doubles
 
-**Examples:**
+Examples:
 ```
 @matchbot start
 @matchbot start doubles
@@ -174,9 +174,9 @@ _Example:_
 
 ---
 ### stop (Owner & Admin Only)
-**Options:** None
+**_Options:_** None
 
-_Example:_
+Example:
 ```
 @matchbot stop
 ```
@@ -185,9 +185,9 @@ _Example:_
 
 ---
 ### reset (Owner & Admin Only)
-**Options:** [HANDLE] = (handle for any player in the current round)
+**_Options:_** [HANDLE] = (handle for any player in the current round)
 
-_Example:_
+Example:
 ```
 @matchbot reset slackuser
 ```
@@ -196,9 +196,9 @@ _Example:_
 
 ---
 ### next (Owner & Admin Only)
-**Options:** None
+**_Options:_** None
 
-_Example:_
+Example:
 ```
 @matchbot next
 ```
@@ -207,9 +207,9 @@ _Example:_
 
 ---
 ### admin (Owner Only)
-**Options:** [OPTIONS] = slackuser | show | clear | (None)
+**_Options:_** [OPTIONS] = slackuser | show | clear | (None)
 
-**Examples:**
+Examples:
 ```
 @matchbot admin
 @matchbot admin slackuser

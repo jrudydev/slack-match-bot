@@ -80,7 +80,7 @@ class Client():
         # possible doubles
         doubles = parts[1]
         
-      is_doubles = doubles == "doubles"
+      is_doubles = doubles == "doubl"
       start_response = self.__start_tourney(is_doubles) 
       request = "Generating tournament bracket...\n"
       response = request + start_response + "\n"

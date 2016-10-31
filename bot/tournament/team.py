@@ -18,15 +18,18 @@ class PendingTeam():
   '''
   This is a place holder object for pending matches.
   '''
-  def __init__(self):
-    # self.__match_id
-    self.__pending_match_number = None
+  def __init__(self, match_number):
+    self.__match_number = match_number
+    self.__pending_match = None
 
-  def set_pending_match_number(self, match_number):
-    self.__pending_match_number = match_number
+  def get_match_number(self):
+    return self.__match_number
 
-  def get_pending_match_number(self):
-    return self.__pending_match_number
+  def set_pending_match(self, pending_match):
+    self.__pending_match = pending_match
+
+  def get_pending_match(self):
+    return self.__pending_match
 
 
 class PlayerTeam():
@@ -36,18 +39,18 @@ class PlayerTeam():
 
   def __init__(self):
     self.__players = []
-    self.__match_id = None
+    self.__match_number = None
 
   def add_player(self, player):
     self.__players.append(player)
 
   def set_match_id(self, match_id):
-    self.__match_id = match_id
     for player in self.__players:
       player.set_match_id(match_id)
 
   def get_match_id(self):
-    return self.__match_id
+    first_player = self.__players[0]
+    return first_player.get_match_id()
 
   def get_users(self):
     users = []
@@ -55,22 +58,7 @@ class PlayerTeam():
       users.append(player.get_user())
     return users
 
-  def get_handles(self):
-    handles = []
-    for player in self.__players:
-      handles.append(player.get_handle())
-    return handles
-
-  def get_name(self):
-    '''
-    Returns the handles separated by ampersand(&)
-    '''
-    handles = []
-    for player in self.__players:
-      handles.append(player.get_handle())
-    return " & ".join(handles)
-
-  def get_handle_and_name(self):
+  def get_player_names(self):
     '''
     Returns the handles and names separated by ampersand(&)
     '''

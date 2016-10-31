@@ -61,7 +61,7 @@ class Match():
       return "Cannot reset a bye/pending match."
 
     if self.is_complete():
-      return "Match already won by " + self.get_winner().get_handle_and_name() + "."
+      return "Match already won by " + self.get_winner().get_player_names() + "."
 
     top_slot, bottom_slot, top_points, bottom_points = self.__get_tuples()
     is_top_winner, is_bottom_winner = self.__get_user_slot(top_slot, bottom_slot, user)
@@ -69,10 +69,10 @@ class Match():
     response = ""
     if is_top_winner:
       self.__wins_tuple = (top_points + 1, bottom_points)
-      response = top_slot.get_handle_and_name()
+      response = top_slot.get_player_names()
     if is_bottom_winner:
       self.__wins_tuple = (top_points, bottom_points + 1)
-      response = bottom_slot.get_handle_and_name()
+      response = bottom_slot.get_player_names()
     
     is_singles = top_slot.is_single_player()
     if response == "":
@@ -94,7 +94,7 @@ class Match():
       return "Cannot reset a bye/pending match."
 
     if self.is_complete():
-      return "Match already been lost by " + self.get_winner().get_handle_and_name() + "."
+      return "Match already been lost by " + self.get_winner().get_player_names() + "."
 
     top_slot, bottom_slot, top_points, bottom_points = self.__get_tuples()
     is_top_loser, is_bottom_loser = self.__get_user_slot(top_slot, bottom_slot, user)
@@ -102,10 +102,10 @@ class Match():
     response = ""
     if is_top_loser:
       self.__wins_tuple = (top_points, bottom_points + 1)
-      response = top_slot.get_handle_and_name()
+      response = top_slot.get_player_names()
     if is_bottom_loser:
       self.__wins_tuple = (top_points + 1, bottom_points)
-      response = bottom_slot.get_handle_and_name()
+      response = bottom_slot.get_player_names()
     
     is_singles = bottom_slot.is_singles()
     if response == "":
@@ -218,10 +218,10 @@ class Match():
     if slot == None:
       output = "This is a bye game."
     elif self.__slots_tuple[BOTTOM_INDEX] == None:
-      output = "_BYE_:  " + slot.get_handle_and_name()
+      output = "_BYE_:  " + slot.get_player_names()
     else:
       points = self.__wins_tuple[TOP_INDEX]
-      output = self.__get_status_label(points) + ":  " + slot.get_handle_and_name()
+      output = self.__get_status_label(points) + ":  " + slot.get_player_names()
 
     return output
 
@@ -238,7 +238,7 @@ class Match():
         output = "_BYE_:  - Bye -"
     else:
       points = self.__wins_tuple[BOTTOM_INDEX]
-      output = self.__get_status_label(points) + ":  " + slot.get_handle_and_name()
+      output = self.__get_status_label(points) + ":  " + slot.get_player_names()
 
     return output
 

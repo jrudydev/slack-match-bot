@@ -320,7 +320,7 @@ class Tourney:
     for match in games:
       if champion:
         winner = match.get_winner()
-        name = winner.get_name()
+        name = winner.get_player_names()
         if name == "":
           name = winner.get_handle()
         if winner.is_single_player():

@@ -55,10 +55,10 @@ It is easy and fast to get a tournament started with MatchBot.
 |:-----:|----------------------------|:----------------------------:|:-----:|:-----:|
 |help   |Documentation link          |None                          |       |       |
 |show   |Print current round         |None                          |       |       |
-|win    |Report a win                |(Admin)[HANDLE] Ex: slackuser |       |       |
-|loss   |Report a loss               |(Admin)[HANDLE] Ex: slackuser |       |       |
-|join   |Opt-in of open tourney      |(Admin)[HANDLE] Ex: slackuser |       |       |
-|boot   |Opt-out of open tourney     |(Admin)[HANDLE] Ex: slackuser |       |       |
+|win    |Report a win                |(Admin Options)               |       |       |
+|loss   |Report a loss               |(Admin Options)               |       |       |
+|join   |Opt-in of open tourney      |(Admin Options)       |       |       |
+|boot   |Opt-out of open tourney     |(Admin Options)               |       |       |
 |start  |Generate tournament         |[TYPE]  Ex: doubles           |X      |       |
 |stop   |Destroy the tournament      |None                          |X      |       |
 |reset  |Reset player match          |[HANDLE]  Ex: slackuser       |X      |       |
@@ -90,7 +90,7 @@ It is easy and fast to get a tournament started with MatchBot.
 
 ---
 ### win
-**Options:** (Admin)[HANDLE] = Ex: slackuser
+**Options:** (Admin Options) - [HANDLE] = Ex: slackuser
 
 **Example:**
 ```
@@ -101,7 +101,7 @@ It is easy and fast to get a tournament started with MatchBot.
 
 ---
 ### loss
-**Options:** (Admin)[HANDLE] = Ex: slackuser
+**Options:** (Admin Options) - [HANDLE] = Ex: slackuser
 
 **Example:**
 ```
@@ -112,7 +112,7 @@ It is easy and fast to get a tournament started with MatchBot.
 
 ---
 ### join
-**Options:** (Admin)[HANDLE] = Ex: slackuser
+**Options:** (Admin Options) - [HANDLE] = Ex: slackuser
 
 **Example:**
 ```
@@ -123,7 +123,7 @@ It is easy and fast to get a tournament started with MatchBot.
 
 ---
 ### boot
-**Options:** (Admin)[HANDLE] = Ex: slackuser
+**Options:** (Admin Options) - [HANDLE] = Ex: slackuser
 
 **Example:**
 ```

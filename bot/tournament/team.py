@@ -18,14 +18,7 @@ class PendingTeam():
   '''
   This is a place holder object for pending matches.
   '''
-  def __init__(self, match_number):
-    self.__match_number = match_number
-    self.__pending_match = None
-
-  def get_match_number(self):
-    return self.__match_number
-
-  def set_pending_match(self, pending_match):
+  def __init__(self, pending_match):
     self.__pending_match = pending_match
 
   def get_pending_match(self):
@@ -39,7 +32,6 @@ class PlayerTeam():
 
   def __init__(self):
     self.__players = []
-    self.__match_number = None
 
   def add_player(self, player):
     self.__players.append(player)

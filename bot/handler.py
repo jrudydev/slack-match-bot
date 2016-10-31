@@ -19,7 +19,6 @@ STOP_TOURNEY = "stop"
 NEXT_ROUND = "next"
 RESET_MATCH = "reset"
 HANDLE_ADMIN = "admin"
-MAKE_WATCH = "watch"
 HANDLE_PRESET = "preset"
 
 # user commands
@@ -327,7 +326,6 @@ class Client():
       command.startswith(STOP_TOURNEY) or \
       command.startswith(NEXT_ROUND) or \
       command.startswith(RESET_MATCH) or \
-      command.startswith(MAKE_WATCH) or \
       command.startswith(HANDLE_PRESET) or \
       (command.startswith(REPORT_LOSS) and command_has_parts) or \
       (command.startswith(REPORT_WIN) and command_has_parts) or \

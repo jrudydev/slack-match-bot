@@ -331,9 +331,9 @@ class Tourney:
       match_number = match.get_match_number()
       if number_of_games == 1:
         if champion:
-          string = "%s\n*Match: %d* _Championship_ :trophy:\n" % (string, match_number)
+          string = "%s\n*Match: %d* _Finals_ :trophy:\n" % (string, match_number)
         else:
-          string = "%s\n*Match: %d* _Championship_ :trophy:\n" % (string, match_number)
+          string = "%s\n*Match: %d* _Finals_ :trophy:\n" % (string, match_number)
       else:
         string = "%s\n*Match: %d*\n" % (string, match_number)
       string = "%s%s\n" % (string, match.get_score())

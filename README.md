@@ -1,8 +1,12 @@
 # Slack Match Bot ![alt text](https://github.com/peperodo/slack-match-bot/blob/match-dev/img/mei.jpg "Logo Title Text 1")
 Slack MatchBot makes a list of users in a channel and generates a single elimination tournament bracket.
 
-## New Features
-- New opt-in option via ```join``` command, also opt-out with ```boot```
+## Features
+```start``` and populate with channel members.
+- Users can opt-in via the ```join``` command, also opt-out with ```boot``` if necessary.
+- Begin the tournament by sending ```start``` and end it with```stop```.
+- Self-reported match results with the ```win``` & ```loss``` commands.
+- Admins have full control over the state of the tournament for corrections.
 
 ## Setup Local Environment
 ```
@@ -36,7 +40,7 @@ It is easy and fast to get a tournament started with MatchBot.
 
 ## Setup
 1. Create a Slack team (skip this step if you already have a team in mind).
-2. Login and add a custom integration to configure a bot named matchbot.
+2. Log in and add a custom integration to configure a bot named matchbot.
 3. Invite matchbot to the team.
 4. Create a channel for the tournament.
 5. Invite matchbot and more friends to the channel.
@@ -108,7 +112,7 @@ Example:
 
 ---
 ### loss
-**_Options:_**
+**_Options:_** None
 
 Example:
 ```

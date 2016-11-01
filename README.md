@@ -61,7 +61,7 @@ It is easy and fast to get a tournament started with MatchBot.
 |show   |Print current round         |None                          |       |       |
 |win    |Report a win                |(Admin Options)               |       |       |
 |loss   |Report a loss               |(Admin Options)               |       |       |
-|join   |Opt-in of open tourney      |(Admin Options)       |       |       |
+|join   |Opt-in of open tourney      |(Admin Options)               |       |       |
 |boot   |Opt-out of open tourney     |(Admin Options)               |       |       |
 |start  |Generate tournament         |[TYPE]  Ex: doubles           |X      |       |
 |stop   |Destroy the tournament      |None                          |X      |       |
